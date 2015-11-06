@@ -1,0 +1,149 @@
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+
+# /******************************** Sentiment analysis *****************************************/
+
+system.time(  
+  read.csv("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/amazon_review_score_final.csv", header = TRUE, sep = ",", 
+           quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+)
+kol.sentiment_score <- read.table("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/amazon_review_score_final.csv",header = TRUE, sep = ",",
+                               quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+str(kol.sentiment_score)
+kol.sentiment_score$Review_Creation_Date <- as.Date(kol.sentiment_score$Review_Creation_Date)
+
+
+# /* Calculating positive and negative sentiments */
+  
+kol.sentscore_aggr <- sqldf('select
+                        week_nmb,Unique_Pdt_Identifier_Mainpdt,avg(score) as Avg_sentiment_score,
+                        sum(score) as Total_sentiment_score,avg(case when score>0 then score else 0 end) as Amz_Avg_Positive_sent_score,
+                        sum(case when score>0 then score else 0 end) as Amz_Total_Positive_sent_score,
+                        avg(case when score<0 then score else 0 end) as Amz_Avg_negative_sent_score,
+                        sum(case when score<0 then score else 0 end) as Amz_Total_negative_sent_score
+                        from "kol.sentiment_score"
+                        group by week_nmb,Unique_Pdt_Identifier_Mainpdt')
+
+# /**************** Preparing usefulness of reviews data **********************/
+  
+kol.helpful_aggr <- sqldf('select
+                          week_nmb,Unique_Pdt_Identifier_Mainpdt,
+                          avg(Review_Helpful_Votes) as Amz_Avg_helpful_votes,
+                          (sum(Review_Helpful_Votes)/sum(Review_Total_Votes)) as Amz_cal_avg_score
+                          from "kol.Amazon_Review"
+                          group by week_nmb,Unique_Pdt_Identifier_Mainpdt')
+
+kol.helpful_aggr <- data.frame(with(kol.helpful_aggr,kol.helpful_aggr[order(week_nmb,Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+kol.sentscore_aggr <- data.frame(with(kol.sentscore_aggr,kol.sentscore_aggr[order(week_nmb,Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+
+kol.helpful_sentscore_aggr <- merge(kol.helpful_aggr,kol.sentscore_aggr,all.x=TRUE,
+                                    by=c("week_nmb","Unique_Pdt_Identifier_Mainpdt"))
+
+
+
+attach(kol.helpful_sentscore_aggr)
+kol.helpful_sentscore_aggr$Avg_wt_score= Amz_cal_avg_score * Avg_sentiment_score;
+kol.helpful_sentscore_aggr$Tot_wt_score = Amz_cal_avg_score * Total_sentiment_score;
+
+kol.helpful_sentscore_aggr$pos_avg_wt_score = Amz_cal_avg_score * Amz_Avg_Positive_sent_score;
+kol.helpful_sentscore_aggr$Pos_tot_wt_score = Amz_cal_avg_score * Amz_Total_Positive_sent_score;
+
+kol.helpful_sentscore_aggr$Neg_avg_wt_score = Amz_cal_avg_score * Amz_Avg_negative_sent_score;
+kol.helpful_sentscore_aggr$Neg_tot_wt_score = Amz_cal_avg_score * Amz_Total_negative_sent_score;
+detach(kol.helpful_sentscore_aggr)
+
+
+kol.helpful_sentscore_aggr[is.na(kol.helpful_sentscore_aggr)] <- 0
+
+kol.helpful_sentscore_aggr$Amz_Avg_helpful_votes <- round(kol.helpful_sentscore_aggr$Amz_Avg_helpful_votes,0)
+kol.helpful_sentscore_aggr$Avg_sentiment_score <- round(kol.helpful_sentscore_aggr$Avg_sentiment_score,0)
+kol.helpful_sentscore_aggr$Amz_Avg_Positive_sent_score <- round(kol.helpful_sentscore_aggr$Amz_Avg_Positive_sent_score,0)
+kol.helpful_sentscore_aggr$Amz_Avg_negative_sent_score <- round(kol.helpful_sentscore_aggr$Amz_Avg_negative_sent_score,0)
+kol.helpful_sentscore_aggr$Avg_wt_score <- round(kol.helpful_sentscore_aggr$Avg_wt_score,0)
+kol.helpful_sentscore_aggr$pos_avg_wt_score <- round(kol.helpful_sentscore_aggr$pos_avg_wt_score,0)
+kol.helpful_sentscore_aggr$Neg_avg_wt_score <- round(kol.helpful_sentscore_aggr$Neg_avg_wt_score,0)
+
+
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+
+# /******************************** Importing image file ******************************************/
+
+system.time(  
+  read.csv("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/Amazon_Images_Luggage.csv", header = TRUE, sep = ",", 
+           quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+)
+kol.Amazon_Image <- read.table("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/Amazon_Images_Luggage.csv",header = TRUE, sep = ",",
+                                quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+str(kol.Amazon_Image)
+kol.Amazon_Image$Extraction_Date <- as.Date(kol.Amazon_Image$Extraction_Date)
+kol.Amazon_Image <- rename(kol.Amazon_Image,c("High_resolution_images"="URL_of_the_Image"))
+
+kol.Amazon_image_aggr <- sqldf('select
+                            Unique_Pdt_Identifier_Mainpdt,
+                            count(URL_of_the_Image) as Amz_No_of_images,
+                            sum(case when UGC="No" then 1 else 0 end) as Amz_Not_User_Gen_images
+                            from
+                            "kol.Amazon_Image"
+                            group by
+                            Unique_Pdt_Identifier_Mainpdt')
+
+attach(kol.Amazon_image_aggr)
+kol.Amazon_image_aggr$Amz_User_Generated_images <- Amz_No_of_images-Amz_Not_User_Gen_images
+detach(kol.Amazon_image_aggr)
+
+
+kol.helpful_sentscore_aggr <- data.frame(with(kol.helpful_sentscore_aggr,kol.helpful_sentscore_aggr[order(Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+kol.Amazon_image_aggr <- data.frame(with(kol.Amazon_image_aggr,kol.Amazon_image_aggr[order(Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+
+kol.Amazon_content <- merge(kol.helpful_sentscore_aggr,kol.Amazon_image_aggr,all.x=TRUE,
+                            by=c("Unique_Pdt_Identifier_Mainpdt"))
+
+
+#/**************************** Merging price-sales and content data for Amazon **************************/
+
+kol.Amazon_content <- rename(kol.Amazon_content,
+                             c("Unique_Pdt_Identifier_Mainpdt"="amazon_product_ID"))
+
+kol.Amazon_content <- data.frame(with(kol.Amazon_content,kol.Amazon_content[order(week_nmb,amazon_product_ID),]),row.names=NULL)
+
+
+kol.price_amz_content_temp <- merge(kol.Amazon_content,kol.price_sales_temp,all.y=TRUE,
+                                by=c("week_nmb","amazon_product_ID"))
+
+kol.price_amz_content <- kol.price_amz_content_temp
+
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+
+#/******************************** Importing Kohls image file ******************************************/
+  
+system.time(  
+  read.csv("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/Kohls_Images_Luggage.csv", header = TRUE, sep = ",", 
+           quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+)
+kol.Kohls_Image <- read.table("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/Kohls_Images_Luggage.csv",header = TRUE, sep = ",",
+                               quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+
+
+kol.Kohls_image_aggr <- sqldf('select Unique_Product_Identifier_Mainpdt,
+                              count(URL_of_the_Image) as kohls_Number_of_images
+                              from
+                              "kol.Kohls_Image"
+                              group by Unique_Product_Identifier_Mainpdt')
+
+kol.Kohls_image_aggr <- data.frame(with(kol.Kohls_image_aggr,kol.Kohls_image_aggr[order(Unique_Product_Identifier_Mainpdt),]),row.names=NULL)
+kol.Kohls_image_aggr <- rename(kol.Kohls_image_aggr,
+                               c("Unique_Product_Identifier_Mainpdt"="kohl_product_id"))
+
+kol.price_amz_content <- data.frame(with(kol.price_amz_content,kol.price_amz_content[order(kohl_product_id),]),row.names=NULL)
+
+
+
+kol.PE_data <- merge(kol.price_amz_content,kol.Kohls_image_aggr,all.x=TRUE,
+                     by="kohl_product_id")
+
+kol.PE_data <- data.frame(with(kol.PE_data,kol.PE_data[order(week_nmb,kohl_product_id),]),row.names=NULL)
+kol.PE_model_data <- kol.PE_data
+
+

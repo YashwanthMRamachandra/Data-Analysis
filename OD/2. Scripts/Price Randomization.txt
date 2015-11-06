@@ -1,0 +1,64 @@
+
+Proc Mixed Data = od.paper_towel_test;  
+class SKU weeknO;
+
+MODEL  ln_sales_units =
+
+/*ln_od_final_pr*/
+/*ln_od_regular_pr*/
+/*od_disc_perc*/
+
+
+/*ln_amz_final_pr*/
+/*ln_amz_mkt_final_pr*/
+/*ln_walmart_final_pr*/
+/*ln_stpl_final_pr*/
+
+
+/*min_comp_final_price*/
+/*ln_min_comp_final_price*/
+
+/*ln_amz_regular_pr*/
+/*ln_amz_mkt_regular_pr*/
+/*ln_walmart_regular_pr*/
+/*ln_stpl_regular_pr*/
+
+/*amz_disc_perc*/
+/*amz_mkt_disc_perc*/
+/*walmart_disc_perc*/
+/*staples_disc_perc*/
+
+/*od_ship*/
+/*amz_ship*/
+/*amz_mkt_ship*/
+/*walmart_ship*/
+/*staples_ship*/
+
+/*od_avail*/
+/*amz_avail*/
+/*amz_mkt_avail*/
+/*Walmart_avail*/
+/*staples_avail*/
+
+/*pr_diff_amz_final_pr*/
+/*pr_diff_amz_mkt_final_pr*/
+/*pr_diff_stpl_final_pr*/
+/*pr_diff_walmart_final_pr*/
+
+/*pr_rat_amz_final_pr*/
+/*pr_rat_amz_mkt_final_pr*/
+pr_rat_stpl_final_pr
+/*pr_rat_walmart_final_pr*/
+
+/*sales_lag*/
+
+/ Solution OutPM=PAFit OutP=SSFit; 
+
+Random ln_od_final_pr Intercept / Solution Subject= SKU Type=UN G GCorr V VCorr; 
+Run;
+
+
+1. how many sku are coming sig
+2. how many holding correct sign
+3. what is diff b/w cat-coef & sku-coef
+4. 

@@ -1,0 +1,491 @@
+
+kol.price_Kohls[with(kol.price_Kohls,unique(kol.price_Kohls[,4])),]
+
+kol.price_Kohls[[unique(kol.price_Kohls[,4]),]]
+
+
+dim(
+  subset(kol.price_Kohls,ord_week_nmb==nodupkey[,1] | Product_ID==nodupkey[,2],
+           select=names(kol.price_Kohls))
+  )
+
+
+
+require(data.table)
+kol.price_Kohls_One <- data.table(kol.price_Kohls,key="TCIN")
+
+kol.price_Kohls_One[, .SD[TCIN],
+                    by=c("Extraction_Date","ord_week_nmb","Site_Name","TCIN","Product_ID","Product_Name","Regular_price","Regular_Price_Range","Shipping","disc_perc","markdown_price","final_price","Product_Description","availability","additional_information","price_promo")]
+
+
+names(kol.price_Kohls_One)
+dt <- data.table(df, key=c("Date", "Server"))
+# .SD holds the data.frame of the current group that is processed
+dt[, .SD[which.max(CPU)], by=c("Date", "Server")]
+
+
+
+
+
+
+Target_nodupkey <- subset(kol.price_Target,Target_nodupkey==Target_nodupkey[,1],
+                         select=names(kol.price_Target))
+
+
+
+
+kol.Amazon_Review_temp$from_date <- (19330+7*(kol.Amazon_Review_temp$week_nmb-1))[1:10]
+
+kol.Amazon_Review_temp$to_date <- kol.Amazon_Review_temp$from_date+6
+kol.Amazon_Review_temp$month_back <- kol.Amazon_Review_temp$from_date-30
+kol.Amazon_Review_temp$two_month_back <- kol.Amazon_Review_temp$from_date-60
+kol.Amazon_Review_temp$three_month_back <- kol.Amazon_Review_temp$from_date-90
+kol.Amazon_Review_temp$sixth_month_back <- kol.Amazon_Review_temp$from_date-180
+
+
+Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/R cross check data files
+
+A.Extraction_Date,A.ord_week_nmb,A.Site_Name,A.TCIN,A.Product_ID,A.Product_Name,A.Regular_price,A.Regular_Price_Range,A.Shipping,A.disc_perc,A.markdown_price,A.final_price,A.Product_Description,A.availability,A.additional_information,A.price_promo
+
+
+
+### SQL roughwork
+
+kol.price_Kohls_nodupkey <- data.frame(with(kol.price_Kohls_nodupkey,kol.price_Kohls_nodupkey[order(ord_week_nmb,Product_ID),]),row.names=NULL)
+
+
+kol.price_Kohls_nodupkey <- 
+  
+  sqldf('select B.* from "kol.price_Kohls" A, "kol.price_Kohls_nodupkey" B
+        where A.TCIN=B.TCIN ')
+
+dim(
+  sqldf('select distinct(BT.Product_ID),BT.Extraction_Date,BT.ord_week_nmb,BT.Site_Name,BT.TCIN
+        from "kol.price_Kohls" BT INNER JOIN "kol.price_Kohls_nodupkey" ST
+        ON ST.ord_week_nmb=BT.ord_week_nmb')[1:19,]
+)  
+
+BT.Product_Name,BT.Regular_price,BT.Regular_Price_Range,
+BT.Shipping,BT.disc_perc,BT.markdown_price,BT.final_price,BT.Product_Description,
+BT.availability,BT.additional_information,BT.price_promo
+
+BT.Extraction_Date,BT.ord_week_nmb,BT.Site_Name,
+BT.TCIN,BT.Product_Name,BT.Regular_price,BT.Regular_Price_Range,
+BT.Shipping,BT.disc_perc,BT.markdown_price,BT.final_price,BT.Product_Description,
+BT.availability,BT.additional_information,BT.price_promo
+  
+  dim(
+    merge(kol.price_Kohls_nodupkey,kol.price_Kohls_nodupkey,by='ord_week_nmb')
+  )
+  
+  
+  kol.price_Kohls_nodupkey <- 
+    
+    subset(kol.price_Kohls,kol.price_Kohls_nodupkey==as.integer(kol.price_Kohls_nodupkey[,1:2]),
+           select=names(kol.price_Kohls))
+  
+  
+  write.csv(kol.price_Kohls_nodupkey,"Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/R cross check data files/kol.price_Kohls_nodupkey_2.csv")
+
+
+
+
+
+
+sqldf('declare Mytable table (
+    Extraction_Date date,
+    ord_week_nmb tinyint,
+    Site_Name nvarchar(100),
+    TCIN tinyint,
+    Product_ID tinyint,
+    Product_Name nvarchar(100),
+    Regular_price smallmoney,
+    Regular_price_range smallmoney,
+    Shipping nvarchar(100),
+    disc_perc decimal(10,10),
+    markdown_price decimal(10,2),
+    final_price decimal(10,2),
+    Product_Description nvarchar(100),
+    availability nvarchar(100),
+    additional_information nvarchar(100),           
+    Unique_Key tinyint,
+    ID int);
+    insert into
+        Mytable
+    from 
+        "kol.price_Kohls_nodupkey"
+     where ID in (Select min(ID) from "kol.price_Kohls_nodupkey" group by Unique_Key)')
+
+
+
+
+#write.csv(kol.price_Kohls_nodupkey,"Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/R cross check data files/kol.price_Kohls_nodupkey_2.csv")
+
+
+kol.price_Kohls$Unique_Key <- paste(kol.price_Kohls$ord_week_nmb,kol.price_Kohls$Product_ID)
+kol.price_Kohls_nodupkey$Unique_Key <- paste(kol.price_Kohls_nodupkey$ord_week_nmb,kol.price_Kohls_nodupkey$Product_ID)
+kol.price_Kohls_nodupkey$ID <- as.integer(0)
+
+kol.price_Kohls$ID <- as.integer(0)
+
+#sqldf('update "kol.price_Kohls" set Unique_Key=ord_week_nmb+Product_ID')
+
+sqldf(c("update 'kol.price_Kohls' set Unique_Key=ord_week_nmb+Product_ID","select * from 'kol.price_Kohls'"))
+sqldf(c("update 'kol.price_Kohls_nodupkey' set Unique_Key=ord_week_nmb+Product_ID","select * from 'kol.price_Kohls_nodupkey'"))
+
+sqldf('select distinct(Unique_Key) from "kol.price_Kohls" ')
+
+MyTable <- kol.price_Kohls
+MyTable <- data.frame(matrix(vector(), 0, 18, dimnames=list(c(), 
+                                       names(kol.price_Kohls))),row.names=NULL, stringsAsFactors=F)
+
+sqldf('insert into MyTable select * from "kol.price_Kohls_nodupkey" 
+      where ID in (Select min(ID) from "kol.price_Kohls_nodupkey" group by Unique_Key)')
+
+
+sqldf('select "Unique_Key" into "MyTable" from "kol.price_Kohls_nodupkey" 
+where ID in (Select min(ID) from "kol.price_Kohls_nodupkey group by Unique_Key)')
+
+
+
+
+sqldf(c("select ord_week_nmb into 'kol.price_Kohls_dedup'","from 'kol.price_Kohls_nodupkey' 
+        where ID in (Select min(ID) from 'kol.price_Kohls_nodupkey' group by Unique_Key)"))
+
+
+
+
+sqldf("insert INTO 'kol.price_Kohls' select * from 'kol.price_Kohls_nodupkey'
+      where ID in (Select min(ID) from 'kol.price_Kohls_nodupkey' group by Unique_Key)")
+
+
+dim(
+kol.price_Kohls_dedup <-data.frame(matrix(vector(), 0, 18, dimnames=list(c(), 
+                                    names(kol.price_Kohls))),row.names=NULL, stringsAsFactors=F)
+)
+
+
+dim(
+sqldf('select distinct(BT.Product_ID),BT.Extraction_Date,BT.ord_week_nmb,BT.Site_Name,BT.Product_ID
+        from "kol.price_Kohls" BT INNER JOIN "kol.price_Kohls_nodupkey" ST
+        ON ST.ord_week_nmb=BT.ord_week_nmb')
+)
+
+,BT.Extraction_Date,BT.ord_week_nmb,BT.Site_Name,BT.TCIN
+
+
+
+
+dflist <- c(kol.price_Kohls,kol.price_Kohls_nodupkey)
+
+dim(
+with(dflist,sqldf("select distinct(A.Product_ID),A.TCIN,A.Site_Name from 'kol.price_Kohls' A
+                  inner join 'kol.price_Kohls_nodupkey' B
+                  on B.Product_ID=A.Product_ID
+                  WHERE A.ord_week_nmb = (SELECT ord_week_nmb FROM 'kol.price_Kohls' WHERE ord_week_nmb=1)
+                  group by A.TCIN")
+     )[1:19,]
+)
+
+
+
+
+
+
+with(dflist,sqldf("SELECT DISTINCT(Unique_key) INTO 'TBLA' FROM 'kol.price_Kohls';
+                  SELECT * FROM 'TBLA'")
+)[1:19,]
+
+
+create table MyTable as
+    select distinct b.*
+  from (select Product_Name,TCIN,min(Unique_Key) as minUK from "kol.price_Kohls"
+        group by Product_Name, TCIN) as a 
+        left join "kol.price_Kohls_nodupkey"
+
+subset(kol.price_Kohls,kol.price_Kohls_nodupkey==kol.price_Kohls_nodupkey[,1],
+       select=c(Extraction_Date,ord_week_nmb,Site_Name,TCIN,Product_ID,Product_Name,Regular_price,
+                Regular_Price_Range,Shipping,disc_perc,markdown_price,final_price,Product_Description,
+                availability,additional_information,price_promo)
+       )
+
+dim(
+  kol.price_Kohls_dedup <-sqldf('select distinct(BT.Product_Name), BT.Extraction_Date,BT.ord_week_nmb,BT.Site_Name,BT.Product_ID,
+    BT.Regular_price,BT.Regular_Price_Range,BT.Shipping,BT.disc_perc,BT.markdown_price,BT.final_price,
+    BT.Product_Description,BT.availability,BT.additional_information,BT.price_promo
+    from "kol.price_Kohls" BT,"kol.price_Kohls_nodupkey" ST
+    where ST.Unique_Key=BT.Unique_Key')
+) #TCIN & Product_Name
+
+INNER JOIN "kol.price_Kohls_nodupkey" ST
+ON ST.Unique_Key=BT.Unique_Key
+
+
+
+
+kol.PE_model_Sales_Price$amazon_disc_perc<-log(kol.PE_model_Sales_Price$amazon_disc_perc+1-min(kol.PE_model_Sales_Price$amazon_disc_perc,na.rm=TRUE))
+kol.PE_model_Sales_Price$amazon_final_price<-log(kol.PE_model_Sales_Price$amazon_final_price+1-min(kol.PE_model_Sales_Price$amazon_final_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$amazon_markdown_price<-log(kol.PE_model_Sales_Price$amazon_markdown_price+1-min(kol.PE_model_Sales_Price$amazon_markdown_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$amazon_Regular_price<-log(kol.PE_model_Sales_Price$amazon_Regular_price+1-min(kol.PE_model_Sales_Price$amazon_Regular_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$amazon_Shipping<-log(kol.PE_model_Sales_Price$amazon_Shipping+1-min(kol.PE_model_Sales_Price$amazon_Shipping,na.rm=TRUE))
+kol.PE_model_Sales_Price$kohl_disc_perc<-log(kol.PE_model_Sales_Price$kohl_disc_perc+1-min(kol.PE_model_Sales_Price$kohl_disc_perc,na.rm=TRUE))
+kol.PE_model_Sales_Price$kohl_final_price<-log(kol.PE_model_Sales_Price$kohl_final_price+1-min(kol.PE_model_Sales_Price$kohl_final_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$kohl_markdown_price<-log(kol.PE_model_Sales_Price$kohl_markdown_price+1-min(kol.PE_model_Sales_Price$kohl_markdown_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$kohl_Regular_price<-log(kol.PE_model_Sales_Price$kohl_Regular_price+1-min(kol.PE_model_Sales_Price$kohl_Regular_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$kohl_Shipping<-log(kol.PE_model_Sales_Price$kohl_Shipping+1-min(kol.PE_model_Sales_Price$kohl_Shipping,na.rm=TRUE))
+kol.PE_model_Sales_Price$Target_disc_perc<-log(kol.PE_model_Sales_Price$Target_disc_perc+1-min(kol.PE_model_Sales_Price$Target_disc_perc,na.rm=TRUE))
+kol.PE_model_Sales_Price$Target_final_price<-log(kol.PE_model_Sales_Price$Target_final_price+1-min(kol.PE_model_Sales_Price$Target_final_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$Target_markdown_price<-log(kol.PE_model_Sales_Price$Target_markdown_price+1-min(kol.PE_model_Sales_Price$Target_markdown_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$Target_Regular_price<-log(kol.PE_model_Sales_Price$Target_Regular_price+1-min(kol.PE_model_Sales_Price$Target_Regular_price,na.rm=TRUE))
+kol.PE_model_Sales_Price$Target_Shipping<-log(kol.PE_model_Sales_Price$Target_Shipping+1-min(kol.PE_model_Sales_Price$Target_Shipping,na.rm=TRUE))
+kol.PE_model_Sales_Price$TCIN_var<-log(kol.PE_model_Sales_Price$TCIN_var+1-min(kol.PE_model_Sales_Price$TCIN_var,na.rm=TRUE))
+kol.PE_model_Sales_Price$kohl_pdt_desc_length<-log(kol.PE_model_Sales_Price$kohl_pdt_desc_length+1-min(kol.PE_model_Sales_Price$kohl_pdt_desc_length,na.rm=TRUE))
+kol.PE_model_Sales_Price$Availability<-log(kol.PE_model_Sales_Price$Availability+1-min(kol.PE_model_Sales_Price$Availability,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_diff_amazon_final_pr<-log(kol.PE_model_Sales_Price$Price_diff_amazon_final_pr+1-min(kol.PE_model_Sales_Price$Price_diff_amazon_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_diff_amazon_reg_pr<-log(kol.PE_model_Sales_Price$Price_diff_amazon_reg_pr+1-min(kol.PE_model_Sales_Price$Price_diff_amazon_reg_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_diff_target_final_pr<-log(kol.PE_model_Sales_Price$Price_diff_target_final_pr+1-min(kol.PE_model_Sales_Price$Price_diff_target_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_diff_target_reg_pr<-log(kol.PE_model_Sales_Price$Price_diff_target_reg_pr+1-min(kol.PE_model_Sales_Price$Price_diff_target_reg_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_rat_amazon_final_pr<-log(kol.PE_model_Sales_Price$Price_rat_amazon_final_pr+1-min(kol.PE_model_Sales_Price$Price_rat_amazon_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_rat_amazon_reg_pr<-log(kol.PE_model_Sales_Price$Price_rat_amazon_reg_pr+1-min(kol.PE_model_Sales_Price$Price_rat_amazon_reg_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_rat_target_final_pr<-log(kol.PE_model_Sales_Price$Price_rat_target_final_pr+1-min(kol.PE_model_Sales_Price$Price_rat_target_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Price_rat_target_reg_pr<-log(kol.PE_model_Sales_Price$Price_rat_target_reg_pr+1-min(kol.PE_model_Sales_Price$Price_rat_target_reg_pr,na.rm=TRUE))
+kol.PE_model_Sales_Price$Recency_month<-log(kol.PE_model_Sales_Price$Recency_month+1-min(kol.PE_model_Sales_Price$Recency_month,na.rm=TRUE))
+kol.PE_model_Sales_Price$Recency_week<-log(kol.PE_model_Sales_Price$Recency_week+1-min(kol.PE_model_Sales_Price$Recency_week,na.rm=TRUE))
+kol.PE_model_Sales_Price$gross_sales<-log(kol.PE_model_Sales_Price$gross_sales+1-min(kol.PE_model_Sales_Price$gross_sales,na.rm=TRUE))
+kol.PE_model_Sales_Price$net_Sales<-log(kol.PE_model_Sales_Price$net_Sales+1-min(kol.PE_model_Sales_Price$net_Sales,na.rm=TRUE))                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+
+
+attach(kol.PE_model_Sales_Price)
+kol.PE_model_Sales_Price <- kol.PE_model_Sales_Price[,c("amazon_disc_perc",
+                                                        "amazon_final_price", "amazon_Regular_price","amazon_Shipping",
+                                                        "kohl_disc_perc","kohl_final_price","kohl_Regular_price",
+                                                        "kohl_Shipping","Target_disc_perc","Target_final_price",
+                                                        "Target_Regular_price","Target_Shipping","TCIN_var",
+                                                        "kohl_pdt_desc_length","Availability","Price_diff_amazon_final_pr",
+                                                        "Price_diff_amazon_reg_pr","Price_diff_target_final_pr",
+                                                        "Price_diff_target_reg_pr","Price_rat_amazon_final_pr",
+                                                        "Price_rat_amazon_reg_pr","Price_rat_target_final_pr",
+                                                        "Price_rat_target_reg_pr","Recency_month","Recency_week",
+                                                        "gross_sales","net_Sales")]
+detach(kol.PE_model_Sales_Price)
+
+set.seed(400)
+kol.PE_model_Sales_Price_IND <- sample(nrow(kol.PE_model_Sales_Price),size=1730)
+
+kol.PE_model_Sales_Price_Train <- kol.PE_model_Sales_Price[kol.PE_model_Sales_Price_IND,]
+kol.PE_model_Sales_Price_Train <- data.frame(with(kol.PE_model_Sales_Price_Train,
+                                                  kol.PE_model_Sales_Price_Train[order(net_Sales),]),row.names=NULL)
+
+kol.PE_model_Sales_Price_Test <- kol.PE_model_Sales_Price[-kol.PE_model_Sales_Price_IND,]
+kol.PE_model_Sales_Price_Test <- data.frame(with(kol.PE_model_Sales_Price_Test,
+                                                 kol.PE_model_Sales_Price_Test[order(net_Sales),]),row.names=NULL)
+
+
+# Check for Multicollinearity  ##
+
+cor(kol.PE_model_Sales_Price_Train[,-c(1,2,3,5,7,9,10,11,17,19,22,24,26)],use="na.or.complete")
+lm(net_Sales ~ ., data=kol.PE_model_Sales_Price_Train[,-c(1,2,3,5,7,9,10,11,17,19,22,24,26)],na.action=na.exclude) # Model
+coef(lm(net_Sales ~ ., data=kol.PE_model_Sales_Price_Train[,-c(1,2,3,5,7,9,10,11,17,19,22,24,26)],na.action=na.exclude)) # Co-efficients
+summary(lm(net_Sales ~ ., data=kol.PE_model_Sales_Price_Train[,-c(1,2,3,5,7,9,10,11,17,19,22,24,26)],na.action=na.exclude)) # Summary
+vif(lm(net_Sales ~ ., data=kol.PE_model_Sales_Price_Train[,-c(1,2,3,5,7,9,10,11,17,19,22,24,26)],na.action=na.exclude)) # VIF 
+
+# Significant variables : amazon_Shipping,kohl_final_price,kohl_Shipping,Target_Shipping,TCIN_var,
+# kohl_pdt_desc_length,Availability,Price_diff_amazon_final_pr,Price_diff_target_final_pr,
+# Price_rat_amazon_final_pr,Price_rat_amazon_reg_pr,Price_rat_target_reg_pr,Recency_week
+
+prcomp(~.,data=kol.PE_model_Sales_Reviews,na.action=na.exclude,scale.=T)
+prcomp(~.,data=kol.PE_model_Sales_Reviews,na.action=na.exclude,scale.=T)$rotation
+
+
+Model_Prediction_Sales_Price<- data.frame(actual_sales=exp(kol.PE_model_Sales_Price_Test$net_Sales),
+                                          predict_sales=round(exp(predict(lm(net_Sales ~ ., data=kol.PE_model_Sales_Price_Train[,-26],na.action=na.exclude),
+                                                                          kol.PE_model_Sales_Price_Test,na.action=na.pass,type="response")),0))
+
+######################################################################################################################################################################################################################################
+#####################################################################################################################################################################################################################################
+
+## Price Elasticity Models - Procedure one : Sales ~ Reviews
+kol.PE_model_Sales_Reviews <- kol.PE_model_data
+
+
+kol.PE_model_Sales_Reviews <- kol.PE_model_Sales_Reviews[,
+                              c("net_Sales","Amz_Avg_helpful_votes","Amz_Avg_negative_sent_score","Amz_Avg_Positive_sent_score",  
+                               "Amz_Avg_rating","Amz_cal_avg_score","Amz_No_of_images","Amz_Not_User_Gen_images",	
+                               "Amz_pdt_desc_length","amz_rating_1_2_cnt","amz_rating_4_5_cnt","Amz_rating1","Amz_rating2",
+                               "Amz_rating3","Amz_rating4","Amz_rating5","Amz_Review_count","Amz_Total_negative_sent_score",
+                                "Amz_Total_Positive_sent_score","Amz_User_Generated_images","Avg_sentiment_score",
+                                "Avg_wt_score",	"kohls_Number_of_images","Neg_avg_wt_score","Neg_tot_wt_score",	
+                                "pos_avg_wt_score","Pos_tot_wt_score","rating1_cnt","rating5_cnt","reviews_1_M",
+                                "reviews_2_M","reviews_3_M","reviews_6_M","Target_pdt_desc_length","Tot_wt_score",
+                                 "Total_sentiment_score")]
+
+kol.PE_model_Sales_Reviews$net_Sales <- log(kol.PE_model_Sales_Reviews$net_Sales+1-min(kol.PE_model_Sales_Reviews$net_Sales,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Avg_helpful_votes<-log(kol.PE_model_Sales_Reviews$Amz_Avg_helpful_votes+1-min(kol.PE_model_Sales_Reviews$Amz_Avg_helpful_votes,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Avg_negative_sent_score<-log(kol.PE_model_Sales_Reviews$Amz_Avg_negative_sent_score+1-min(kol.PE_model_Sales_Reviews$Amz_Avg_negative_sent_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Avg_Positive_sent_score<-log(kol.PE_model_Sales_Reviews$Amz_Avg_Positive_sent_score+1-min(kol.PE_model_Sales_Reviews$Amz_Avg_Positive_sent_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Avg_rating<-log(kol.PE_model_Sales_Reviews$Amz_Avg_rating+1-min(kol.PE_model_Sales_Reviews$Amz_Avg_rating,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_cal_avg_score<-log(kol.PE_model_Sales_Reviews$Amz_cal_avg_score+1-min(kol.PE_model_Sales_Reviews$Amz_cal_avg_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_No_of_images<-log(kol.PE_model_Sales_Reviews$Amz_No_of_images+1-min(kol.PE_model_Sales_Reviews$Amz_No_of_images,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Not_User_Gen_images<-log(kol.PE_model_Sales_Reviews$Amz_Not_User_Gen_images+1-min(kol.PE_model_Sales_Reviews$Amz_Not_User_Gen_images,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_pdt_desc_length<-log(kol.PE_model_Sales_Reviews$Amz_pdt_desc_length+1-min(kol.PE_model_Sales_Reviews$Amz_pdt_desc_length,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$amz_rating_1_2_cnt<-log(kol.PE_model_Sales_Reviews$amz_rating_1_2_cnt+1-min(kol.PE_model_Sales_Reviews$amz_rating_1_2_cnt,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$amz_rating_4_5_cnt<-log(kol.PE_model_Sales_Reviews$amz_rating_4_5_cnt+1-min(kol.PE_model_Sales_Reviews$amz_rating_4_5_cnt,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_rating1<-log(kol.PE_model_Sales_Reviews$Amz_rating1+1-min(kol.PE_model_Sales_Reviews$Amz_rating1,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_rating2<-log(kol.PE_model_Sales_Reviews$Amz_rating2+1-min(kol.PE_model_Sales_Reviews$Amz_rating2,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_rating3<-log(kol.PE_model_Sales_Reviews$Amz_rating3+1-min(kol.PE_model_Sales_Reviews$Amz_rating3,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_rating4<-log(kol.PE_model_Sales_Reviews$Amz_rating4+1-min(kol.PE_model_Sales_Reviews$Amz_rating4,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_rating5<-log(kol.PE_model_Sales_Reviews$Amz_rating5+1-min(kol.PE_model_Sales_Reviews$Amz_rating5,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Review_count<-log(kol.PE_model_Sales_Reviews$Amz_Review_count+1-min(kol.PE_model_Sales_Reviews$Amz_Review_count,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Total_negative_sent_score<-log(kol.PE_model_Sales_Reviews$Amz_Total_negative_sent_score+1-min(kol.PE_model_Sales_Reviews$Amz_Total_negative_sent_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_Total_Positive_sent_score<-log(kol.PE_model_Sales_Reviews$Amz_Total_Positive_sent_score+1-min(kol.PE_model_Sales_Reviews$Amz_Total_Positive_sent_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Amz_User_Generated_images<-log(kol.PE_model_Sales_Reviews$Amz_User_Generated_images+1-min(kol.PE_model_Sales_Reviews$Amz_User_Generated_images,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Avg_sentiment_score<-log(kol.PE_model_Sales_Reviews$Avg_sentiment_score+1-min(kol.PE_model_Sales_Reviews$Avg_sentiment_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Avg_wt_score<-log(kol.PE_model_Sales_Reviews$Avg_wt_score+1-min(kol.PE_model_Sales_Reviews$Avg_wt_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$kohls_Number_of_images<-log(kol.PE_model_Sales_Reviews$kohls_Number_of_images+1-min(kol.PE_model_Sales_Reviews$kohls_Number_of_images,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Neg_avg_wt_score<-log(kol.PE_model_Sales_Reviews$Neg_avg_wt_score+1-min(kol.PE_model_Sales_Reviews$Neg_avg_wt_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Neg_tot_wt_score<-log(kol.PE_model_Sales_Reviews$Neg_tot_wt_score+1-min(kol.PE_model_Sales_Reviews$Neg_tot_wt_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$pos_avg_wt_score<-log(kol.PE_model_Sales_Reviews$pos_avg_wt_score+1-min(kol.PE_model_Sales_Reviews$pos_avg_wt_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Pos_tot_wt_score<-log(kol.PE_model_Sales_Reviews$Pos_tot_wt_score+1-min(kol.PE_model_Sales_Reviews$Pos_tot_wt_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$rating1_cnt<-log(kol.PE_model_Sales_Reviews$rating1_cnt+1-min(kol.PE_model_Sales_Reviews$rating1_cnt,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$rating5_cnt<-log(kol.PE_model_Sales_Reviews$rating5_cnt+1-min(kol.PE_model_Sales_Reviews$rating5_cnt,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$reviews_1_M<-log(kol.PE_model_Sales_Reviews$reviews_1_M+1-min(kol.PE_model_Sales_Reviews$reviews_1_M,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$reviews_2_M<-log(kol.PE_model_Sales_Reviews$reviews_2_M+1-min(kol.PE_model_Sales_Reviews$reviews_2_M,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$reviews_3_M<-log(kol.PE_model_Sales_Reviews$reviews_3_M+1-min(kol.PE_model_Sales_Reviews$reviews_3_M,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$reviews_6_M<-log(kol.PE_model_Sales_Reviews$reviews_6_M+1-min(kol.PE_model_Sales_Reviews$reviews_6_M,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Target_pdt_desc_length<-log(kol.PE_model_Sales_Reviews$Target_pdt_desc_length+1-min(kol.PE_model_Sales_Reviews$Target_pdt_desc_length,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Tot_wt_score<-log(kol.PE_model_Sales_Reviews$Tot_wt_score+1-min(kol.PE_model_Sales_Reviews$Tot_wt_score,na.rm=TRUE))
+kol.PE_model_Sales_Reviews$Total_sentiment_score<-log(kol.PE_model_Sales_Reviews$Total_sentiment_score+1-min(kol.PE_model_Sales_Reviews$Total_sentiment_score,na.rm=TRUE))
+
+
+# Principal Component analysis  ##
+
+prcomp(~.,data=kol.PE_model_Sales_Reviews,na.action=na.exclude,scale.=T)
+prcomp(~.,data=kol.PE_model_Sales_Reviews,na.action=na.exclude,scale.=T)$rotation
+
+
+# Significant Variables : net_Sales,Amz_No_of_images,Amz_Not_User_Gen_images,Amz_pdt_desc_length,
+    # Amz_rating5,Amz_Review_count,Amz_Total_negative_sent_score,Amz_Total_Positive_sent_score
+    # Amz_User_Generated_images,kohls_Number_of_images,Neg_tot_wt_score,pos_avg_wt_score,reviews_1_M,
+    # reviews_3_M,reviews_6_M,Target_pdt_desc_length,Total_sentiment_score
+
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+
+# Price Elasticity Model building with Price+Reviews+Images ##
+
+kol.PE_model_Sales_PRI <- kol.PE_model_data[,
+                              c("net_Sales","amazon_Shipping","kohl_final_price","kohl_Shipping",
+                              "kohl_pdt_desc_length","Target_Shipping","TCIN_var",
+                              "Availability","Price_diff_amazon_final_pr",
+                              "Price_diff_target_final_pr","Price_rat_amazon_final_pr",
+                              "Price_rat_amazon_reg_pr","Price_rat_target_reg_pr",
+                              "Recency_week","Amz_pdt_desc_length","Amz_rating5",
+                              "Amz_Review_count","Amz_Total_negative_sent_score",
+                              "Amz_Total_Positive_sent_score","Neg_tot_wt_score",
+                              "pos_avg_wt_score","reviews_1_M","reviews_3_M",
+                              "reviews_6_M","Target_pdt_desc_length",
+                              "Total_sentiment_score","Amz_No_of_images",
+                              "Amz_Not_User_Gen_images","Amz_User_Generated_images",
+                              "kohls_Number_of_images")]
+
+kol.PE_model_Sales_PRI$Availability <- factor(kol.PE_model_Sales_PRI$Availability,levels=c(1,0),labels=c("Yes","No"))
+
+kol.PE_model_Sales_PRI$net_Sales<-log(kol.PE_model_Sales_PRI$net_Sales+1-min(kol.PE_model_Sales_PRI$net_Sales,na.rm=TRUE))
+kol.PE_model_Sales_PRI$amazon_Shipping<-log(kol.PE_model_Sales_PRI$amazon_Shipping+1-min(kol.PE_model_Sales_PRI$amazon_Shipping,na.rm=TRUE))
+kol.PE_model_Sales_PRI$kohl_final_price<-log(kol.PE_model_Sales_PRI$kohl_final_price+1-min(kol.PE_model_Sales_PRI$kohl_final_price,na.rm=TRUE))
+kol.PE_model_Sales_PRI$kohl_Shipping<-log(kol.PE_model_Sales_PRI$kohl_Shipping+1-min(kol.PE_model_Sales_PRI$kohl_Shipping,na.rm=TRUE))
+kol.PE_model_Sales_PRI$Target_Shipping<-log(kol.PE_model_Sales_PRI$Target_Shipping+1-min(kol.PE_model_Sales_PRI$Target_Shipping,na.rm=TRUE))
+kol.PE_model_Sales_PRI$Price_diff_amazon_final_pr<-log(kol.PE_model_Sales_PRI$Price_diff_amazon_final_pr+1-min(kol.PE_model_Sales_PRI$Price_diff_amazon_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_PRI$Price_diff_target_final_pr<-log(kol.PE_model_Sales_PRI$Price_diff_target_final_pr+1-min(kol.PE_model_Sales_PRI$Price_diff_target_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_PRI$Price_rat_amazon_final_pr<-log(kol.PE_model_Sales_PRI$Price_rat_amazon_final_pr+1-min(kol.PE_model_Sales_PRI$Price_rat_amazon_final_pr,na.rm=TRUE))
+kol.PE_model_Sales_PRI$Price_rat_amazon_reg_pr<-log(kol.PE_model_Sales_PRI$Price_rat_amazon_reg_pr+1-min(kol.PE_model_Sales_PRI$Price_rat_amazon_reg_pr,na.rm=TRUE))
+kol.PE_model_Sales_PRI$Price_rat_target_reg_pr<-log(kol.PE_model_Sales_PRI$Price_rat_target_reg_pr+1-min(kol.PE_model_Sales_PRI$Price_rat_target_reg_pr,na.rm=TRUE))
+
+
+set.seed(400)
+kol.PE_model_Sales_PRI_IND <- sample(nrow(kol.PE_model_Sales_PRI),size=1730)
+
+kol.PE_model_Sales_PRI_Train <- kol.PE_model_Sales_PRI[kol.PE_model_Sales_PRI_IND,]
+kol.PE_model_Sales_PRI_Train <- data.frame(with(kol.PE_model_Sales_PRI_Train,
+                                                kol.PE_model_Sales_PRI_Train[order(net_Sales),]),row.names=NULL)
+
+kol.PE_model_Sales_PRI_Test <- kol.PE_model_Sales_PRI[-kol.PE_model_Sales_PRI_IND,]
+kol.PE_model_Sales_PRI_Test <- data.frame(with(kol.PE_model_Sales_PRI_Test,
+                                               kol.PE_model_Sales_PRI_Test[order(net_Sales),]),row.names=NULL)
+
+qqplot(kol.PE_model_Sales_PRI$kohl_final_price,kol.PE_model_Sales_PRI$net_Sales)
+qqline(kol.PE_model_Sales_PRI$net_Sales)
+
+#Train data
+lm(net_Sales ~., data=kol.PE_model_Sales_PRI_Train,na.action=na.exclude)
+
+
+
+
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+
+# Graphs and Tables
+
+kol.PE_model_Sales_Price_Reviews <- kol.PE_model_data[,
+                                       c("week_nmb", "kohl_product_id","net_Sales","amazon_Shipping","kohl_final_price","kohl_Shipping",
+                                        "Target_Shipping","TCIN_var","kohl_pdt_desc_length",
+                                        "Availability","Price_diff_amazon_final_pr",
+                                        "Price_diff_target_final_pr","Price_rat_amazon_final_pr",
+                                        "Price_rat_amazon_reg_pr","Price_rat_target_reg_pr",
+                                        "Recency_week","Amz_No_of_images","Amz_Not_User_Gen_images",
+                                        "Amz_pdt_desc_length","Amz_rating5","Amz_Review_count",
+                                        "Amz_Total_negative_sent_score","Amz_Total_Positive_sent_score",
+                                        "Amz_User_Generated_images","kohls_Number_of_images",
+                                        "Neg_tot_wt_score","pos_avg_wt_score","reviews_1_M",
+                                        "reviews_3_M","reviews_6_M","Target_pdt_desc_length",
+                                        "Total_sentiment_score")]
+
+kol.PE_Sales_Price_Reviews_OUT_ANALYSIS <- data.frame(with(kol.PE_model_Sales_Price_Reviews,
+                                                           kol.PE_model_Sales_Price_Reviews[order(week_nmb),]),
+                                                      row.names=NULL)
+
+
+attach(kol.PE_Sales_Price_Reviews_OUT_ANALYSIS)
+kol.PE_Sales_Price_Reviews_OUT_ANALYSIS$Revenue <- net_Sales*kohl_final_price
+detach(kol.PE_Sales_Price_Reviews_OUT_ANALYSIS)
+
+plot(kol.PE_Sales_Price_Reviews_OUT_ANALYSIS$net_Sales,
+     kol.PE_Sales_Price_Reviews_OUT_ANALYSIS$Revenue,type="l")
+
+table(kol.PE_Sales_Price_Reviews_OUT_ANALYSIS$week_nmb,
+      kol.PE_Sales_Price_Reviews_OUT_ANALYSIS$net_Sales,
+      kol.PE_Sales_Price_Reviews_OUT_ANALYSIS$kohl_product_id)
+
+xtabs(~week_nmb+net_Sales+kohl_product_id,
+      data=kol.PE_Sales_Price_Reviews_OUT_ANALYSIS)
+
+xtabs(~week_nmb+net_Sales+kohl_product_id,
+             data=kol.PE_Sales_Price_Reviews_OUT_ANALYSIS)
+
+loglm(~week_nmb+net_Sales+kohl_product_id,
+            data=kol.PE_Sales_Price_Reviews_OUT_ANALYSIS)
+help(loglm)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

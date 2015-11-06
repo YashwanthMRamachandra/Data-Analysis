@@ -1,0 +1,3922 @@
+
+
+libname kol 'D:\Karuna Sawant\Price Elasticity\Kohls\3.SAS\New_Data\Latest_run';
+
+/**************************************************************************************************************** 
+
+										PREPARING PRICETRAC DATA
+
+******************************************************************************************************************/
+
+/* kol.Kohls_Lugg_Merged_Wkly_Updated is the 40 weeks merged file for luggage category. 
+This is the basic raw file for PricetRac*/
+
+/* Calculating ord_week_nmb and disc_perc */
+
+data 
+	kol.Kohls_Lugg_Merged_Wkly_Updated;
+set 
+	kol.Kohls_Lugg_Merged_Wkly_Updated;
+	disc_perc = (Regular_Price-final_price)/Regular_price;
+	if 
+	Extraction_Date < '03-Dec-2012'd then ord_week_nmb=0; 
+	else 
+	ord_week_nmb = int((Extraction_Date - '03-Dec-2012'd)/7)+1;
+run; /************************** 89843 ******************************/
+
+/* Converting shipping and markdown to numeric */
+
+data kol.Kohls_Lugg_Merged_Wkly_Updated;
+set kol.Kohls_Lugg_Merged_Wkly_Updated;;
+Shipping=input(Shipping,best32.);
+markdown_price=input(markdown_price,best32.);
+run;
+
+/******************************* Splitting the entire PriceTrac data set per retailer *******/
+
+/* Preparing Kohls data */
+
+data 
+	kol.Pricetrac_data_kohls;
+set 
+	kol.Kohls_Lugg_Merged_Wkly_Updated(keep =Extraction_date ord_week_nmb Site_Name TCIN Product_id Product_Name Regular_price Regular_Price_Range Shipping disc_perc markdown_price final_price Product_description Availability additional_information price_promo);
+where 
+	Site_Name in("Kohls","kohls");
+run;
+
+/* Removing duplicate TCIN */
+
+proc sort data = kol.Pricetrac_data_kohls;
+by
+ord_week_nmb
+Product_id
+TCIN;
+run;
+
+proc sort data = kol.Pricetrac_data_kohls nodupkey out = kol.Pricetrac_data_kohls_final;
+by
+ord_week_nmb
+Product_id;
+run;
+
+/* Preparing Amazon data */
+
+data 
+	kol.Pricetrac_data_amazon;
+set 
+	kol.Kohls_Lugg_Merged_Wkly_Updated(keep =Extraction_date ord_week_nmb Site_Name TCIN Product_id Product_Name Regular_price Regular_Price_Range Shipping disc_perc markdown_price final_price Product_description Availability additional_information price_promo);
+where 
+	Site_Name = "Amazon";
+run;
+
+/* Removing duplicate TCIN */
+
+proc sort data = kol.Pricetrac_data_amazon;
+by
+ord_week_nmb
+Product_id
+TCIN;
+run;
+
+proc sort data = kol.Pricetrac_data_amazon nodupkey out = kol.Pricetrac_data_amazon_final;
+by
+ord_week_nmb
+Product_id;
+run;
+
+/* Preparing Amazon market place data */
+
+data 
+	kol.Pricetrac_data_amazon_mkt_place;
+set 
+	kol.Kohls_Lugg_Merged_Wkly_Updated(keep =Extraction_date ord_week_nmb Site_Name TCIN Product_id Product_Name Regular_price Regular_Price_Range Shipping disc_perc markdown_price final_price Product_description Availability additional_information price_promo);
+where 
+	Site_Name = "Amazon Marketplace";
+run;
+
+/* Removing duplicate TCIN */
+
+proc sort data = kol.Pricetrac_data_amazon_mkt_place;
+by
+ord_week_nmb
+Product_id
+TCIN;
+run;
+
+proc sort data = kol.Pricetrac_data_amazon_mkt_place nodupkey out = kol.Pricetrac_data_amazon_mkt_final;
+by
+ord_week_nmb
+Product_id;
+run;
+
+/* Preparing Walmart data */
+
+data 
+	kol.Pricetrac_data_walmart;
+set 
+	kol.Kohls_Lugg_Merged_Wkly_Updated(keep =Extraction_date ord_week_nmb Site_Name TCIN Product_id Product_Name Regular_price Regular_Price_Range Shipping disc_perc markdown_price final_price Product_description Availability additional_information price_promo);
+where 
+	Site_Name = "Wal-Mart";
+run;
+
+/* Removing duplicate TCIN */
+
+proc sort data = kol.Pricetrac_data_walmart;
+by
+ord_week_nmb
+Product_id
+TCIN;
+run;
+
+proc sort data = kol.Pricetrac_data_walmart nodupkey out = kol.Pricetrac_data_walmart_final;
+by
+ord_week_nmb
+Product_id;
+run;
+
+/* Preparing Target data */
+
+data 
+	kol.Pricetrac_data_target;
+set 
+	kol.Kohls_Lugg_Merged_Wkly_Updated(keep =Extraction_date ord_week_nmb Site_Name TCIN Product_id Product_Name Regular_price Regular_Price_Range Shipping disc_perc markdown_price final_price Product_description Availability additional_information price_promo);
+where 
+	Site_Name = "Target";
+run;
+
+  
+
+/* Preparing file for competitor pricing. Here the prices of competitors will be mapped against Kohls */
+
+proc sql;
+create table kol.Price_trac_Mapping_file_final as
+select distinct
+	pk.site_name,
+	pk.Extraction_date,
+	pk.ord_week_nmb,
+	pk.TCIN as Kohls_TCIN,
+	pk.Product_id as Kohls_product_id,
+	pk.Product_Name as Kohls_product_name,
+	pk.Regular_price as Kohls_Regular_price,
+	pk.disc_perc as Kohls_disc_perc,
+	pk.markdown_price as Kohls_markdown_price,
+	pk.final_price as Kohls_final_price,
+	pk.Shipping as Kohls_Shipping,
+	pk.Product_description as Kohls_Product_description,
+	pk.Availability as Kohls_Availability,
+	pk.additional_information as kohls_additional_info,
+	pk.price_promo as kohls_price_promo,
+
+	pa.TCIN as amz_TCIN,
+	pa.Product_id as amz_product_id,
+	pa.Product_Name as amz_product_name,
+	pa.Regular_price as amz_Regular_price,
+	pa.disc_perc as amz_disc_perc,
+	pa.markdown_price as amz_markdown_price,
+	pa.final_price as amz_final_price,
+	pa.Shipping as amz_Shipping,
+	pa.Product_description as amz_Product_description,
+	pa.Availability as amz_Availability,
+	pa.additional_information as amz_additional_info,
+	pa.price_promo as amz_price_promo,
+	
+	pt.TCIN as Target_TCIN,
+	pt.Product_id as Target_product_id,
+	pt.Product_Name as Target_product_name,
+	pt.Regular_price as Target_Regular_price,
+	pt.disc_perc as Traget_disc_perc,
+	pt.markdown_price as Target_markdown_price,
+	pt.final_price as Target_final_price,
+	pt.Shipping as Target_Shipping,
+	pt.Product_description as target_Product_description,
+	pt.Availability as target_Availability,
+	pt.additional_information as target_additional_info,
+	pt.price_promo as target_price_promo
+from
+	kol.Pricetrac_data_kohls_final as pk
+left outer join
+	kol.Pricetrac_data_amazon_final as pa
+on
+	pk.TCIN = pa.TCIN and
+	pk.ord_week_nmb= pa.ord_week_nmb
+left outer join 
+	kol.Pricetrac_data_target as pt
+on
+    pk.TCIN = pt.TCIN and
+	pk.ord_week_nmb=pt.ord_week_nmb;
+quit; /**** 3574 ****/ 
+
+
+/************************** Calculating price difference ********************************/
+
+data kol.Price_trac_Mapping_file_final;
+set kol.Price_trac_Mapping_file_final;
+format kohls_pdt_desc_length 10.;
+
+Price_diff_amz_final_pr = Kohls_final_price - amz_final_price;
+Price_diff_target_final_pr = Kohls_final_price - Target_final_price;
+
+Price_diff_amz_reg_pr = Kohls_regular_price - amz_regular_price;
+Price_diff_target_reg_pr = Kohls_regular_price - Target_regular_price;
+
+kohls_pdt_desc_length =  length(kohls_Product_description);
+
+if kohls_Availability ="Yes" then Availability_flag=1; 
+else Availability_flag=0;
+
+/*if kohls_additional_info = "Free Super Saving Shipping & Free Returns" then promo_flag1 = 1;*/
+/*else promo_flag1=0;*/
+
+/*Saving_Dollar = substr(kohls_price_promo,find(kohls_price_promo,"$")+1,find(kohls_price_promo," "));*/
+
+run;
+
+
+/************************** Calculating Recency of the product ********************************/
+
+
+proc sql;
+create table kohls_first_last_extr_date as
+select
+	Kohls_product_id,
+	min(Extraction_date) as first_ext_date,
+	max(Extraction_date) as Latest_ext_date
+from
+	kol.Price_trac_Mapping_file_final
+group by
+	Kohls_product_id;
+quit;
+
+data 
+	kohls_first_last_extr_date;
+set 
+	kohls_first_last_extr_date;
+format 
+	first_ext_date latest_ext_date mmddyy10.;
+	Recency_week =int((date()- first_ext_date)/7);
+	Recency_Month =int((date()- first_ext_date)/30);
+run;
+
+proc sort data = kohls_first_last_extr_date;
+by Kohls_product_id;
+run;
+
+proc sort data = kol.Price_trac_Mapping_file_final;
+by Kohls_product_id;
+run;
+
+data kol.Price_trac_Mapping_file_final;
+Merge
+kol.Price_trac_Mapping_file_final
+kohls_first_last_extr_date(keep =Kohls_product_id Recency_week Recency_Month Latest_ext_date);
+by
+Kohls_product_id;
+run;
+
+proc sort data=kol.Price_trac_Mapping_file_final;
+by ord_week_nmb Kohls_product_id;
+run; 
+
+
+/* Calculating no of variants using TCIN */
+proc sql;
+create table TCIN_wise_data as
+select
+	ord_week_nmb,
+	Product_id,
+	count(distinct TCIN) as No_of_variants,
+	max(final_price) as max_price,
+	min(final_price) as min_price
+from
+	kol.Kohls_Lugg_Merged_Wkly_Updated
+group by
+	ord_week_nmb,
+	Product_id;
+quit;
+
+data kol.Kohls_Price_trac_model_file_v1;
+set
+kol.Price_trac_Mapping_file_final(keep =Extraction_Date ord_week_nmb Kohls_product_id Kohls_product_name Kohls_TCIN Kohls_Regular_price Kohls_Shipping Kohls_disc_perc Kohls_markdown_price Kohls_final_price 
+amz_product_id amz_product_name amz_TCIN amz_Regular_price amz_Shipping amz_disc_perc amz_markdown_price amz_final_price 
+Target_product_id Target_product_name Target_TCIN Target_Regular_price Target_Shipping Traget_disc_perc Target_markdown_price Target_final_price 
+Price_diff_amz_final_pr Price_diff_target_final_pr  
+Recency_Month Recency_week Availability_flag kohls_pdt_desc_length kohls_price_promo Latest_ext_date);
+run;
+
+data kol.Kohls_Price_trac_model_file_v1;
+retain 
+Extraction_Date ord_week_nmb Kohls_product_id Kohls_product_name Kohls_TCIN Kohls_Regular_price Kohls_Shipping Kohls_disc_perc Kohls_markdown_price Kohls_final_price 
+amz_product_id amz_product_name amz_TCIN amz_Regular_price amz_Shipping amz_disc_perc amz_markdown_price amz_final_price 
+Target_product_id Target_product_name Target_TCIN Target_Regular_price Target_Shipping Traget_disc_perc Target_markdown_price Target_final_price 
+Price_diff_amz_final_pr Price_diff_target_final_pr 
+Recency_Month Recency_week Availability_flag kohls_pdt_desc_length kohls_price_promo Latest_ext_date;
+set
+kol.Kohls_Price_trac_model_file_v1;
+run;
+
+
+data kol.Kohls_Price_trac_model_file_v2;
+Merge
+kol.Kohls_Price_trac_model_file_v1(keep = Extraction_Date ord_week_nmb Kohls_product_id Kohls_product_name Kohls_TCIN Kohls_Regular_price Kohls_Shipping Kohls_disc_perc Kohls_markdown_price Kohls_final_price 
+amz_product_id amz_product_name amz_TCIN amz_Regular_price amz_Shipping amz_disc_perc amz_markdown_price amz_final_price 
+Target_product_id Target_product_name Target_TCIN Target_Regular_price Target_Shipping Traget_disc_perc Target_markdown_price Target_final_price 
+Price_diff_amz_final_pr Price_diff_target_final_pr
+Recency_Month Recency_week Availability_flag kohls_pdt_desc_length Latest_ext_date in=ina)
+TCIN_wise_data(rename=(product_id=Kohls_product_id) in=inb);
+by
+ord_week_nmb 
+Kohls_product_id;
+if ina=1;
+run;
+
+
+/**************************************************************************************************************** 
+
+										PREPARING SALES DATA
+
+******************************************************************************************************************/
+
+
+/****************************************** Kohls PricetTrac SKUId data ********************/
+
+
+data kol.Pricetrac_SkuId_Data_v1;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\PriceTrac_SKuids_v1.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+Informat product_id $10.;
+Informat Skuid best32.;
+
+Format product_id $10.;
+Format Skuid best32.;
+
+input
+product_id $
+Skuid;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+
+data kol.Pricetrac_SkuId_Data_v2;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\PriceTrac_SKuids_v2.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+Informat product_id $10.;
+Informat Skuid best32.;
+
+Format product_id $10.;
+Format Skuid best32.;
+
+input
+product_id $
+Skuid;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+data kol.Pricetrac_SkuId_Data_v3;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\PriceTrac_SKuids_v3.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+Informat product_id $10.;
+Informat Skuid best32.;
+
+Format product_id $10.;
+Format Skuid best32.;
+
+input
+product_id $
+Skuid;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+data kol.Pricetrac_SkuId_Data_v4;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\PriceTrac_SKuids_v4.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+Informat product_id $10.;
+Informat Skuid best32.;
+
+Format product_id $10.;
+Format Skuid best32.;
+
+input
+product_id $
+Skuid;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+data kol.Pricetrac_skuid_data_final_v1;
+set
+kol.Pricetrac_SkuId_Data_v1
+kol.Pricetrac_SkuId_Data_v2
+kol.Pricetrac_SkuId_Data_v3
+kol.Pricetrac_SkuId_Data_v4;
+run;
+
+proc sql;
+create table kol.Pricetrac_skuid_data_final as
+select distinct * from kol.Pricetrac_skuid_data_final_v1;
+quit;
+
+proc sort data=kol.Pricetrac_skuid_data_final;
+by skuid;
+run;
+
+
+/* Importing sales data received from the client */
+
+data kol.kohls_sales_data;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Sales\Kohls_luggage_sales_data_basefile_v1.csv' MISSOVER DSD lrecl=32767 firstobs=2;
+
+Informat Brand $20.;
+Informat Class1 best32.;
+Informat class2 $20.;
+Informat Style1 $20.;
+Informat Style2 $30.;
+Informat SKU1 best32.;
+Informat SKU2 $25.;
+Informat Merchandise_Vendor $30.;
+Informat Subclass1 best32.;
+Informat Subclass2 $20.;
+Informat Day_of_week $9.;
+Informat Week1_Sales_Units best32.;
+Informat Week1_Sales_value best32.;
+Informat Week1_AUR_dollar best32.;
+Informat Week1_Return_Units best32.;
+Informat Week1_Return best32.;
+Informat Week1_BOH_Units best32.;
+Informat Week1_BOH_dollar best32.;
+Informat Week2_Sales_Units best32.;
+Informat Week2_Sales_value best32.;
+Informat Week2_AUR_dollar best32.;
+Informat Week2_Return_Units best32.;
+Informat Week2_Return_dollar best32.;
+Informat Week2_BOH_Units best32.;
+Informat Week2_BOH_dollar best32.;
+Informat Week3_Sales_Units best32.;
+Informat Week3_Sales_value best32.;
+Informat Week3_AUR_dollar best32.;
+Informat Week3_Return_Units best32.;
+Informat Week3_Return_dollar best32.;
+Informat Week3_BOH_Units best32.;
+Informat Week3_BOH_dollar best32.;
+Informat Week4_Sales_Units best32.;
+Informat Week4_Sales_value best32.;
+Informat Week4_AUR_dollar best32.;
+Informat Week4_Return_Units best32.;
+Informat Week4_Return_dollar best32.;
+Informat Week4_BOH_Units best32.;
+Informat Week4_BOH_dollar best32.;
+Informat Week5_Sales_Units best32.;
+Informat Week5_Sales_value best32.;
+Informat Week5_AUR_dollar best32.;
+Informat Week5_Return_Units best32.;
+Informat Week5_Return_dollar best32.;
+Informat Week5_BOH_Units best32.;
+Informat Week5_BOH_dollar best32.;
+Informat Week6_Sales_Units best32.;
+Informat Week6_Sales_value best32.;
+Informat Week6_AUR_dollar best32.;
+Informat Week6_Return_Units best32.;
+Informat Week6_Return_dollar best32.;
+Informat Week6_BOH_Units best32.;
+Informat Week6_BOH_dollar best32.;
+Informat Week7_Sales_Units best32.;
+Informat Week7_Sales_value best32.;
+Informat Week7_AUR_dollar best32.;
+Informat Week7_Return_Units best32.;
+Informat Week7_Return_dollar best32.;
+Informat Week7_BOH_Units best32.;
+Informat Week7_BOH_dollar best32.;
+Informat Week8_Sales_Units best32.;
+Informat Week8_Sales_value best32.;
+Informat Week8_AUR_dollar best32.;
+Informat Week8_Return_Units best32.;
+Informat Week8_Return_dollar best32.;
+Informat Week8_BOH_Units best32.;
+Informat Week8_BOH_dollar best32.;
+Informat Week9_Sales_Units best32.;
+Informat Week9_Sales_value best32.;
+Informat Week9_AUR_dollar best32.;
+Informat Week9_Return_Units best32.;
+Informat Week9_Return_dollar best32.;
+Informat Week9_BOH_Units best32.;
+Informat Week9_BOH_dollar best32.;
+Informat Week10_Sales_Units best32.;
+Informat Week10_Sales_value best32.;
+Informat Week10_AUR_dollar best32.;
+Informat Week10_Return_Units best32.;
+Informat Week10_Return_dollar best32.;
+Informat Week10_BOH_Units best32.;
+Informat Week10_BOH_dollar best32.;
+Informat Week11_Sales_Units best32.;
+Informat Week11_Sales_value best32.;
+Informat Week11_AUR_dollar best32.;
+Informat Week11_Return_Units best32.;
+Informat Week11_Return_dollar best32.;
+Informat Week11_BOH_Units best32.;
+Informat Week11_BOH_dollar best32.;
+Informat Week12_Sales_Units best32.;
+Informat Week12_Sales_value best32.;
+Informat Week12_AUR_dollar best32.;
+Informat Week12_Return_Units best32.;
+Informat Week12_Return_dollar best32.;
+Informat Week12_BOH_Units best32.;
+Informat Week12_BOH_dollar best32.;
+Informat Week13_Sales_Units best32.;
+Informat Week13_Sales_value best32.;
+Informat Week13_AUR_dollar best32.;
+Informat Week13_Return_Units best32.;
+Informat Week13_Return_dollar best32.;
+Informat Week13_BOH_Units best32.;
+Informat Week13_BOH_dollar best32.;
+Informat Week14_Sales_Units best32.;
+Informat Week14_Sales_value best32.;
+Informat Week14_AUR_dollar best32.;
+Informat Week14_Return_Units best32.;
+Informat Week14_Return_dollar best32.;
+Informat Week14_BOH_Units best32.;
+Informat Week14_BOH_dollar best32.;
+Informat Week15_Sales_Units best32.;
+Informat Week15_Sales_value best32.;
+Informat Week15_AUR_dollar best32.;
+Informat Week15_Return_Units best32.;
+Informat Week15_Return_dollar best32.;
+Informat Week15_BOH_Units best32.;
+Informat Week15_BOH_dollar best32.;
+Informat Week16_Sales_Units best32.;
+Informat Week16_Sales_value best32.;
+Informat Week16_AUR_dollar best32.;
+Informat Week16_Return_Units best32.;
+Informat Week16_Return_dollar best32.;
+Informat Week16_BOH_Units best32.;
+Informat Week16_BOH_dollar best32.;
+Informat Week17_Sales_Units best32.;
+Informat Week17_Sales_value best32.;
+Informat Week17_AUR_dollar best32.;
+Informat Week17_Return_Units best32.;
+Informat Week17_Return_dollar best32.;
+Informat Week17_BOH_Units best32.;
+Informat Week17_BOH_dollar best32.;
+Informat Week18_Sales_Units best32.;
+Informat Week18_Sales_value best32.;
+Informat Week18_AUR_dollar best32.;
+Informat Week18_Return_Units best32.;
+Informat Week18_Return_dollar best32.;
+Informat Week18_BOH_Units best32.;
+Informat Week18_BOH_dollar best32.;
+Informat Week19_Sales_Units best32.;
+Informat Week19_Sales_value best32.;
+Informat Week19_AUR_dollar best32.;
+Informat Week19_Return_Units best32.;
+Informat Week19_Return_dollar best32.;
+Informat Week19_BOH_Units best32.;
+Informat Week19_BOH_dollar best32.;
+Informat Week20_Sales_Units best32.;
+Informat Week20_Sales_value best32.;
+Informat Week20_AUR_dollar best32.;
+Informat Week20_Return_Units best32.;
+Informat Week20_Return_dollar best32.;
+Informat Week20_BOH_Units best32.;
+Informat Week20_BOH_dollar best32.;
+Informat Week21_Sales_Units best32.;
+Informat Week21_Sales_value best32.;
+Informat Week21_AUR_dollar best32.;
+Informat Week21_Return_Units best32.;
+Informat Week21_Return_dollar best32.;
+Informat Week21_BOH_Units best32.;
+Informat Week21_BOH_dollar best32.;
+Informat Week22_Sales_Units best32.;
+Informat Week22_Sales_value best32.;
+Informat Week22_AUR_dollar best32.;
+Informat Week22_Return_Units best32.;
+Informat Week22_Return_dollar best32.;
+Informat Week22_BOH_Units best32.;
+Informat Week22_BOH_dollar best32.;
+Informat Week23_Sales_Units best32.;
+Informat Week23_Sales_value best32.;
+Informat Week23_AUR_dollar best32.;
+Informat Week23_Return_Units best32.;
+Informat Week23_Return_dollar best32.;
+Informat Week23_BOH_Units best32.;
+Informat Week23_BOH_dollar best32.;
+Informat Week24_Sales_Units best32.;
+Informat Week24_Sales_value best32.;
+Informat Week24_AUR_dollar best32.;
+Informat Week24_Return_Units best32.;
+Informat Week24_Return_dollar best32.;
+Informat Week24_BOH_Units best32.;
+Informat Week24_BOH_dollar best32.;
+Informat Week25_Sales_Units best32.;
+Informat Week25_Sales_value best32.;
+Informat Week25_AUR_dollar best32.;
+Informat Week25_Return_Units best32.;
+Informat Week25_Return_dollar best32.;
+Informat Week25_BOH_Units best32.;
+Informat Week25_BOH_dollar best32.;
+Informat Week26_Sales_Units best32.;
+Informat Week26_Sales_value best32.;
+Informat Week26_AUR_dollar best32.;
+Informat Week26_Return_Units best32.;
+Informat Week26_Return_dollar best32.;
+Informat Week26_BOH_Units best32.;
+Informat Week26_BOH_dollar best32.;
+Informat Week27_Sales_Units best32.;
+Informat Week27_Sales_value best32.;
+Informat Week27_AUR_dollar best32.;
+Informat Week27_Return_Units best32.;
+Informat Week27_Return_dollar best32.;
+Informat Week27_BOH_Units best32.;
+Informat Week27_BOH_dollar best32.;
+Informat Week28_Sales_Units best32.;
+Informat Week28_Sales_value best32.;
+Informat Week28_AUR_dollar best32.;
+Informat Week28_Return_Units best32.;
+Informat Week28_Return_dollar best32.;
+Informat Week28_BOH_Units best32.;
+Informat Week28_BOH_dollar best32.;
+Informat Week29_Sales_Units best32.;
+Informat Week29_Sales_value best32.;
+Informat Week29_AUR_dollar best32.;
+Informat Week29_Return_Units best32.;
+Informat Week29_Return_dollar best32.;
+Informat Week29_BOH_Units best32.;
+Informat Week29_BOH_dollar best32.;
+Informat Week30_Sales_Units best32.;
+Informat Week30_Sales_value best32.;
+Informat Week30_AUR_dollar best32.;
+Informat Week30_Return_Units best32.;
+Informat Week30_Return_dollar best32.;
+Informat Week30_BOH_Units best32.;
+Informat Week30_BOH_dollar best32.;
+Informat Week31_Sales_Units best32.;
+Informat Week31_Sales_value best32.;
+Informat Week31_AUR_dollar best32.;
+Informat Week31_Return_Units best32.;
+Informat Week31_Return_dollar best32.;
+Informat Week31_BOH_Units best32.;
+Informat Week31_BOH_dollar best32.;
+Informat Week32_Sales_Units best32.;
+Informat Week32_Sales_value best32.;
+Informat Week32_AUR_dollar best32.;
+Informat Week32_Return_Units best32.;
+Informat Week32_Return_dollar best32.;
+Informat Week32_BOH_Units best32.;
+Informat Week32_BOH_dollar best32.;
+Informat Week33_Sales_Units best32.;
+Informat Week33_Sales_value best32.;
+Informat Week33_AUR_dollar best32.;
+Informat Week33_Return_Units best32.;
+Informat Week33_Return_dollar best32.;
+Informat Week33_BOH_Units best32.;
+Informat Week33_BOH_dollar best32.;
+Informat Week34_Sales_Units best32.;
+Informat Week34_Sales_value best32.;
+Informat Week34_AUR_dollar best32.;
+Informat Week34_Return_Units best32.;
+Informat Week34_Return_dollar best32.;
+Informat Week34_BOH_Units best32.;
+Informat Week34_BOH_dollar best32.;
+Informat Week35_Sales_Units best32.;
+Informat Week35_Sales_value best32.;
+Informat Week35_AUR_dollar best32.;
+Informat Week35_Return_Units best32.;
+Informat Week35_Return_dollar best32.;
+Informat Week35_BOH_Units best32.;
+Informat Week35_BOH_dollar best32.;
+Informat Week36_Sales_Units best32.;
+Informat Week36_Sales_value best32.;
+Informat Week36_AUR_dollar best32.;
+Informat Week36_Return_Units best32.;
+Informat Week36_Return_dollar best32.;
+Informat Week36_BOH_Units best32.;
+Informat Week36_BOH_dollar best32.;
+Informat Week37_Sales_Units best32.;
+Informat Week37_Sales_value best32.;
+Informat Week37_AUR_dollar best32.;
+Informat Week37_Return_Units best32.;
+Informat Week37_Return_dollar best32.;
+Informat Week37_BOH_Units best32.;
+Informat Week37_BOH_dollar best32.;
+Informat Week38_Sales_Units best32.;
+Informat Week38_Sales_value best32.;
+Informat Week38_AUR_dollar best32.;
+Informat Week38_Return_Units best32.;
+Informat Week38_Return_dollar best32.;
+Informat Week38_BOH_Units best32.;
+Informat Week38_BOH_dollar best32.;
+Informat Week39_Sales_Units best32.;
+Informat Week39_Sales_value best32.;
+Informat Week39_AUR_dollar best32.;
+Informat Week39_Return_Units best32.;
+Informat Week39_Return_dollar best32.;
+Informat Week39_BOH_Units best32.;
+Informat Week39_BOH_dollar best32.;
+Informat Week40_Sales_Units best32.;
+Informat Week40_Sales_value best32.;
+Informat Week40_AUR_dollar best32.;
+Informat Week40_Return_Units best32.;
+Informat Week40_Return_dollar best32.;
+Informat Week40_BOH_Units best32.;
+Informat Week40_BOH_dollar best32.;
+
+Format Brand $20.;
+Format Class1 best32.;
+Format class2 $20.;
+Format Style1 $20.;
+Format Style2 $30.;
+Format SKU1 best32.;
+Format SKU2 $25.;
+Format Merchandise_Vendor $30.;
+Format Subclass1 best32.;
+Format Subclass2 $20.;
+Format Day_of_week $9.;
+Format Week1_Sales_Units best32.;
+Format Week1_Sales_value best32.;
+Format Week1_AUR_dollar best32.;
+Format Week1_Return_Units best32.;
+Format Week1_Return best32.;
+Format Week1_BOH_Units best32.;
+Format Week1_BOH_dollar best32.;
+Format Week2_Sales_Units best32.;
+Format Week2_Sales_value best32.;
+Format Week2_AUR_dollar best32.;
+Format Week2_Return_Units best32.;
+Format Week2_Return_dollar best32.;
+Format Week2_BOH_Units best32.;
+Format Week2_BOH_dollar best32.;
+Format Week3_Sales_Units best32.;
+Format Week3_Sales_value best32.;
+Format Week3_AUR_dollar best32.;
+Format Week3_Return_Units best32.;
+Format Week3_Return_dollar best32.;
+Format Week3_BOH_Units best32.;
+Format Week3_BOH_dollar best32.;
+Format Week4_Sales_Units best32.;
+Format Week4_Sales_value best32.;
+Format Week4_AUR_dollar best32.;
+Format Week4_Return_Units best32.;
+Format Week4_Return_dollar best32.;
+Format Week4_BOH_Units best32.;
+Format Week4_BOH_dollar best32.;
+Format Week5_Sales_Units best32.;
+Format Week5_Sales_value best32.;
+Format Week5_AUR_dollar best32.;
+Format Week5_Return_Units best32.;
+Format Week5_Return_dollar best32.;
+Format Week5_BOH_Units best32.;
+Format Week5_BOH_dollar best32.;
+Format Week6_Sales_Units best32.;
+Format Week6_Sales_value best32.;
+Format Week6_AUR_dollar best32.;
+Format Week6_Return_Units best32.;
+Format Week6_Return_dollar best32.;
+Format Week6_BOH_Units best32.;
+Format Week6_BOH_dollar best32.;
+Format Week7_Sales_Units best32.;
+Format Week7_Sales_value best32.;
+Format Week7_AUR_dollar best32.;
+Format Week7_Return_Units best32.;
+Format Week7_Return_dollar best32.;
+Format Week7_BOH_Units best32.;
+Format Week7_BOH_dollar best32.;
+Format Week8_Sales_Units best32.;
+Format Week8_Sales_value best32.;
+Format Week8_AUR_dollar best32.;
+Format Week8_Return_Units best32.;
+Format Week8_Return_dollar best32.;
+Format Week8_BOH_Units best32.;
+Format Week8_BOH_dollar best32.;
+Format Week9_Sales_Units best32.;
+Format Week9_Sales_value best32.;
+Format Week9_AUR_dollar best32.;
+Format Week9_Return_Units best32.;
+Format Week9_Return_dollar best32.;
+Format Week9_BOH_Units best32.;
+Format Week9_BOH_dollar best32.;
+Format Week10_Sales_Units best32.;
+Format Week10_Sales_value best32.;
+Format Week10_AUR_dollar best32.;
+Format Week10_Return_Units best32.;
+Format Week10_Return_dollar best32.;
+Format Week10_BOH_Units best32.;
+Format Week10_BOH_dollar best32.;
+Format Week11_Sales_Units best32.;
+Format Week11_Sales_value best32.;
+Format Week11_AUR_dollar best32.;
+Format Week11_Return_Units best32.;
+Format Week11_Return_dollar best32.;
+Format Week11_BOH_Units best32.;
+Format Week11_BOH_dollar best32.;
+Format Week12_Sales_Units best32.;
+Format Week12_Sales_value best32.;
+Format Week12_AUR_dollar best32.;
+Format Week12_Return_Units best32.;
+Format Week12_Return_dollar best32.;
+Format Week12_BOH_Units best32.;
+Format Week12_BOH_dollar best32.;
+Format Week13_Sales_Units best32.;
+Format Week13_Sales_value best32.;
+Format Week13_AUR_dollar best32.;
+Format Week13_Return_Units best32.;
+Format Week13_Return_dollar best32.;
+Format Week13_BOH_Units best32.;
+Format Week13_BOH_dollar best32.;
+Format Week14_Sales_Units best32.;
+Format Week14_Sales_value best32.;
+Format Week14_AUR_dollar best32.;
+Format Week14_Return_Units best32.;
+Format Week14_Return_dollar best32.;
+Format Week14_BOH_Units best32.;
+Format Week14_BOH_dollar best32.;
+Format Week15_Sales_Units best32.;
+Format Week15_Sales_value best32.;
+Format Week15_AUR_dollar best32.;
+Format Week15_Return_Units best32.;
+Format Week15_Return_dollar best32.;
+Format Week15_BOH_Units best32.;
+Format Week15_BOH_dollar best32.;
+Format Week16_Sales_Units best32.;
+Format Week16_Sales_value best32.;
+Format Week16_AUR_dollar best32.;
+Format Week16_Return_Units best32.;
+Format Week16_Return_dollar best32.;
+Format Week16_BOH_Units best32.;
+Format Week16_BOH_dollar best32.;
+Format Week17_Sales_Units best32.;
+Format Week17_Sales_value best32.;
+Format Week17_AUR_dollar best32.;
+Format Week17_Return_Units best32.;
+Format Week17_Return_dollar best32.;
+Format Week17_BOH_Units best32.;
+Format Week17_BOH_dollar best32.;
+Format Week18_Sales_Units best32.;
+Format Week18_Sales_value best32.;
+Format Week18_AUR_dollar best32.;
+Format Week18_Return_Units best32.;
+Format Week18_Return_dollar best32.;
+Format Week18_BOH_Units best32.;
+Format Week18_BOH_dollar best32.;
+Format Week19_Sales_Units best32.;
+Format Week19_Sales_value best32.;
+Format Week19_AUR_dollar best32.;
+Format Week19_Return_Units best32.;
+Format Week19_Return_dollar best32.;
+Format Week19_BOH_Units best32.;
+Format Week19_BOH_dollar best32.;
+Format Week20_Sales_Units best32.;
+Format Week20_Sales_value best32.;
+Format Week20_AUR_dollar best32.;
+Format Week20_Return_Units best32.;
+Format Week20_Return_dollar best32.;
+Format Week20_BOH_Units best32.;
+Format Week20_BOH_dollar best32.;
+Format Week21_Sales_Units best32.;
+Format Week21_Sales_value best32.;
+Format Week21_AUR_dollar best32.;
+Format Week21_Return_Units best32.;
+Format Week21_Return_dollar best32.;
+Format Week21_BOH_Units best32.;
+Format Week21_BOH_dollar best32.;
+Format Week22_Sales_Units best32.;
+Format Week22_Sales_value best32.;
+Format Week22_AUR_dollar best32.;
+Format Week22_Return_Units best32.;
+Format Week22_Return_dollar best32.;
+Format Week22_BOH_Units best32.;
+Format Week22_BOH_dollar best32.;
+Format Week23_Sales_Units best32.;
+Format Week23_Sales_value best32.;
+Format Week23_AUR_dollar best32.;
+Format Week23_Return_Units best32.;
+Format Week23_Return_dollar best32.;
+Format Week23_BOH_Units best32.;
+Format Week23_BOH_dollar best32.;
+Format Week24_Sales_Units best32.;
+Format Week24_Sales_value best32.;
+Format Week24_AUR_dollar best32.;
+Format Week24_Return_Units best32.;
+Format Week24_Return_dollar best32.;
+Format Week24_BOH_Units best32.;
+Format Week24_BOH_dollar best32.;
+Format Week25_Sales_Units best32.;
+Format Week25_Sales_value best32.;
+Format Week25_AUR_dollar best32.;
+Format Week25_Return_Units best32.;
+Format Week25_Return_dollar best32.;
+Format Week25_BOH_Units best32.;
+Format Week25_BOH_dollar best32.;
+Format Week26_Sales_Units best32.;
+Format Week26_Sales_value best32.;
+Format Week26_AUR_dollar best32.;
+Format Week26_Return_Units best32.;
+Format Week26_Return_dollar best32.;
+Format Week26_BOH_Units best32.;
+Format Week26_BOH_dollar best32.;
+Format Week27_Sales_Units best32.;
+Format Week27_Sales_value best32.;
+Format Week27_AUR_dollar best32.;
+Format Week27_Return_Units best32.;
+Format Week27_Return_dollar best32.;
+Format Week27_BOH_Units best32.;
+Format Week27_BOH_dollar best32.;
+Format Week28_Sales_Units best32.;
+Format Week28_Sales_value best32.;
+Format Week28_AUR_dollar best32.;
+Format Week28_Return_Units best32.;
+Format Week28_Return_dollar best32.;
+Format Week28_BOH_Units best32.;
+Format Week28_BOH_dollar best32.;
+Format Week29_Sales_Units best32.;
+Format Week29_Sales_value best32.;
+Format Week29_AUR_dollar best32.;
+Format Week29_Return_Units best32.;
+Format Week29_Return_dollar best32.;
+Format Week29_BOH_Units best32.;
+Format Week29_BOH_dollar best32.;
+Format Week30_Sales_Units best32.;
+Format Week30_Sales_value best32.;
+Format Week30_AUR_dollar best32.;
+Format Week30_Return_Units best32.;
+Format Week30_Return_dollar best32.;
+Format Week30_BOH_Units best32.;
+Format Week30_BOH_dollar best32.;
+Format Week31_Sales_Units best32.;
+Format Week31_Sales_value best32.;
+Format Week31_AUR_dollar best32.;
+Format Week31_Return_Units best32.;
+Format Week31_Return_dollar best32.;
+Format Week31_BOH_Units best32.;
+Format Week31_BOH_dollar best32.;
+Format Week32_Sales_Units best32.;
+Format Week32_Sales_value best32.;
+Format Week32_AUR_dollar best32.;
+Format Week32_Return_Units best32.;
+Format Week32_Return_dollar best32.;
+Format Week32_BOH_Units best32.;
+Format Week32_BOH_dollar best32.;
+Format Week33_Sales_Units best32.;
+Format Week33_Sales_value best32.;
+Format Week33_AUR_dollar best32.;
+Format Week33_Return_Units best32.;
+Format Week33_Return_dollar best32.;
+Format Week33_BOH_Units best32.;
+Format Week33_BOH_dollar best32.;
+Format Week34_Sales_Units best32.;
+Format Week34_Sales_value best32.;
+Format Week34_AUR_dollar best32.;
+Format Week34_Return_Units best32.;
+Format Week34_Return_dollar best32.;
+Format Week34_BOH_Units best32.;
+Format Week34_BOH_dollar best32.;
+Format Week35_Sales_Units best32.;
+Format Week35_Sales_value best32.;
+Format Week35_AUR_dollar best32.;
+Format Week35_Return_Units best32.;
+Format Week35_Return_dollar best32.;
+Format Week35_BOH_Units best32.;
+Format Week35_BOH_dollar best32.;
+Format Week36_Sales_Units best32.;
+Format Week36_Sales_value best32.;
+Format Week36_AUR_dollar best32.;
+Format Week36_Return_Units best32.;
+Format Week36_Return_dollar best32.;
+Format Week36_BOH_Units best32.;
+Format Week36_BOH_dollar best32.;
+Format Week37_Sales_Units best32.;
+Format Week37_Sales_value best32.;
+Format Week37_AUR_dollar best32.;
+Format Week37_Return_Units best32.;
+Format Week37_Return_dollar best32.;
+Format Week37_BOH_Units best32.;
+Format Week37_BOH_dollar best32.;
+Format Week38_Sales_Units best32.;
+Format Week38_Sales_value best32.;
+Format Week38_AUR_dollar best32.;
+Format Week38_Return_Units best32.;
+Format Week38_Return_dollar best32.;
+Format Week38_BOH_Units best32.;
+Format Week38_BOH_dollar best32.;
+Format Week39_Sales_Units best32.;
+Format Week39_Sales_value best32.;
+Format Week39_AUR_dollar best32.;
+Format Week39_Return_Units best32.;
+Format Week39_Return_dollar best32.;
+Format Week39_BOH_Units best32.;
+Format Week39_BOH_dollar best32.;
+Format Week40_Sales_Units best32.;
+Format Week40_Sales_value best32.;
+Format Week40_AUR_dollar best32.;
+Format Week40_Return_Units best32.;
+Format Week40_Return_dollar best32.;
+Format Week40_BOH_Units best32.;
+Format Week40_BOH_dollar best32.;
+
+Input
+Brand $
+Class1
+class2 $
+Style1 $
+Style2 $
+SKU1
+SKU2 $
+Merchandise_Vendor $
+Subclass1
+Subclass2 $
+Day_of_week $
+Week1_Sales_Units
+Week1_Sales_value
+Week1_AUR_dollar
+Week1_Return_Units
+Week1_Return
+Week1_BOH_Units
+Week1_BOH_dollar
+Week2_Sales_Units
+Week2_Sales_value
+Week2_AUR_dollar
+Week2_Return_Units
+Week2_Return_dollar
+Week2_BOH_Units
+Week2_BOH_dollar
+Week3_Sales_Units
+Week3_Sales_value
+Week3_AUR_dollar
+Week3_Return_Units
+Week3_Return_dollar
+Week3_BOH_Units
+Week3_BOH_dollar
+Week4_Sales_Units
+Week4_Sales_value
+Week4_AUR_dollar
+Week4_Return_Units
+Week4_Return_dollar
+Week4_BOH_Units
+Week4_BOH_dollar
+Week5_Sales_Units
+Week5_Sales_value
+Week5_AUR_dollar
+Week5_Return_Units
+Week5_Return_dollar
+Week5_BOH_Units
+Week5_BOH_dollar
+Week6_Sales_Units
+Week6_Sales_value
+Week6_AUR_dollar
+Week6_Return_Units
+Week6_Return_dollar
+Week6_BOH_Units
+Week6_BOH_dollar
+Week7_Sales_Units
+Week7_Sales_value
+Week7_AUR_dollar
+Week7_Return_Units
+Week7_Return_dollar
+Week7_BOH_Units
+Week7_BOH_dollar
+Week8_Sales_Units
+Week8_Sales_value
+Week8_AUR_dollar
+Week8_Return_Units
+Week8_Return_dollar
+Week8_BOH_Units
+Week8_BOH_dollar
+Week9_Sales_Units
+Week9_Sales_value
+Week9_AUR_dollar
+Week9_Return_Units
+Week9_Return_dollar
+Week9_BOH_Units
+Week9_BOH_dollar
+Week10_Sales_Units
+Week10_Sales_value
+Week10_AUR_dollar
+Week10_Return_Units
+Week10_Return_dollar
+Week10_BOH_Units
+Week10_BOH_dollar
+Week11_Sales_Units
+Week11_Sales_value
+Week11_AUR_dollar
+Week11_Return_Units
+Week11_Return_dollar
+Week11_BOH_Units
+Week11_BOH_dollar
+Week12_Sales_Units
+Week12_Sales_value
+Week12_AUR_dollar
+Week12_Return_Units
+Week12_Return_dollar
+Week12_BOH_Units
+Week12_BOH_dollar
+Week13_Sales_Units
+Week13_Sales_value
+Week13_AUR_dollar
+Week13_Return_Units
+Week13_Return_dollar
+Week13_BOH_Units
+Week13_BOH_dollar
+Week14_Sales_Units
+Week14_Sales_value
+Week14_AUR_dollar
+Week14_Return_Units
+Week14_Return_dollar
+Week14_BOH_Units
+Week14_BOH_dollar
+Week15_Sales_Units
+Week15_Sales_value
+Week15_AUR_dollar
+Week15_Return_Units
+Week15_Return_dollar
+Week15_BOH_Units
+Week15_BOH_dollar
+Week16_Sales_Units
+Week16_Sales_value
+Week16_AUR_dollar
+Week16_Return_Units
+Week16_Return_dollar
+Week16_BOH_Units
+Week16_BOH_dollar
+Week17_Sales_Units
+Week17_Sales_value
+Week17_AUR_dollar
+Week17_Return_Units
+Week17_Return_dollar
+Week17_BOH_Units
+Week17_BOH_dollar
+Week18_Sales_Units
+Week18_Sales_value
+Week18_AUR_dollar
+Week18_Return_Units
+Week18_Return_dollar
+Week18_BOH_Units
+Week18_BOH_dollar
+Week19_Sales_Units
+Week19_Sales_value
+Week19_AUR_dollar
+Week19_Return_Units
+Week19_Return_dollar
+Week19_BOH_Units
+Week19_BOH_dollar
+Week20_Sales_Units
+Week20_Sales_value
+Week20_AUR_dollar
+Week20_Return_Units
+Week20_Return_dollar
+Week20_BOH_Units
+Week20_BOH_dollar
+Week21_Sales_Units
+Week21_Sales_value
+Week21_AUR_dollar
+Week21_Return_Units
+Week21_Return_dollar
+Week21_BOH_Units
+Week21_BOH_dollar
+Week22_Sales_Units
+Week22_Sales_value
+Week22_AUR_dollar
+Week22_Return_Units
+Week22_Return_dollar
+Week22_BOH_Units
+Week22_BOH_dollar
+Week23_Sales_Units
+Week23_Sales_value
+Week23_AUR_dollar
+Week23_Return_Units
+Week23_Return_dollar
+Week23_BOH_Units
+Week23_BOH_dollar
+Week24_Sales_Units
+Week24_Sales_value
+Week24_AUR_dollar
+Week24_Return_Units
+Week24_Return_dollar
+Week24_BOH_Units
+Week24_BOH_dollar
+Week25_Sales_Units
+Week25_Sales_value
+Week25_AUR_dollar
+Week25_Return_Units
+Week25_Return_dollar
+Week25_BOH_Units
+Week25_BOH_dollar
+Week26_Sales_Units
+Week26_Sales_value
+Week26_AUR_dollar
+Week26_Return_Units
+Week26_Return_dollar
+Week26_BOH_Units
+Week26_BOH_dollar
+Week27_Sales_Units
+Week27_Sales_value
+Week27_AUR_dollar
+Week27_Return_Units
+Week27_Return_dollar
+Week27_BOH_Units
+Week27_BOH_dollar
+Week28_Sales_Units
+Week28_Sales_value
+Week28_AUR_dollar
+Week28_Return_Units
+Week28_Return_dollar
+Week28_BOH_Units
+Week28_BOH_dollar
+Week29_Sales_Units
+Week29_Sales_value
+Week29_AUR_dollar
+Week29_Return_Units
+Week29_Return_dollar
+Week29_BOH_Units
+Week29_BOH_dollar
+Week30_Sales_Units
+Week30_Sales_value
+Week30_AUR_dollar
+Week30_Return_Units
+Week30_Return_dollar
+Week30_BOH_Units
+Week30_BOH_dollar
+Week31_Sales_Units
+Week31_Sales_value
+Week31_AUR_dollar
+Week31_Return_Units
+Week31_Return_dollar
+Week31_BOH_Units
+Week31_BOH_dollar
+Week32_Sales_Units
+Week32_Sales_value
+Week32_AUR_dollar
+Week32_Return_Units
+Week32_Return_dollar
+Week32_BOH_Units
+Week32_BOH_dollar
+Week33_Sales_Units
+Week33_Sales_value
+Week33_AUR_dollar
+Week33_Return_Units
+Week33_Return_dollar
+Week33_BOH_Units
+Week33_BOH_dollar
+Week34_Sales_Units
+Week34_Sales_value
+Week34_AUR_dollar
+Week34_Return_Units
+Week34_Return_dollar
+Week34_BOH_Units
+Week34_BOH_dollar
+Week35_Sales_Units
+Week35_Sales_value
+Week35_AUR_dollar
+Week35_Return_Units
+Week35_Return_dollar
+Week35_BOH_Units
+Week35_BOH_dollar
+Week36_Sales_Units
+Week36_Sales_value
+Week36_AUR_dollar
+Week36_Return_Units
+Week36_Return_dollar
+Week36_BOH_Units
+Week36_BOH_dollar
+Week37_Sales_Units
+Week37_Sales_value
+Week37_AUR_dollar
+Week37_Return_Units
+Week37_Return_dollar
+Week37_BOH_Units
+Week37_BOH_dollar
+Week38_Sales_Units
+Week38_Sales_value
+Week38_AUR_dollar
+Week38_Return_Units
+Week38_Return_dollar
+Week38_BOH_Units
+Week38_BOH_dollar
+Week39_Sales_Units
+Week39_Sales_value
+Week39_AUR_dollar
+Week39_Return_Units
+Week39_Return_dollar
+Week39_BOH_Units
+Week39_BOH_dollar
+Week40_Sales_Units
+Week40_Sales_value
+Week40_AUR_dollar
+Week40_Return_Units
+Week40_Return_dollar
+Week40_BOH_Units
+Week40_BOH_dollar;
+run; /*********** 24324 ************************/
+
+data kol.kohls_sales_data;
+set kol.kohls_sales_data;
+week1_Gross_Sales = week1_sales_units-week1_Return_Units;
+week2_Gross_Sales = week2_sales_units-week2_Return_Units;
+week3_Gross_Sales = week3_sales_units-week3_Return_Units;
+week4_Gross_Sales = week4_sales_units-week4_Return_Units;
+week5_Gross_Sales = week5_sales_units-week5_Return_Units;
+week6_Gross_Sales = week6_sales_units-week6_Return_Units;
+week7_Gross_Sales = week7_sales_units-week7_Return_Units;
+week8_Gross_Sales = week8_sales_units-week8_Return_Units;
+week9_Gross_Sales = week9_sales_units-week9_Return_Units;
+week10_Gross_Sales = week10_sales_units-week10_Return_Units;
+week11_Gross_Sales = week11_sales_units-week11_Return_Units;
+week12_Gross_Sales = week12_sales_units-week12_Return_Units;
+week13_Gross_Sales = week13_sales_units-week13_Return_Units;
+week14_Gross_Sales = week14_sales_units-week14_Return_Units;
+week15_Gross_Sales = week15_sales_units-week15_Return_Units;
+week16_Gross_Sales = week16_sales_units-week16_Return_Units;
+week17_Gross_Sales = week17_sales_units-week17_Return_Units;
+week18_Gross_Sales = week18_sales_units-week18_Return_Units;
+week19_Gross_Sales = week19_sales_units-week19_Return_Units;
+week20_Gross_Sales = week20_sales_units-week20_Return_Units;
+week21_Gross_Sales = week21_sales_units-week21_Return_Units;
+week22_Gross_Sales = week22_sales_units-week22_Return_Units;
+week23_Gross_Sales = week23_sales_units-week23_Return_Units;
+week24_Gross_Sales = week24_sales_units-week24_Return_Units;
+week25_Gross_Sales = week25_sales_units-week25_Return_Units;
+week26_Gross_Sales = week26_sales_units-week26_Return_Units;
+week27_Gross_Sales = week27_sales_units-week27_Return_Units;
+week28_Gross_Sales = week28_sales_units-week28_Return_Units;
+week29_Gross_Sales = week29_sales_units-week29_Return_Units;
+week30_Gross_Sales = week30_sales_units-week30_Return_Units;
+week31_Gross_Sales = week31_sales_units-week31_Return_Units;
+week32_Gross_Sales = week32_sales_units-week32_Return_Units;
+week33_Gross_Sales = week33_sales_units-week33_Return_Units;
+week34_Gross_Sales = week34_sales_units-week34_Return_Units;
+week35_Gross_Sales = week35_sales_units-week35_Return_Units;
+week36_Gross_Sales = week36_sales_units-week36_Return_Units;
+week37_Gross_Sales = week37_sales_units-week37_Return_Units;
+week38_Gross_Sales = week38_sales_units-week38_Return_Units;
+week39_Gross_Sales = week39_sales_units-week39_Return_Units;
+week40_Gross_Sales = week40_sales_units-week40_Return_Units;
+run;
+
+Proc sql;
+create table kol.Kohls_rolled_up_data as 
+select
+SKU1,
+sum(week1_Gross_sales) as week1_Gross_sales,
+sum(week2_Gross_sales) as week2_Gross_sales,
+sum(week3_Gross_sales) as week3_Gross_sales,
+sum(week4_Gross_sales) as week4_Gross_sales,
+sum(week5_Gross_sales) as week5_Gross_sales,
+sum(week6_Gross_sales) as week6_Gross_sales,
+sum(week7_Gross_sales) as week7_Gross_sales,
+sum(week8_Gross_sales) as week8_Gross_sales,
+sum(week9_Gross_sales) as week9_Gross_sales,
+sum(week10_Gross_sales) as week10_Gross_sales,
+sum(week11_Gross_sales) as week11_Gross_sales,
+sum(week12_Gross_sales) as week12_Gross_sales,
+sum(week13_Gross_sales) as week13_Gross_sales,
+sum(week14_Gross_sales) as week14_Gross_sales,
+sum(week15_Gross_sales) as week15_Gross_sales,
+sum(week16_Gross_sales) as week16_Gross_sales,
+sum(week17_Gross_sales) as week17_Gross_sales,
+sum(week18_Gross_sales) as week18_Gross_sales,
+sum(week19_Gross_sales) as week19_Gross_sales,
+sum(week20_Gross_sales) as week20_Gross_sales,
+sum(week21_Gross_sales) as week21_Gross_sales,
+sum(week22_Gross_sales) as week22_Gross_sales,
+sum(week23_Gross_sales) as week23_Gross_sales,
+sum(week24_Gross_sales) as week24_Gross_sales,
+sum(week25_Gross_sales) as week25_Gross_sales,
+sum(week26_Gross_sales) as week26_Gross_sales,
+sum(week27_Gross_sales) as week27_Gross_sales,
+sum(week28_Gross_sales) as week28_Gross_sales,
+sum(week29_Gross_sales) as week29_Gross_sales,
+sum(week30_Gross_sales) as week30_Gross_sales,
+sum(week31_Gross_sales) as week31_Gross_sales,
+sum(week32_Gross_sales) as week32_Gross_sales,
+sum(week33_Gross_sales) as week33_Gross_sales,
+sum(week34_Gross_sales) as week34_Gross_sales,
+sum(week35_Gross_sales) as week35_Gross_sales,
+sum(week36_Gross_sales) as week36_Gross_sales,
+sum(week37_Gross_sales) as week37_Gross_sales,
+sum(week38_Gross_sales) as week38_Gross_sales,
+sum(week39_Gross_sales) as week39_Gross_sales,
+sum(week40_Gross_sales) as week40_Gross_sales,
+sum(Week1_Sales_Units)  as Week1_Sales_Units,
+sum(Week2_Sales_Units)  as Week2_Sales_Units,
+sum(Week3_Sales_Units)  as Week3_Sales_Units,
+sum(Week4_Sales_Units)  as Week4_Sales_Units,
+sum(Week5_Sales_Units)  as Week5_Sales_Units,
+sum(Week6_Sales_Units)  as Week6_Sales_Units,
+sum(Week7_Sales_Units)  as Week7_Sales_Units,
+sum(Week8_Sales_Units)  as Week8_Sales_Units,
+sum(Week9_Sales_Units)  as Week9_Sales_Units,
+sum(Week10_Sales_Units)  as Week10_Sales_Units,
+sum(Week11_Sales_Units)  as Week11_Sales_Units,
+sum(Week12_Sales_Units)  as Week12_Sales_Units,
+sum(Week13_Sales_Units)  as Week13_Sales_Units,
+sum(Week14_Sales_Units)  as Week14_Sales_Units,
+sum(Week15_Sales_Units)  as Week15_Sales_Units,
+sum(Week16_Sales_Units)  as Week16_Sales_Units,
+sum(Week17_Sales_Units)  as Week17_Sales_Units,
+sum(Week18_Sales_Units)  as Week18_Sales_Units,
+sum(Week19_Sales_Units)  as Week19_Sales_Units,
+sum(Week20_Sales_Units)  as Week20_Sales_Units,
+sum(Week21_Sales_Units)  as Week21_Sales_Units,
+sum(Week22_Sales_Units)  as Week22_Sales_Units,
+sum(Week23_Sales_Units)  as Week23_Sales_Units,
+sum(Week24_Sales_Units)  as Week24_Sales_Units,
+sum(Week25_Sales_Units)  as Week25_Sales_Units,
+sum(Week26_Sales_Units)  as Week26_Sales_Units,
+sum(Week27_Sales_Units)  as Week27_Sales_Units,
+sum(Week28_Sales_Units)  as Week28_Sales_Units,
+sum(Week29_Sales_Units)  as Week29_Sales_Units,
+sum(Week30_Sales_Units)  as Week30_Sales_Units,
+sum(Week31_Sales_Units)  as Week31_Sales_Units,
+sum(Week32_Sales_Units)  as Week32_Sales_Units,
+sum(Week33_Sales_Units)  as Week33_Sales_Units,
+sum(Week34_Sales_Units)  as Week34_Sales_Units,
+sum(Week35_Sales_Units)  as Week35_Sales_Units,
+sum(Week36_Sales_Units)  as Week36_Sales_Units,
+sum(Week37_Sales_Units)  as Week37_Sales_Units,
+sum(Week38_Sales_Units)  as Week38_Sales_Units,
+sum(Week39_Sales_Units)  as Week39_Sales_Units,
+sum(Week40_Sales_Units)  as Week40_Sales_Units
+from
+kol.kohls_sales_data
+group by
+SKU1;
+quit;
+
+/****** Transposing gross sales volume **************************/
+
+proc transpose data = kol.Kohls_rolled_up_data
+	out = kol.kohls_gross_sales_volume prefix = Gross_Sales_volume name =  sales_units_per_week;
+	var Week1_gross_sales Week2_gross_sales Week3_gross_sales Week4_gross_sales Week5_gross_sales 
+		Week6_gross_sales Week7_gross_sales Week8_gross_sales Week9_gross_sales Week10_gross_sales 
+		Week11_gross_sales Week12_gross_sales Week13_gross_sales Week14_gross_sales Week15_gross_sales 
+		Week16_gross_sales Week17_gross_sales Week18_gross_sales Week19_gross_sales Week20_gross_sales 
+		Week21_gross_sales Week22_gross_sales Week23_gross_sales Week24_gross_sales Week25_gross_sales 
+		Week26_gross_sales Week27_gross_sales Week28_gross_sales Week29_gross_sales Week30_gross_sales 
+		Week31_gross_sales Week32_gross_sales Week33_gross_sales Week34_gross_sales Week35_gross_sales 
+		Week36_gross_sales Week37_gross_sales Week38_gross_sales Week39_gross_sales Week40_gross_sales;
+	by  SKU1;
+run;
+
+data kol.kohls_gross_sales_volume;
+set kol.kohls_gross_sales_volume;
+string1= find(sales_units_per_week,"week",1)+4;
+string2= (find(sales_units_per_week,"_",1)-find(sales_units_per_week,"week",1)-4);
+week_number = int(substr(sales_units_per_week,string1,string2));
+run;
+
+proc sort data = kol.kohls_gross_sales_volume;
+by sku1 week_number;
+run;
+
+/****** Transposing net sales volume **************************/
+
+proc transpose data = kol.Kohls_rolled_up_data
+	out = kol.kohls_net_sales_volume prefix = Net_Sales_volume name =  sales_units_per_week;
+	var Week1_sales_units Week2_sales_units Week3_sales_units Week4_sales_units Week5_sales_units 
+		Week6_sales_units Week7_sales_units Week8_sales_units Week9_sales_units Week10_sales_units 
+		Week11_sales_units Week12_sales_units Week13_sales_units Week14_sales_units Week15_sales_units 
+		Week16_sales_units Week17_sales_units Week18_sales_units Week19_sales_units Week20_sales_units 
+		Week21_sales_units Week22_sales_units Week23_sales_units Week24_sales_units Week25_sales_units 
+		Week26_sales_units Week27_sales_units Week28_sales_units Week29_sales_units Week30_sales_units 
+		Week31_sales_units Week32_sales_units Week33_sales_units Week34_sales_units Week35_sales_units 
+		Week36_sales_units Week37_sales_units Week38_sales_units Week39_sales_units Week40_sales_units;
+	by SKU1;
+run;
+
+data kol.kohls_net_sales_volume;
+set kol.kohls_net_sales_volume;
+string1= find(sales_units_per_week,"Week",1)+4;
+string2= (find(sales_units_per_week,"_",1)-find(sales_units_per_week,"Week",1)-4);
+week_number = int(substr(sales_units_per_week,string1,string2));
+run;
+
+/******************* Merging gross and net sales ************************/
+
+proc sort data = kol.kohls_net_sales_volume;
+by sku1 week_number ;
+run;
+
+data Kol.Kohls_sales_data_final;
+Merge
+kol.kohls_gross_sales_volume(keep = week_number SKU1 gross_sales_volume1)
+kol.kohls_net_sales_volume(keep = week_number SKU1 Net_Sales_volume1);
+by
+sku1
+week_number;
+run;
+
+data kol.Kohls_sales_data_final;
+set Kol.Kohls_sales_data_final;
+rename  
+week_number = ord_week_nmb
+sku1=skuid
+gross_sales_volume1 = Gross_sales_volume
+Net_Sales_volume1 = Net_Sales_volume;
+run;
+
+data kol.Kohls_sales_data_final;
+retain ord_week_nmb SKUid Net_Sales_volume Gross_sales_volume;
+set kol.Kohls_sales_data_final;
+run;
+
+proc sort data=kol.Kohls_sales_data_final;
+by skuid;
+run;
+
+proc sort data=kol.Pricetrac_skuid_data_final;
+by skuid;
+run;
+
+data kol.Kohls_sales_volume_data_final;
+Merge
+kol.Kohls_sales_data_final(in=ina)
+kol.Pricetrac_skuid_data_final(in=inb);
+by
+SKUid;
+if
+ina=1 and inb=1;
+run; /************************* 6280 ***********************/
+
+/************************************* Merging sales data and PricetRac information *******************/
+
+proc sort data=kol.Kohls_sales_volume_data_final;
+by ord_week_nmb product_id;
+run;
+
+proc sort data=kol.Kohls_Price_trac_model_file_v2;
+by ord_week_nmb kohls_product_id;
+run;
+
+data kol.kohls_sales_pricetrac_merged;
+Merge
+kol.Kohls_sales_volume_data_final(rename=(product_id=kohls_product_id)in=ina)
+kol.Kohls_Price_trac_model_file_v2(in=inb);
+by
+ord_week_nmb
+kohls_product_id;
+if
+ina=1 and inb=1;
+run; /************************** 2959 *******************/ 
+
+
+/********************************** Number of substitue ************************************/
+
+/******************** No of substitue ************************/
+
+
+/* Identifying unique product names from the file in which we are merging price and sales data */
+
+proc sql;
+create table kol.kohls_unique_pdt_name as
+select distinct kohls_product_name from kol.kohls_sales_pricetrac_merged;
+quit;
+
+/* Duffel segment */
+
+data kol.Segment_duffel_substitue_data;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\02-Dec-2013 onwards\No of substitutes\Kohls_duffel_bags.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+        informat Product_name $1000. ;
+        informat Designer_bags best32. ;
+        informat Wheeled best32. ;
+        informat Packable best32. ;
+
+		format Product_name $1000. ;
+        format Designer_bags best32. ;
+        format Wheeled best32. ;
+        format Packable best32. ;
+
+		input
+             Product_name $
+			 Designer_bags
+			 Wheeled
+			 Packable;
+       if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+Proc sql;
+create table kol.Segment_duffels_substitute_final as 
+select
+	t.Product_name,
+	t.Designer_bags,
+	t.Wheeled,
+	t.Packable,
+	sum(sub.cnt)-1 as Kohls_own_Total_sub_duff
+from
+	kol.Segment_duffel_substitue_data t,
+	(
+	select
+		Designer_bags,
+		Wheeled,
+		Packable,
+		count(1) as cnt
+	from
+		kol.Segment_duffel_substitue_data
+	group by
+		Designer_bags,
+		Wheeled,
+		Packable
+	)sub
+where
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.Wheeled = sub.Wheeled and t.Wheeled = 1)or 
+	(t.Packable = sub.Packable and t.Packable = 1)
+group by
+	t. Product_name,
+	t.Designer_bags,
+	t.Wheeled,
+	t.Packable;
+quit;
+
+
+/******************** Creating substitue for Amazon *************/
+
+/* Mapping 1,0 chart prepared against product names to calculate no of substitue */
+
+proc sort data = kol.kohls_sales_pricetrac_merged;
+by kohls_product_name;
+run;
+
+proc sort data = kol.Segment_duffel_substitue_data;
+by product_name;
+run;
+
+/* Only taking products that are present in Amazon. This can be identified using final price. 
+If that product is present then it will have final price. */ 
+
+data 
+	kol.kohls_amz_price_sales_duff_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name amz_final_price in=ina)
+	kol.Segment_duffel_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	amz_final_price>0;
+run;
+
+proc sort data = kol.kohls_amz_price_sales_duff_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+/* Determining no of substitue */
+
+Proc sql;
+create table kol.Kohls_amz_duffels_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Wheeled,
+	t.Packable,
+	sum(sub.cnt)-1 as Amz_Total_sub_duff
+from
+	kol.kohls_amz_price_sales_duff_sub t,
+	(
+	select
+		Designer_bags,
+		Wheeled,
+		Packable,
+		count(1) as cnt
+	from
+		kol.kohls_amz_price_sales_duff_sub
+	group by
+		Designer_bags,
+		Wheeled,
+		Packable
+	)sub
+where
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.Wheeled = sub.Wheeled and t.Wheeled = 1)or 
+	(t.Packable = sub.Packable and t.Packable = 1)
+group by
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Wheeled,
+	t.Packable;
+quit;
+
+
+/******************** Creating substitue for Target *************/
+
+data 
+	kol.kohls_target_price_sale_duff_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name target_final_price in=ina)
+	kol.Segment_duffel_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	target_final_price>0;
+run;
+
+proc sort data = kol.kohls_target_price_sale_duff_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_target_duff_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Wheeled,
+	t.Packable,
+	sum(sub.cnt)-1 as Target_Total_sub_duff
+from
+	kol.kohls_target_price_sale_duff_sub t,
+	(
+	select
+		Designer_bags,
+		Wheeled,
+		Packable,
+		count(1) as cnt
+	from
+		kol.kohls_target_price_sale_duff_sub
+	group by
+		Designer_bags,
+		Wheeled,
+		Packable
+	)sub
+where
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.Wheeled = sub.Wheeled and t.Wheeled = 1)or 
+	(t.Packable = sub.Packable and t.Packable = 1)
+group by
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Wheeled,
+	t.Packable;
+quit;
+
+data kol.own_comp_sub_duff_data;
+merge
+	kol.Segment_duffels_substitute_final(keep = product_name Kohls_own_Total_sub_duff rename=(product_name=kohls_product_name))
+	kol.Kohls_amz_duffels_sub_final(keep = kohls_product_name Amz_Total_sub_duff)
+	kol.Kohls_target_duff_sub_final(keep = kohls_product_name Target_Total_sub_duff);
+by
+	kohls_product_name;
+run;
+
+
+/* Kids-Teenager segment */
+
+data kol.Segment_kids_substitue_data;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\02-Dec-2013 onwards\No of substitutes\Kohls_kids_teenagers.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+        informat Product_name $1000.  ;
+        informat Designer_bags best32. ;
+		informat mini best32. ;
+		informat Backpack best32. ;
+		informat Messenger_bags best32. ;
+		informat Wheeled best32. ;
+        
+		format Product_name $1000.  ;
+        format Designer_bags best32. ;
+		format mini best32. ;
+		format Backpack best32. ;
+		format Messenger_bags best32. ;
+		format Wheeled best32. ;
+
+		input
+            Product_name $
+			Designer_bags
+			Mini
+			Backpack
+			Messenger_bags
+			Wheeled;
+       if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+Proc sql;
+create table kol.Segment_kids_substitute_final as 
+select
+	t.Product_name,
+	t.Designer_bags,
+	t.Mini,
+	t.Backpack,
+	t.Messenger_bags,
+	t.wheeled,
+	sum(sub.cnt)-1 as Kohls_own_Total_sub_kid
+from
+	kol.Segment_kids_substitue_data t,
+	(
+	select
+		Designer_bags,
+		Mini,
+		Backpack,
+		Messenger_bags,
+		wheeled,
+		count(1) as cnt
+	from
+		kol.Segment_kids_substitue_data
+	group by
+		Designer_bags,
+		Mini,
+		Backpack,
+		Messenger_bags,
+		wheeled
+	)sub
+where
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.mini = sub.mini and t.mini = 1) or
+	(t.Backpack = sub.Backpack and t.Backpack = 1)or
+	(t.Messenger_bags = sub.Messenger_bags and t.Messenger_bags = 1)or 
+	(t.wheeled = sub.wheeled and t.wheeled = 1)	
+group by
+	t.Product_name,
+	t.Designer_bags,
+	t.Mini,
+	t.Backpack,
+	t.Messenger_bags,
+	t.wheeled;
+quit;
+
+/******************** Creating substitue for Amazon *************/
+
+proc sort data = kol.kohls_sales_pricetrac_merged;
+by kohls_product_name;
+run;
+
+
+proc sort data = kol.Segment_kids_substitue_data;
+by product_name;
+run;
+
+data 
+	kol.kohls_amz_price_sales_kids_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name amz_final_price in=ina)
+	kol.Segment_kids_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	amz_final_price>0;
+run;
+
+proc sort data = kol.kohls_amz_price_sales_kids_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_amz_kids_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Mini,
+	t.Backpack,
+	t.Messenger_bags,
+	t.wheeled,
+	sum(sub.cnt)-1 as Amz_Total_sub_kid
+from
+	kol.kohls_amz_price_sales_kids_sub t,
+	(
+	select
+		Designer_bags,
+		Mini,
+		Backpack,
+		Messenger_bags,
+		wheeled,
+		count(1) as cnt
+	from
+		kol.kohls_amz_price_sales_kids_sub
+	group by
+		Designer_bags,
+		Mini,
+		Backpack,
+		Messenger_bags,
+		wheeled
+	)sub
+where
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.mini = sub.mini and t.mini = 1) or
+	(t.Backpack = sub.Backpack and t.Backpack = 1)or
+	(t.Messenger_bags = sub.Messenger_bags and t.Messenger_bags = 1)or 
+	(t.wheeled = sub.wheeled and t.wheeled = 1)	
+group by
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Mini,
+	t.Backpack,
+	t.Messenger_bags,
+	t.wheeled;
+quit;
+
+
+/******************** Creating substitue for Target *************/
+
+data 
+	kol.kohls_target_price_sales_kid_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name target_final_price in=ina)
+	kol.Segment_kids_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	target_final_price>0;
+run;
+
+proc sort data = kol.kohls_target_price_sales_kid_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_target_kids_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Mini,
+	t.Backpack,
+	t.Messenger_bags,
+	t.wheeled,
+	sum(sub.cnt)-1 as Target_Total_sub_kid
+from
+	kol.kohls_target_price_sales_kid_sub t,
+	(
+	select
+		Designer_bags,
+		Mini,
+		Backpack,
+		Messenger_bags,
+		wheeled,
+		count(1) as cnt
+	from
+		kol.kohls_target_price_sales_kid_sub
+	group by
+		Designer_bags,
+		Mini,
+		Backpack,
+		Messenger_bags,
+		wheeled
+	)sub
+where
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.mini = sub.mini and t.mini = 1) or
+	(t.Backpack = sub.Backpack and t.Backpack = 1)or
+	(t.Messenger_bags = sub.Messenger_bags and t.Messenger_bags = 1)or 
+	(t.wheeled = sub.wheeled and t.wheeled = 1)	
+group by
+	t.kohls_Product_name,
+	t.Designer_bags,
+	t.Mini,
+	t.Backpack,
+	t.Messenger_bags,
+	t.wheeled;
+quit;
+
+
+/* Merging files prepared for each competitors */
+
+data kol.own_comp_sub_kids_data;
+merge
+	kol.Segment_kids_substitute_final(keep = product_name Kohls_own_Total_sub_kid rename=(product_name=kohls_product_name))
+	kol.Kohls_amz_kids_sub_final(keep = kohls_product_name Amz_Total_sub_kid)
+	kol.Kohls_target_kids_sub_final(keep = kohls_product_name Target_Total_sub_kid);
+by
+	kohls_product_name;
+run;
+
+
+/* Luggage segment */
+
+data kol.Segment_lugg_substitue_data;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\02-Dec-2013 onwards\No of substitutes\Kohls_luggage_sets.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+        informat Product_name $1000.  ;
+        informat pc_2_3 best32. ;
+		informat pc_4_5 best32. ;
+		informat Designer_bags best32. ;
+		informat Expandable best32. ;
+		informat wheeled_spinner best32. ;
+        
+		format Product_name $1000.  ;
+        format pc_2_3 best32. ;
+		format pc_4_5 best32. ;
+		format Designer_bags best32. ;
+		format Expandable best32. ;
+		format wheeled_spinner best32. ;
+
+		input
+            Product_name $
+			pc_2_3
+			pc_4_5
+			Designer_bags
+			Expandable
+			wheeled_spinner;
+       if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+Proc sql;
+create table kol.Segment_lugg_substitute_final as 
+select
+	t.Product_name,
+	t.pc_2_3,
+	t.pc_4_5,
+	t.Designer_bags,
+	t.Expandable,
+	t.wheeled_spinner,
+	sum(sub.cnt)-1 as Kohls_own_Total_sub_lugg
+from
+	kol.Segment_lugg_substitue_data t,
+	(
+	select
+		pc_2_3,
+		pc_4_5,
+		Designer_bags,
+		Expandable,
+		wheeled_spinner,
+		count(1) as cnt
+	from
+		kol.Segment_lugg_substitue_data
+	group by
+		pc_2_3,
+		pc_4_5,
+		Designer_bags,
+		Expandable,
+		wheeled_spinner
+	)sub
+where
+	(t.pc_2_3 = sub.pc_2_3 and t.pc_2_3 = 1)or
+	(t.pc_4_5 = sub.pc_4_5 and t.pc_4_5 = 1) or
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.Expandable = sub.Expandable and t.Expandable = 1)or 
+	(t.wheeled_spinner = sub.wheeled_spinner and t.wheeled_spinner = 1)	
+group by
+	t.Product_name,
+	t.pc_2_3,
+	t.pc_4_5,
+	t.Designer_bags,
+	t.Expandable,
+	t.wheeled_spinner;
+quit;
+
+/******************** Creating substitue for Amazon *************/
+
+proc sort data = kol.kohls_sales_pricetrac_merged;
+by kohls_product_name;
+run;
+
+
+proc sort data = kol.Segment_lugg_substitue_data;
+by product_name;
+run;
+
+data 
+	kol.kohls_amz_price_sales_lugg_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name amz_final_price in=ina)
+	kol.Segment_lugg_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	amz_final_price>0;
+run;
+
+proc sort data = kol.kohls_amz_price_sales_lugg_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_amz_lugg_sub_final as 
+select
+	t.kohls_Product_name,
+	t.pc_2_3,
+	t.pc_4_5,
+	t.Designer_bags,
+	t.Expandable,
+	t.wheeled_spinner,
+	sum(sub.cnt)-1 as Amz_Total_sub_lugg
+from
+	kol.kohls_amz_price_sales_lugg_sub t,
+	(
+	select
+		pc_2_3,
+		pc_4_5,
+		Designer_bags,
+		Expandable,
+		wheeled_spinner,
+		count(1) as cnt
+	from
+		kol.kohls_amz_price_sales_lugg_sub
+	group by
+		pc_2_3,
+		pc_4_5,
+		Designer_bags,
+		Expandable,
+		wheeled_spinner
+	)sub
+where
+	(t.pc_2_3 = sub.pc_2_3 and t.pc_2_3 = 1)or
+	(t.pc_4_5 = sub.pc_4_5 and t.pc_4_5 = 1) or
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.Expandable = sub.Expandable and t.Expandable = 1)or 
+	(t.wheeled_spinner = sub.wheeled_spinner and t.wheeled_spinner = 1)	
+group by
+	t.kohls_Product_name,
+	t.pc_2_3,
+	t.pc_4_5,
+	t.Designer_bags,
+	t.Expandable,
+	t.wheeled_spinner;
+quit;
+
+
+/******************** Creating substitue for Target *************/
+
+data 
+	kol.kohls_target_price_sale_lugg_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name target_final_price in=ina)
+	kol.Segment_lugg_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	target_final_price>0;
+run;
+
+proc sort data = kol.kohls_target_price_sale_lugg_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_target_lugg_sub_final as 
+select
+	t.kohls_Product_name,
+	t.pc_2_3,
+	t.pc_4_5,
+	t.Designer_bags,
+	t.Expandable,
+	t.wheeled_spinner,
+	sum(sub.cnt)-1 as Target_Total_sub_lugg
+from
+	kol.kohls_target_price_sale_lugg_sub t,
+	(
+	select
+		pc_2_3,
+		pc_4_5,
+		Designer_bags,
+		Expandable,
+		wheeled_spinner,
+		count(1) as cnt
+	from
+		kol.kohls_target_price_sale_lugg_sub
+	group by
+		pc_2_3,
+		pc_4_5,
+		Designer_bags,
+		Expandable,
+		wheeled_spinner
+	)sub
+where
+	(t.pc_2_3 = sub.pc_2_3 and t.pc_2_3 = 1)or
+	(t.pc_4_5 = sub.pc_4_5 and t.pc_4_5 = 1) or
+	(t.Designer_bags = sub.Designer_bags and t.Designer_bags = 1)or
+	(t.Expandable = sub.Expandable and t.Expandable = 1)or 
+	(t.wheeled_spinner = sub.wheeled_spinner and t.wheeled_spinner = 1)	
+group by
+	t.kohls_Product_name,
+	t.pc_2_3,
+	t.pc_4_5,
+	t.Designer_bags,
+	t.Expandable,
+	t.wheeled_spinner;
+quit;
+
+/* Merging files prepared for each competitors */
+
+data kol.own_comp_sub_lugg_data;
+merge
+	kol.Segment_lugg_substitute_final(keep = product_name Kohls_own_Total_sub_lugg rename=(product_name=kohls_product_name))
+	kol.Kohls_amz_lugg_sub_final(keep = kohls_product_name Amz_Total_sub_lugg)
+	kol.Kohls_target_lugg_sub_final(keep = kohls_product_name Target_Total_sub_lugg);
+by
+	kohls_product_name;
+run;
+
+
+/* laptop_briefcase segment */
+
+data kol.Segment_prof_substitue_data;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\02-Dec-2013 onwards\No of substitutes\Kohls_laptop_briefcase.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+        informat Product_name $1000.  ;
+        informat Laptop_facility best32. ;
+		informat Leather best32. ;
+		informat Expandable best32. ;
+		informat Size_mentioned best32. ;
+		informat Wheeled best32. ;
+        
+		format Product_name $1000.  ;
+        format Laptop_facility best32. ;
+		format Leather best32. ;
+		format Expandable best32. ;
+		format Size_mentioned best32. ;
+		format Wheeled best32. ;
+
+		input
+            Product_name $
+			Laptop_facility
+			Leather
+			Expandable
+			Size_mentioned
+			Wheeled;
+       if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+Proc sql;
+create table kol.Segment_prof_substitute_final as 
+select
+	t.Product_name,
+	t.Laptop_facility,
+	t.Leather,
+	t.Expandable,
+	t.Size_mentioned,
+	t.Wheeled,
+	sum(sub.cnt)-1 as Kohls_own_Total_sub_pro
+from
+	kol.Segment_prof_substitue_data t,
+	(
+	select
+		Laptop_facility,
+		Leather,
+		Expandable,
+		Size_mentioned,
+		Wheeled,
+		count(1) as cnt
+	from
+		kol.Segment_prof_substitue_data
+	group by
+		Laptop_facility,
+		Leather,
+		Expandable,
+		Size_mentioned,
+		Wheeled
+	)sub
+where
+	(t.Laptop_facility = sub.Laptop_facility and t.Laptop_facility = 1)or
+	(t.Leather = sub.Leather and t.Leather = 1) or
+	(t.Expandable = sub.Expandable and t.Expandable = 1)or
+	(t.Size_mentioned = sub.Size_mentioned and t.Size_mentioned = 1)or 
+	(t.Wheeled = sub.Wheeled and t.Wheeled = 1)	
+group by
+	t.Product_name,
+	t.Laptop_facility,
+	t.Leather,
+	t.Expandable,
+	t.Size_mentioned,
+	t.Wheeled;
+quit;
+
+/******************** Creating substitue for Amazon *************/
+
+proc sort data = kol.kohls_sales_pricetrac_merged;
+by kohls_product_name;
+run;
+
+
+proc sort data = kol.Segment_prof_substitue_data;
+by product_name;
+run;
+
+data 
+	kol.kohls_amz_price_sales_prof_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name amz_final_price in=ina)
+	kol.Segment_prof_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	amz_final_price>0;
+run;
+
+proc sort data = kol.kohls_amz_price_sales_prof_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_amz_prof_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Laptop_facility,
+	t.Leather,
+	t.Expandable,
+	t.Size_mentioned,
+	t.Wheeled,
+	sum(sub.cnt)-1 as Amz_Total_sub_pro
+from
+	kol.kohls_amz_price_sales_prof_sub t,
+	(
+	select
+		Laptop_facility,
+		Leather,
+		Expandable,
+		Size_mentioned,
+		Wheeled,
+		count(1) as cnt
+	from
+		kol.kohls_amz_price_sales_prof_sub
+	group by
+		Laptop_facility,
+		Leather,
+		Expandable,
+		Size_mentioned,
+		Wheeled
+	)sub
+where
+	(t.Laptop_facility = sub.Laptop_facility and t.Laptop_facility = 1)or
+	(t.Leather = sub.Leather and t.Leather = 1) or
+	(t.Expandable = sub.Expandable and t.Expandable = 1)or
+	(t.Size_mentioned = sub.Size_mentioned and t.Size_mentioned = 1)or 
+	(t.Wheeled = sub.Wheeled and t.Wheeled = 1)	
+group by
+	t.kohls_Product_name,
+	t.Laptop_facility,
+	t.Leather,
+	t.Expandable,
+	t.Size_mentioned,
+	t.Wheeled;
+quit;
+
+
+/******************** Creating substitue for Target *************/
+
+data 
+	kol.kohls_target_price_sale_prof_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name target_final_price in=ina)
+	kol.Segment_prof_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	target_final_price>0;
+run;
+
+proc sort data = kol.kohls_target_price_sale_prof_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_target_prof_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Laptop_facility,
+	t.Leather,
+	t.Expandable,
+	t.Size_mentioned,
+	t.Wheeled,
+	sum(sub.cnt)-1 as Target_Total_sub_pro
+from
+	kol.kohls_target_price_sale_prof_sub t,
+	(
+	select
+		Laptop_facility,
+		Leather,
+		Expandable,
+		Size_mentioned,
+		Wheeled,
+		count(1) as cnt
+	from
+		kol.kohls_target_price_sale_prof_sub
+	group by
+		Laptop_facility,
+		Leather,
+		Expandable,
+		Size_mentioned,
+		Wheeled
+	)sub
+where
+	(t.Laptop_facility = sub.Laptop_facility and t.Laptop_facility = 1)or
+	(t.Leather = sub.Leather and t.Leather = 1) or
+	(t.Expandable = sub.Expandable and t.Expandable = 1)or
+	(t.Size_mentioned = sub.Size_mentioned and t.Size_mentioned = 1)or 
+	(t.Wheeled = sub.Wheeled and t.Wheeled = 1)	
+group by
+	t.kohls_Product_name,
+	t.Laptop_facility,
+	t.Leather,
+	t.Expandable,
+	t.Size_mentioned,
+	t.Wheeled;
+quit;
+
+/* Merging files prepared for each competitors */
+
+data kol.own_comp_sub_prof_data;
+merge
+	kol.Segment_prof_substitute_final(keep = product_name Kohls_own_Total_sub_pro rename=(product_name=kohls_product_name))
+	kol.Kohls_amz_prof_sub_final(keep = kohls_product_name Amz_Total_sub_pro)
+	kol.Kohls_target_prof_sub_final(keep = kohls_product_name Target_Total_sub_pro);
+by
+	kohls_product_name;
+run;
+
+
+
+/* Travel accesories segment */
+
+data kol.Segment_accr_substitue_data;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\PriceTrac\02-Dec-2013 onwards\No of substitutes\Kohls_travel_accesories.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+        informat Product_name $1000.  ;
+        informat Neck_pillow best32. ;
+		informat Containers best32. ;
+		informat Lock best32. ;
+		informat Tags best32. ;
+		informat Packing_cube best32. ;
+        
+		format Product_name $1000.  ;
+        format Neck_pillow best32. ;
+		format Containers best32. ;
+		format Lock best32. ;
+		format Tags best32. ;
+		format Packing_cube best32. ;
+
+		input
+            Product_name $
+			Neck_pillow
+			Containers
+			Lock
+			Tags
+			Packing_cube;
+       if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+Proc sql;
+create table kol.Segment_accr_substitute_final as 
+select
+	t.Product_name,
+	t.Neck_pillow,
+	t.Containers,
+	t.Lock,
+	t.Tags,
+	t.Packing_cube,
+	sum(sub.cnt)-1 as Kohls_own_Total_sub_accr
+from
+	kol.Segment_accr_substitue_data t,
+	(
+	select
+		Neck_pillow,
+		Containers,
+		Lock,
+		Tags,
+		Packing_cube,
+		count(1) as cnt
+	from
+		kol.Segment_accr_substitue_data
+	group by
+		Neck_pillow,
+		Containers,
+		Lock,
+		Tags,
+		Packing_cube
+	)sub
+where
+	(t.Neck_pillow = sub.Neck_pillow and t.Neck_pillow = 1)or
+	(t.Containers = sub.Containers and t.Containers = 1) or
+	(t.Lock = sub.Lock and t.Lock = 1)or
+	(t.Tags = sub.Tags and t.Tags = 1)or 
+	(t.Packing_cube = sub.Packing_cube and t.Packing_cube = 1)	
+group by
+	t.Product_name,
+	t.Neck_pillow,
+	t.Containers,
+	t.Lock,
+	t.Tags,
+	t.Packing_cube;
+quit;
+
+/******************** Creating substitue for Amazon *************/
+
+proc sort data = kol.kohls_sales_pricetrac_merged;
+by kohls_product_name;
+run;
+
+
+proc sort data = kol.Segment_accr_substitue_data;
+by product_name;
+run;
+
+data 
+	kol.kohls_amz_price_sales_accr_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name amz_final_price in=ina)
+	kol.Segment_accr_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	amz_final_price>0;
+run;
+
+proc sort data = kol.kohls_amz_price_sales_accr_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_amz_accr_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Neck_pillow,
+	t.Containers,
+	t.Lock,
+	t.Tags,
+	t.Packing_cube,
+	sum(sub.cnt)-1 as Amz_Total_sub_accr
+from
+	kol.kohls_amz_price_sales_accr_sub t,
+	(
+	select
+		Neck_pillow,
+		Containers,
+		Lock,
+		Tags,
+		Packing_cube,
+		count(1) as cnt
+	from
+		kol.kohls_amz_price_sales_accr_sub
+	group by
+		Neck_pillow,
+		Containers,
+		Lock,
+		Tags,
+		Packing_cube
+	)sub
+where
+	(t.Neck_pillow = sub.Neck_pillow and t.Neck_pillow = 1)or
+	(t.Containers = sub.Containers and t.Containers = 1) or
+	(t.Lock = sub.Lock and t.Lock = 1)or
+	(t.Tags = sub.Tags and t.Tags = 1)or 
+	(t.Packing_cube = sub.Packing_cube and t.Packing_cube = 1)	
+group by
+	t.kohls_Product_name,
+	t.Neck_pillow,
+	t.Containers,
+	t.Lock,
+	t.Tags,
+	t.Packing_cube;
+quit;
+
+/******************** Creating substitue for Target *************/
+
+data 
+	kol.kohls_target_price_sale_accr_sub;
+merge 
+	kol.kohls_sales_pricetrac_merged(keep = kohls_product_name target_final_price in=ina)
+	kol.Segment_accr_substitue_data(rename=(product_name=kohls_product_name) in=inb);
+by
+	kohls_product_name;
+if
+	ina=1 and inb=1;
+if
+	target_final_price>0;
+run;
+
+proc sort data = kol.kohls_target_price_sale_accr_sub nodupkey;
+by kohls_Product_Name;
+run;
+
+Proc sql;
+create table kol.Kohls_target_accr_sub_final as 
+select
+	t.kohls_Product_name,
+	t.Neck_pillow,
+	t.Containers,
+	t.Lock,
+	t.Tags,
+	t.Packing_cube,
+	sum(sub.cnt)-1 as Target_Total_sub_accr
+from
+	kol.kohls_target_price_sale_accr_sub t,
+	(
+	select
+		Neck_pillow,
+		Containers,
+		Lock,
+		Tags,
+		Packing_cube,
+		count(1) as cnt
+	from
+		kol.kohls_target_price_sale_accr_sub
+	group by
+		Neck_pillow,
+		Containers,
+		Lock,
+		Tags,
+		Packing_cube
+	)sub
+where
+	(t.Neck_pillow = sub.Neck_pillow and t.Neck_pillow = 1)or
+	(t.Containers = sub.Containers and t.Containers = 1) or
+	(t.Lock = sub.Lock and t.Lock = 1)or
+	(t.Tags = sub.Tags and t.Tags = 1)or 
+	(t.Packing_cube = sub.Packing_cube and t.Packing_cube = 1)	
+group by
+	t.kohls_Product_name,
+	t.Neck_pillow,
+	t.Containers,
+	t.Lock,
+	t.Tags,
+	t.Packing_cube;
+quit;
+
+
+/* Merging files prepared for each competitors */
+
+data kol.own_comp_sub_accr_data;
+merge
+	kol.Segment_accr_substitute_final(keep = product_name Kohls_own_Total_sub_accr rename=(product_name=kohls_product_name))
+	kol.Kohls_amz_accr_sub_final(keep = kohls_product_name Amz_Total_sub_accr)
+	kol.Kohls_target_accr_sub_final(keep = kohls_product_name Target_Total_sub_accr);
+by
+	kohls_product_name;
+run;
+
+
+/***************** Merging own and competitor variables with sales_pricetrac data ***********************/
+
+proc sort data = kol.kohls_sales_pricetrac_merged;
+by kohls_product_name;
+run;
+
+data kol.Kohls_substitute_final;
+Merge
+kol.Own_comp_sub_accr_data
+kol.Own_comp_sub_duff_data
+kol.Own_comp_sub_kids_data
+kol.own_comp_sub_lugg_data
+kol.Own_comp_sub_prof_data;
+by
+kohls_product_name;
+run;
+
+data kol.Kohls_substitute_final(drop=i);
+set kol.Kohls_substitute_final;
+array testmiss(*)_numeric_;
+do i=1 to dim(testmiss);
+if testmiss(i)=. then testmiss(i)=0;
+end;
+run;
+
+
+data kol.kohls_sales_pricetrac_merged_v1;
+Merge
+kol.kohls_sales_pricetrac_merged(in=ina)
+kol.Kohls_substitute_final;
+by
+kohls_product_name;
+if
+ina=1;
+run;
+
+proc sort data = kol.kohls_sales_pricetrac_merged_v1;
+by ord_week_nmb kohls_product_name;
+run;
+
+
+
+/**************************************************************************************************************** 
+
+										PREPARING CONTENT DATA 
+
+******************************************************************************************************************/
+                                                                                   
+/*************************** AMAZON DATA ************************************/
+
+
+/****************** Importing Product file **************************/
+
+data kol.kol_amazon_content_data_v1;
+ %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+  infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\Amazon_Product_Luggage.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2;
+
+	informat UgamID $10.;
+	informat Category_Path $70.;
+	informat Retailer $6.;
+	informat Division $4.;
+	informat Category $5.;
+	informat Department $3.;
+	informat Class $3.;
+	informat Subclass $3.;
+	informat Product_URL $156.;
+	informat Brand $30.;
+	informat Product_Name $500.;
+	informat Unique_Pdt_Identifier_MainPdt $10.;
+	informat Unique_Pdt_Identifier_Variant $10.;
+	informat Final_Price_after_Discount $20.;
+	informat Extraction_Date $16.;
+	informat Page_Title $105.;
+	informat Meta_Keywords $123.;
+	informat Meta_description $143.;
+	informat Product_Description $2044.;
+	informat Product_Description_Main_Copy $4160.;
+	informat Product_Description_Image_Link $3.;
+	informat Product_Description_Feature_Box $3.;
+	informat Product_Description_Fact_Tables $3.;
+	informat Product_Features $3.;
+	informat Product_Images $3.;
+	informat View_share_related_images_widget $2.;
+	informat Color $3.;
+	informat Video $3.;
+	informat Video_Count $3.;
+	informat Video_Length $3.;
+	informat Video_link $3.;
+	informat Product_Specification $500.;
+	informat Pdt_Spec_Cnt_of_attribute $3.;
+	informat Pdt_Spec_Attribution_NameValues $466.;
+	informat Product_Details $500.;
+	informat Product_Details_Cnt_of_attribute $3.;
+	informat Pdt_Detail_Attribution_NameValue $500.;
+	informat Reviews_Count best32.;
+	informat Total_Average_Ratings best32.;
+	informat Rating1 $4.;
+	informat Rating2 $4.;
+	informat Rating3 $4.;
+	informat Rating4 $4.;
+	informat Rating5 $4.;
+	informat Rating6 $3.;
+	informat Rating7 $3.;
+	informat Rating8 $3.;
+	informat Rating9 $3.;
+	informat Rating10 $3.;
+	informat Content_3p $3.;
+	informat Site_Likes $3.;
+	informat Facebook_Like $3.;
+	informat Google_1 $3.;
+	informat Pinterest $3.;
+	informat List_Price $10.;
+	informat Discount best32.;
+	informat Discount_pct comma32.;
+	informat Availability $3.;
+	informat BuyBoxWinner $11.;
+	informat Top_3_sellers $228.;
+	informat Seller_Count_New_item $3.;
+	informat Seller_Count_Used_item $3.;
+	informat Seller_Count_Refurbished_item $3.;
+	informat UPC $32.;
+	informat Product_Dimensions $25.;
+	informat Shipping_weight $9.;
+	informat Special_Offers_Product_Promotion $185.;
+	informat Frequently_Bought_Together_Data $500.;
+	informat Frequently_Bought_Together_Count $3.;
+	informat Product_Details_Size $11.;
+	informat Product_Details_Inseam $3.;
+	informat Best_seller_ranking $17.;
+
+	format UgamID $10.;
+	format Category_Path $70.;
+	format Retailer $6.;
+	format Division $4.;
+	format Category $5.;
+	format Department $3.;
+	format Class $3.;
+	format Subclass $3.;
+	format Product_URL $156.;
+	format Brand $30.;
+	format Product_Name $103.;
+	format Unique_Pdt_Identifier_MainPdt $10.;
+	format Unique_Pdt_Identifier_Variant $10.;
+	format Final_Price_after_Discount $20.;
+	format Extraction_Date $16.;
+	format Page_Title $105.;
+	format Meta_Keywords $123.;
+	format Meta_description $143.;
+	format Product_Description $2044.;
+	format Product_Description_Main_Copy $$4160.;
+	format Product_Description_Image_Link $3.;
+	format Product_Description_Feature_Box $3.;
+	format Product_Description_Fact_Tables $3.;
+	format Product_Features $3.;
+	format Product_Images $3.;
+	format View_share_related_images_widget $2.;
+	format Color $3.;
+	format Video $3.;
+	format Video_Count $3.;
+	format Video_Length $3.;
+	format Video_link $3.;
+	format Product_Specification $500.;
+	format Pdt_Spec_Cnt_of_attribute $3.;
+	format Pdt_Spec_Attribution_NameValues $466.;
+	format Product_Details $500.;
+	format Product_Details_Cnt_of_attribute $3.;
+	format Pdt_Detail_Attribution_NameValue $500.;
+	format Reviews_Count best32.;
+	format Total_Average_Ratings best32.;
+	format Rating1 $4.;
+	format Rating2 $4.;
+	format Rating3 $4.;
+	format Rating4 $4.;
+	format Rating5 $4.;
+	format Rating6 $3.;
+	format Rating7 $3.;
+	format Rating8 $3.;
+	format Rating9 $3.;
+	format Rating10 $3.;
+	format Content_3p $3.;
+	format Site_Likes $3.;
+	format Facebook_Like $3.;
+	format Google_1 $3.;
+	format Pinterest $3.;
+	format List_Price $10.;
+	format Discount best32.;
+	format Discount_pct comma32.;
+	format Availability $3.;
+	format BuyBoxWinner $11.;
+	format Top_3_sellers $228.;
+	format Seller_Count_New_item $3.;
+	format Seller_Count_Used_item $3.;
+	format Seller_Count_Refurbished_item $3.;
+	format UPC $32.;
+	format Product_Dimensions $25.;
+	format Shipping_weight $9.;
+	format Special_Offers_Product_Promotion $185.;
+	format Frequently_Bought_Together_Data $500.;
+	format Frequently_Bought_Together_Count $3.;
+	format Product_Details_Size $11.;
+	format Product_Details_Inseam $3.;
+	format Best_seller_ranking $17.;
+
+Input
+	UgamID $
+	Category_Path $
+	Retailer $
+	Division $
+	Category $
+	Department $
+	Class $
+	Subclass $
+	Product_URL $
+	Brand $
+	Product_Name $
+	Unique_Pdt_Identifier_MainPdt $
+	Unique_Pdt_Identifier_Variant $
+	Final_Price_after_Discount $
+	Extraction_Date $
+	Page_Title $
+	Meta_Keywords $
+	Meta_description $
+	Product_Description $
+	Product_Description_Main_Copy $
+	Product_Description_Image_Link $
+	Product_Description_Feature_Box $
+	Product_Description_Fact_Tables $
+	Product_Features $
+	Product_Images $
+	View_share_related_images_widget $
+	Color $
+	Video $
+	Video_Count $
+	Video_Length $
+	Video_link $
+	Product_Specification $
+	Pdt_Spec_Cnt_of_attribute $
+	Pdt_Spec_Attribution_NameValues $
+	Product_Details $
+	Product_Details_Cnt_of_attribute $
+	Pdt_Detail_Attribution_NameValue $
+	Reviews_Count $
+	Total_Average_Ratings 
+	Rating1 $
+	Rating2 $
+	Rating3 $
+	Rating4 $
+	Rating5 $
+	Rating6 $
+	Rating7 $
+	Rating8 $
+	Rating9 $
+	Rating10 $
+	Content_3p $
+	Site_Likes $
+	Facebook_Like $
+	Google_1 $
+	Pinterest $
+	List_Price $
+	Discount 
+	Discount_pct 
+	Availability $
+	BuyBoxWinner $
+	Top_3_sellers $
+	Seller_Count_New_item $
+	Seller_Count_Used_item $
+	Seller_Count_Refurbished_item $
+	UPC $
+	Product_Dimensions $
+	Shipping_weight $
+	Special_Offers_Product_Promotion $
+	Frequently_Bought_Together_Data $
+	Frequently_Bought_Together_Count $
+	Product_Details_Size $
+	Product_Details_Inseam $
+	Best_seller_ranking $;
+
+if	_ERROR_	then	call	symputx('_EFIERR_',1);	/*	set	ERROR	detection	macro	variable	*/
+run;
+
+data kol.kol_amazon_content_data;
+set kol.kol_amazon_content_data_v1
+(keep = Unique_Pdt_Identifier_MainPdt  Unique_Pdt_Identifier_Variant Reviews_Count Total_Average_Ratings Product_Description_Main_Copy);
+Amazon_main_copy_len = length(Product_Description_Main_Copy);
+run;
+
+
+/***** Importing review data ***************************/
+
+data kol.Kol_Amazon_Review_Data_v1;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\Amazon_Review_Luggage.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+informat UgamID $10.;
+informat Category_Path $70.;
+informat Retailer $6.;
+informat Division $4.;
+informat Category $5.;
+informat Department $3.;
+informat Class $3.;
+informat Subclass $3.;
+informat Product_URL $154.;
+informat Brand $25.;
+informat Product_Name $98.;
+informat Unique_Pdt_Identifier_Mainpdt $10.;
+informat Unique_Pdt_Identifier_Variant $10.;
+informat Final_Price_after_Discount $20.;
+informat Extraction_Date $16.;
+informat Review_Link $201.;
+informat Review_Header $66.;
+informat Review_Creation_Date mmddyy10.;
+informat Review_From $23.;
+informat Review_By $58.;
+informat Review_Helpful_Votes best32.;
+informat Review_Total_Votes best32.;
+informat Review_Rating_Score best32.;
+informat Review_Rating_Scale best32.;
+informat Review_Reviewers_Badges $11.;
+informat Review_Text $8994.;
+informat Review_Count_Of_Comments $3.;
+informat Review_Verified_Purchase $4.;
+informat Reviewer_Age $3.;
+informat Reviewer_Gender $3.;
+informat Review_Count best32.;
+informat Product_reviews best32.;
+
+format UgamID $10.;
+format Category_Path $70.;
+format Retailer $6.;
+format Division $4.;
+format Category $5.;
+format Department $3.;
+format Class $3.;
+format Subclass $3.;
+format Product_URL $154.;
+format Brand $25.;
+format Product_Name $98.;
+format Unique_Pdt_Identifier_Mainpdt $10.;
+format Unique_Pdt_Identifier_Variant $10.;
+format Final_Price_after_Discount $20.;
+format Extraction_Date $16.;
+format Review_Link $201.;
+format Review_Header $66.;
+format Review_Creation_Date mmddyy10.;
+format Review_From $23.;
+format Review_By $58.;
+format Review_Helpful_Votes best32.;
+format Review_Total_Votes best32.;
+format Review_Rating_Score best32.;
+format Review_Rating_Scale best32.;
+format Review_Reviewers_Badges $11.;
+format Review_Text $8994.;
+format Review_Count_Of_Comments $3.;
+format Review_Verified_Purchase $4.;
+format Reviewer_Age $3.;
+format Reviewer_Gender $3.;
+format Review_Count best32.;
+format Product_reviews best32.;
+
+input
+UgamID$
+Category_Path$
+Retailer$
+Division$
+Category$
+Department$
+Class$
+Subclass$
+Product_URL$
+Brand$
+Product_Name$
+Unique_Pdt_Identifier_Mainpdt $
+Unique_Pdt_Identifier_Variant $
+Final_Price_after_Discount $
+Extraction_Date $
+Review_Link$
+Review_Header$
+Review_Creation_Date
+Review_From$
+Review_By$
+Review_Helpful_Votes
+Review_Total_Votes
+Review_Rating_Score
+Review_Rating_Scale
+Review_Reviewers_Badges$
+Review_Text$
+Review_Count_Of_Comments$
+Review_Verified_Purchase$
+Reviewer_Age$
+Reviewer_Gender$
+Review_Count
+Product_reviews;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run; /******************* 5152 **************************/
+
+data kol.Kol_Amazon_Review_Data_v1;
+set kol.Kol_Amazon_Review_Data_v1;
+if 
+	Review_Creation_Date < '03-Dec-2012'd then ord_week_nmb=0; 
+else 
+	ord_week_nmb = int((Review_Creation_Date - '03-Dec-2012'd)/7)+1;
+run;
+
+
+data kol.amazon_sentiment_score;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\amazon_review_score_final.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+informat Sr_no best32. ;
+informat score best32. ;
+informat Review_Text $7017. ;
+informat Product_Name $100. ;
+informat Unique_Pdt_Identifier_Mainpdt $10. ;
+informat Review_Creation_Date mmddyy10.;
+
+format Sr_no best32. ;
+format score best32. ;
+format Review_Text $7017. ;
+format Product_Name $100. ;
+format Unique_Pdt_Identifier_Mainpdt $10. ;
+format Review_Creation_Date mmddyy10.;
+
+input
+Sr_no
+score
+Review_Text $
+Product_Name $
+Unique_Pdt_Identifier_Mainpdt $
+Review_Creation_Date;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+data kol.amazon_sentiment_score;
+set kol.amazon_sentiment_score;
+if 
+	Review_Creation_Date < '03-Dec-2012'd then ord_week_nmb=0; 
+else 
+	ord_week_nmb = int((Review_Creation_Date - '03-Dec-2012'd)/7)+1;
+run;
+
+proc sort data = kol.AMAZON_SENTIMENT_SCORE;
+by ord_week_nmb;
+run;
+
+/*********** Taking average of score per main product id ******************/
+
+Proc sql;
+create table kol.Amazon_sentiment_Avg_score_pid as
+select
+ord_week_nmb,
+Unique_Pdt_Identifier_Mainpdt,
+avg(score) as Avg_sentiment_score,
+sum(score) as Total_sentiment_score,
+avg(case when score>0 then score else 0 end) as Avg_Positive_sentiment_score,
+sum(case when score>0 then score else 0 end) as Total_Positive_sentiment_score,
+avg(case when score<0 then score else 0 end) as Avg_negative_sentiment_score,
+sum(case when score<0 then score else 0 end) as Total_negative_sentiment_score
+from
+kol.AMAZON_SENTIMENT_SCORE
+group by
+ord_week_nmb,
+Unique_Pdt_Identifier_Mainpdt;
+quit; /********************* 6878 ***************/
+
+
+/**************** Preparing usefulness of reviews data **********************/
+
+Proc sql;
+create table kol.Amazon_Helpfulness_review_v1 as
+select
+ord_week_nmb,
+Unique_Pdt_Identifier_Mainpdt,
+avg(Review_Helpful_Votes) as Avg_helpful_votes,
+(sum(Review_Helpful_Votes)/sum(Review_Total_Votes)) as Actual_avg_score
+from
+kol.Kol_Amazon_Review_Data_v1
+group by
+ord_week_nmb,
+Unique_Pdt_Identifier_Mainpdt;
+quit; /****************** 6878 *******************/
+
+Proc sort data = kol.Amazon_Helpfulness_review_v1;
+by
+ord_week_nmb
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+Proc sort data = kol.Amazon_sentiment_Avg_score_pid;
+by
+ord_week_nmb
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+Data kol.Amazon_Helpfulness_review_v2;
+merge
+kol.Amazon_Helpfulness_review_v1(in=ina)
+kol.Amazon_sentiment_Avg_score_pid;
+by
+ord_week_nmb
+Unique_Pdt_Identifier_Mainpdt;
+if
+ina =1;
+run; /***************** 6878 ************************/
+
+
+Data kol.Amazon_Helpfulness_review_v2;
+set kol.Amazon_Helpfulness_review_v2;
+format Avg_Weighted_score best32.;
+format Total_weighted_score best32.;
+Avg_Weighted_score = Actual_avg_score * Avg_sentiment_score;
+Total_weighted_score = Actual_avg_score * Total_sentiment_score;
+run;
+
+
+/******************************** Importing image file ******************************************/
+
+ data kol.Amazon_Image_data_v1;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\Amazon_Images_Luggage.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+informat UgamID $9.;
+informat Category_Path $70.;
+informat Retailer $6.;
+informat Division $4.;
+informat Category $5.;
+informat Department $3.;
+informat Class $3.;
+informat Subclass $3.;
+informat Product_URL $162.;
+informat Brand $38.;
+informat Product_Name $98.;
+informat Unique_Pdt_Identifier_Mainpdt $10.;
+informat Unique_Pdt_Identifier_Variant $46.;
+informat Final_Price_after_Discount $3.;
+informat Extraction_Date mmddyy10.;
+informat URL_of_the_Image $83.;
+informat UGC $5.;
+informat Notes $2.;
+informat Alt_Tag $3.;
+format UgamID $9.;
+format Category_Path $70.;
+format Retailer $6.;
+format Division $4.;
+format Category $5.;
+format Department $3.;
+format Class $3.;
+format Subclass $3.;
+format Product_URL $162.;
+format Brand $38.;
+format Product_Name $98.;
+format Unique_Pdt_Identifier_Mainpdt $10.;
+format Unique_Pdt_Identifier_Variant $46.;
+format Final_Price_after_Discount $3.;
+format Extraction_Date mmddyy10.;
+format URL_of_the_Image $83.;
+format UGC $5.;
+format Notes $2.;
+format Alt_Tag $3.;
+
+input
+UgamID $
+Category_Path $
+Retailer $
+Division $
+Category $
+Department $
+Class $
+Subclass $
+Product_URL $
+Brand $
+Product_Name $
+Unique_Pdt_Identifier_Mainpdt $
+Unique_Pdt_Identifier_Variant $
+Final_Price_after_Discount $
+Extraction_Date
+URL_of_the_Image $
+UGC $
+Notes $
+Alt_Tag $;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+
+run;
+
+proc sql;
+create table kol.Amazon_pdt_wise_image as
+select
+	Unique_Pdt_Identifier_Mainpdt,
+	count(URL_of_the_Image) as Amz_Number_of_images,
+	sum(case when UGC="No" then 1 else 0 end) as Amz_Not_User_Gen_images
+from
+	kol.Amazon_Image_data_v1
+group by
+	Unique_Pdt_Identifier_Mainpdt;
+quit;
+
+data kol.Amazon_pdt_wise_image;
+set kol.Amazon_pdt_wise_image;
+format 
+	Amz_User_Generated_images best32.;
+	Amz_User_Generated_images = (Amz_Number_of_images-Amz_Not_User_Gen_images);
+run;
+
+
+proc sort data = kol.Amazon_Helpfulness_review_v2;
+by Unique_Pdt_Identifier_Mainpdt;
+run;
+
+
+proc sort data = kol.Amazon_pdt_wise_image;
+by
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+proc sort data = kol.kol_amazon_content_data;
+by
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+data kol.Amazon_content_data_final;
+Merge
+kol.Amazon_Helpfulness_review_v2(in=ina)
+kol.kol_amazon_content_data(keep = Unique_Pdt_Identifier_MainPdt Unique_Pdt_Identifier_Variant Reviews_Count Total_Average_Ratings Amazon_main_copy_len)
+kol.Amazon_pdt_wise_image;
+by
+Unique_Pdt_Identifier_Mainpdt;
+if ina=1;
+if ord_week_nmb>0;
+run; /***************************** 6547********************/
+
+
+/********************************* Merging PriceTrac and Content(Amazon) file ***********************/
+
+/**** Note - Content data is for Amazon. Hence we need TCIN in order to map Amazon to Kohls. 
+Product_ids from Amazon that can be mapped to PriceTrac so that we can get TCIN are only considered in the analysis ******/
+
+proc sort data = kol.Amazon_content_data_final;
+by ord_week_nmb Unique_Pdt_Identifier_Mainpdt;
+run;
+
+proc sort data = kol.Kohls_sales_pricetrac_merged_v1;
+by ord_week_nmb kohls_product_id;
+run;
+
+/****** Here we are using PriceTrac basic file where in we have week by week data across retailers. Henece Product id is used for merging
+ as weekly data also contains Amazon. This will give us TCIN which is required to map Amazon review data against Kohls *******/
+
+Data kol.kol_amazon_content_data_final;
+Merge
+kol.Amazon_content_data_final(rename=(Unique_Pdt_Identifier_Mainpdt=Product_id)in= ina)
+kol.Kohls_Lugg_Merged_Wkly_Updated(keep= TCIN ord_week_nmb Product_id in=inb);
+by
+ord_week_nmb
+Product_id;
+if
+ina=1 and inb=1;
+run;/******************************* 6670 **************************/
+
+proc sort data =kol.Kohls_sales_pricetrac_merged_v1;
+by ord_week_nmb kohls_TCIN;
+run;
+
+proc sort data = kol.kol_amazon_content_data_final;
+by ord_week_nmb TCIN;
+run;
+
+data kol.kol_amazon_content_price_data;
+merge
+kol.Kohls_sales_pricetrac_merged_v1(rename =(Kohls_TCIN = TCIN) in=ina)
+kol.kol_amazon_content_data_final(in=inb);
+by
+ord_week_nmb
+TCIN;
+if
+ina=1;
+run; 
+
+proc sort data=kol.kol_amazon_content_price_data nodup;
+by ord_week_nmb kohls_product_id;
+run; /***************************** 2959 ***************************/
+
+proc sort data=kol.kol_amazon_content_price_data nodup;
+by kohls_product_id;
+run; 
+
+proc sort data=kohls_first_last_extr_date nodup;
+by kohls_product_id;
+run; 
+
+
+/************************** Calculating velocity of the product ********************************/
+
+data kol.kol_amazon_content_price_data;
+ set kol.kol_amazon_content_price_data;
+ last_month= intnx ('month',today(),-1) ;
+ last_two_month= intnx ('month',today(),-2);
+ last_three_month= intnx ('month',today(),-3);
+ last_six_month= intnx ('month',today(),-6);
+
+ last_ext_month= intnx ('month',Latest_ext_date,-1) ;
+ last_ext_two_month= intnx ('month',Latest_ext_date,-2);
+ last_ext_three_month= intnx ('month',Latest_ext_date,-3);
+ last_ext_six_month= intnx ('month',Latest_ext_date,-6);	
+
+ format last_month last_two_month last_three_month last_six_month 
+ last_ext_month last_ext_two_month last_ext_three_month last_ext_six_month mmddyy10.;
+ run ;
+
+proc sql;
+create table review_data_cnt as
+select distinct
+	amz_product_id,
+	count(case when v1.extraction_date between Latest_ext_date and last_ext_month then Review_text else "" end) as Total_reviews_last_month,
+	count(case when v1.extraction_date between Latest_ext_date and last_ext_two_month then Review_text else "" end) as Total_reviews_two_months,
+	count(case when v1.extraction_date between Latest_ext_date and last_ext_three_month then Review_text else "" end) as Total_reviews_three_months,
+	count(case when v1.extraction_date between Latest_ext_date and last_ext_six_month then Review_text else "" end) as Total_reviews_six_months
+from
+	kol.kol_amazon_content_price_data v1,
+	kol.Kol_Amazon_Review_Data_v1 as r
+where
+	v1.amz_product_id = r.Unique_Pdt_Identifier_MainPdt and
+	v1.ord_week_nmb = r.ord_week_nmb
+group by
+	amz_product_id;
+quit;
+
+proc sort data =kol.kol_amazon_content_price_data;
+by amz_product_id;
+run;
+
+proc sort data =review_data_cnt;
+by amz_product_id;
+run;
+
+data kol.kol_amazon_content_price_data;
+merge
+kol.kol_amazon_content_price_data(in=ina)
+review_data_cnt(in=inb);
+by
+amz_product_id;
+if
+ina=1;
+run;
+
+
+/************************************** KOHLS DATA ****************************/
+
+/****************** Importing Product file **************************/
+
+data kol.kohls_content_data_v1;
+ %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+  infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\Kohls_Product_Luggage.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2;
+
+	informat UgamID $10.;
+	informat Category_Path $70.;
+	informat Retailer $6.;
+	informat Division $4.;
+	informat Category $5.;
+	informat Department $3.;
+	informat Class $3.;
+	informat Subclass $3.;
+	informat Product_URL $156.;
+	informat Brand $30.;
+	informat Product_Name $500.;
+	informat Unique_Pdt_Identifier_MainPdt $10.;
+	informat Unique_Pdt_Identifier_Variant $10.;
+	informat Final_Price_after_Discount $20.;
+	informat Extraction_Date $16.;
+	informat Page_Title $105.;
+	informat Meta_Keywords $123.;
+	informat Meta_description $143.;
+	informat Product_Description $2044.;
+	informat Product_Description_Main_Copy $4160.;
+	informat Product_Description_Image_Link $3.;
+	informat Product_Description_Feature_Box $3.;
+	informat Product_Description_Fact_Tables $3.;
+	informat Product_Features $3.;
+	informat Product_Images $3.;
+	informat View_share_related_images_widget $2.;
+	informat Color $3.;
+	informat Video $3.;
+	informat Video_Count $3.;
+	informat Video_Length $3.;
+	informat Video_link $3.;
+	informat Product_Specification $500.;
+	informat Pdt_Spec_Cnt_of_attribute $3.;
+	informat Pdt_Spec_Attribution_NameValues $466.;
+	informat Product_Details $500.;
+	informat Product_Details_Cnt_of_attribute $3.;
+	informat Pdt_Detail_Attribution_NameValue $500.;
+	informat Reviews_Count best32.;
+	informat Total_Average_Ratings best32.;
+	informat Rating1 $4.;
+	informat Rating2 $4.;
+	informat Rating3 $4.;
+	informat Rating4 $4.;
+	informat Rating5 $4.;
+	informat Rating6 $3.;
+	informat Rating7 $3.;
+	informat Rating8 $3.;
+	informat Rating9 $3.;
+	informat Rating10 $3.;
+	informat Content_3p $3.;
+	informat Site_Likes $3.;
+	informat Facebook_Like $3.;
+	informat Google_1 $3.;
+	informat Pinterest $3.;
+	informat List_Price $10.;
+	informat Discount best32.;
+	informat Discount_pct comma32.;
+	informat Availability $3.;
+	informat BuyBoxWinner $11.;
+	informat Top_3_sellers $228.;
+	informat Seller_Count_New_item $3.;
+	informat Seller_Count_Used_item $3.;
+	informat Seller_Count_Refurbished_item $3.;
+	informat UPC $32.;
+	informat Product_Dimensions $25.;
+	informat Shipping_weight $9.;
+	informat Special_Offers_Product_Promotion $185.;
+	informat Frequently_Bought_Together_Data $500.;
+	informat Frequently_Bought_Together_Count $3.;
+	informat Product_Details_Size $11.;
+	informat Product_Details_Inseam $3.;
+	informat Best_seller_ranking $17.;
+
+	format UgamID $10.;
+	format Category_Path $70.;
+	format Retailer $6.;
+	format Division $4.;
+	format Category $5.;
+	format Department $3.;
+	format Class $3.;
+	format Subclass $3.;
+	format Product_URL $156.;
+	format Brand $30.;
+	format Product_Name $103.;
+	format Unique_Pdt_Identifier_MainPdt $10.;
+	format Unique_Pdt_Identifier_Variant $10.;
+	format Final_Price_after_Discount $20.;
+	format Extraction_Date $16.;
+	format Page_Title $105.;
+	format Meta_Keywords $123.;
+	format Meta_description $143.;
+	format Product_Description $2044.;
+	format Product_Description_Main_Copy $$4160.;
+	format Product_Description_Image_Link $3.;
+	format Product_Description_Feature_Box $3.;
+	format Product_Description_Fact_Tables $3.;
+	format Product_Features $3.;
+	format Product_Images $3.;
+	format View_share_related_images_widget $2.;
+	format Color $3.;
+	format Video $3.;
+	format Video_Count $3.;
+	format Video_Length $3.;
+	format Video_link $3.;
+	format Product_Specification $500.;
+	format Pdt_Spec_Cnt_of_attribute $3.;
+	format Pdt_Spec_Attribution_NameValues $466.;
+	format Product_Details $500.;
+	format Product_Details_Cnt_of_attribute $3.;
+	format Pdt_Detail_Attribution_NameValue $500.;
+	format Reviews_Count best32.;
+	format Total_Average_Ratings best32.;
+	format Rating1 $4.;
+	format Rating2 $4.;
+	format Rating3 $4.;
+	format Rating4 $4.;
+	format Rating5 $4.;
+	format Rating6 $3.;
+	format Rating7 $3.;
+	format Rating8 $3.;
+	format Rating9 $3.;
+	format Rating10 $3.;
+	format Content_3p $3.;
+	format Site_Likes $3.;
+	format Facebook_Like $3.;
+	format Google_1 $3.;
+	format Pinterest $3.;
+	format List_Price $10.;
+	format Discount best32.;
+	format Discount_pct comma32.;
+	format Availability $3.;
+	format BuyBoxWinner $11.;
+	format Top_3_sellers $228.;
+	format Seller_Count_New_item $3.;
+	format Seller_Count_Used_item $3.;
+	format Seller_Count_Refurbished_item $3.;
+	format UPC $32.;
+	format Product_Dimensions $25.;
+	format Shipping_weight $9.;
+	format Special_Offers_Product_Promotion $185.;
+	format Frequently_Bought_Together_Data $500.;
+	format Frequently_Bought_Together_Count $3.;
+	format Product_Details_Size $11.;
+	format Product_Details_Inseam $3.;
+	format Best_seller_ranking $17.;
+
+Input
+	UgamID $
+	Category_Path $
+	Retailer $
+	Division $
+	Category $
+	Department $
+	Class $
+	Subclass $
+	Product_URL $
+	Brand $
+	Product_Name $
+	Unique_Pdt_Identifier_MainPdt $
+	Unique_Pdt_Identifier_Variant $
+	Final_Price_after_Discount $
+	Extraction_Date $
+	Page_Title $
+	Meta_Keywords $
+	Meta_description $
+	Product_Description $
+	Product_Description_Main_Copy $
+	Product_Description_Image_Link $
+	Product_Description_Feature_Box $
+	Product_Description_Fact_Tables $
+	Product_Features $
+	Product_Images $
+	View_share_related_images_widget $
+	Color $
+	Video $
+	Video_Count $
+	Video_Length $
+	Video_link $
+	Product_Specification $
+	Pdt_Spec_Cnt_of_attribute $
+	Pdt_Spec_Attribution_NameValues $
+	Product_Details $
+	Product_Details_Cnt_of_attribute $
+	Pdt_Detail_Attribution_NameValue $
+	Reviews_Count $
+	Total_Average_Ratings 
+	Rating1 $
+	Rating2 $
+	Rating3 $
+	Rating4 $
+	Rating5 $
+	Rating6 $
+	Rating7 $
+	Rating8 $
+	Rating9 $
+	Rating10 $
+	Content_3p $
+	Site_Likes $
+	Facebook_Like $
+	Google_1 $
+	Pinterest $
+	List_Price $
+	Discount 
+	Discount_pct 
+	Availability $
+	BuyBoxWinner $
+	Top_3_sellers $
+	Seller_Count_New_item $
+	Seller_Count_Used_item $
+	Seller_Count_Refurbished_item $
+	UPC $
+	Product_Dimensions $
+	Shipping_weight $
+	Special_Offers_Product_Promotion $
+	Frequently_Bought_Together_Data $
+	Frequently_Bought_Together_Count $
+	Product_Details_Size $
+	Product_Details_Inseam $
+	Best_seller_ranking $;
+
+if	_ERROR_	then	call	symputx('_EFIERR_',1);	/*	set	ERROR	detection	macro	variable	*/
+run;
+
+data kol.kohls_content_data;
+set kol.kohls_content_data_v1
+(keep = Product_Name Unique_Pdt_Identifier_MainPdt Unique_Pdt_Identifier_Variant Product_Description_Main_Copy
+	    Reviews_Count Total_Average_Ratings);
+kohls_main_copy_len = length(Product_Description_Main_Copy);
+run;
+
+
+data kol.kohls_content_data;
+set kol.kohls_content_data ;
+rename 
+Reviews_Count = kohls_reviews_cnt
+Total_Average_Ratings= kohls_Total_Avg_Ratings;
+run;
+
+/***** Importing review data ***************************/
+
+data kol.kohls_Review_Data_v1;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\Kohls_Review_Luggage.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+informat UgamID $10.;
+informat Category_Path $70.;
+informat Retailer $6.;
+informat Division $4.;
+informat Category $5.;
+informat Department $3.;
+informat Class $3.;
+informat Subclass $3.;
+informat Product_URL $154.;
+informat Brand $25.;
+informat Product_Name $98.;
+informat Unique_Pdt_Identifier_Mainpdt $10.;
+informat Unique_Pdt_Identifier_Variant $10.;
+informat Final_Price_after_Discount $20.;
+informat Extraction_Date $16.;
+informat Review_Link $201.;
+informat Review_Header $66.;
+informat Review_Creation_Date mmddyy10.;
+informat Review_From $23.;
+informat Review_By $58.;
+informat Review_Helpful_Votes best32.;
+informat Review_Total_Votes best32.;
+informat Review_Rating_Score best32.;
+informat Review_Rating_Scale best32.;
+informat Review_Reviewers_Badges $11.;
+informat Review_Text $8994.;
+informat Review_Count_Of_Comments $3.;
+informat Review_Verified_Purchase $4.;
+informat Reviewer_Age $3.;
+informat Reviewer_Gender $3.;
+informat Review_Count best32.;
+informat Product_reviews best32.;
+
+format UgamID $10.;
+format Category_Path $70.;
+format Retailer $6.;
+format Division $4.;
+format Category $5.;
+format Department $3.;
+format Class $3.;
+format Subclass $3.;
+format Product_URL $154.;
+format Brand $25.;
+format Product_Name $98.;
+format Unique_Pdt_Identifier_Mainpdt $10.;
+format Unique_Pdt_Identifier_Variant $10.;
+format Final_Price_after_Discount $20.;
+format Extraction_Date $16.;
+format Review_Link $201.;
+format Review_Header $66.;
+format Review_Creation_Date mmddyy10.;
+format Review_From $23.;
+format Review_By $58.;
+format Review_Helpful_Votes best32.;
+format Review_Total_Votes best32.;
+format Review_Rating_Score best32.;
+format Review_Rating_Scale best32.;
+format Review_Reviewers_Badges $11.;
+format Review_Text $8994.;
+format Review_Count_Of_Comments $3.;
+format Review_Verified_Purchase $4.;
+format Reviewer_Age $3.;
+format Reviewer_Gender $3.;
+format Review_Count best32.;
+format Product_reviews best32.;
+
+input
+UgamID$
+Category_Path$
+Retailer$
+Division$
+Category$
+Department$
+Class$
+Subclass$
+Product_URL$
+Brand$
+Product_Name$
+Unique_Pdt_Identifier_Mainpdt $
+Unique_Pdt_Identifier_Variant $
+Final_Price_after_Discount $
+Extraction_Date $
+Review_Link$
+Review_Header$
+Review_Creation_Date
+Review_From$
+Review_By$
+Review_Helpful_Votes
+Review_Total_Votes
+Review_Rating_Score
+Review_Rating_Scale
+Review_Reviewers_Badges$
+Review_Text$
+Review_Count_Of_Comments$
+Review_Verified_Purchase$
+Reviewer_Age$
+Reviewer_Gender$
+Review_Count
+Product_reviews;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run; /******************* 5152 **************************/
+
+data kol.kohls_Review_Data_v1;
+set kol.kohls_Review_Data_v1;
+if 
+	Review_Creation_Date < '03-Dec-2012'd then ord_week_nmb=0; 
+else 
+	ord_week_nmb = int((Review_Creation_Date - '03-Dec-2012'd)/7)+1;
+run;
+
+
+/******************************** Importing image file ******************************************/
+
+ data kol.Kohls_Image_data_v1;
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+infile 'D:\Karuna Sawant\Price Elasticity\Kohls\2. Edited Data\Content\New data\Kohls_Images_Luggage.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+informat UgamID $9.;
+informat Category_Path $70.;
+informat Retailer $6.;
+informat Division $4.;
+informat Category $5.;
+informat Department $3.;
+informat Class $3.;
+informat Subclass $3.;
+informat Product_URL $162.;
+informat Brand $38.;
+informat Product_Name $98.;
+informat Unique_Pdt_Identifier_Mainpdt $10.;
+informat Unique_Pdt_Identifier_Variant $46.;
+informat Final_Price_after_Discount $3.;
+informat Extraction_Date mmddyy10.;
+informat URL_of_the_Image $126.;
+informat UGC $5.;
+informat Notes $2.;
+informat Alt_Tag $3.;
+format UgamID $9.;
+format Category_Path $70.;
+format Retailer $6.;
+format Division $4.;
+format Category $5.;
+format Department $3.;
+format Class $3.;
+format Subclass $3.;
+format Product_URL $162.;
+format Brand $38.;
+format Product_Name $98.;
+format Unique_Pdt_Identifier_Mainpdt $10.;
+format Unique_Pdt_Identifier_Variant $46.;
+format Final_Price_after_Discount $3.;
+format Extraction_Date mmddyy10.;
+format URL_of_the_Image $126.;
+format UGC $5.;
+format Notes $2.;
+format Alt_Tag $3.;
+
+input
+UgamID $
+Category_Path $
+Retailer $
+Division $
+Category $
+Department $
+Class $
+Subclass $
+Product_URL $
+Brand $
+Product_Name $
+Unique_Pdt_Identifier_Mainpdt $
+Unique_Pdt_Identifier_Variant $
+Final_Price_after_Discount $
+Extraction_Date
+URL_of_the_Image $
+UGC $
+Notes $
+Alt_Tag $;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+
+run;
+
+proc sql;
+create table kol.Kohls_pdt_wise_image as
+select
+	Unique_Pdt_Identifier_Mainpdt,
+	count(URL_of_the_Image) as kohls_Number_of_images,
+	sum(case when UGC="No" then 1 else 0 end) as kohls_Not_User_Gen_images
+from
+	kol.Kohls_Image_data_v1
+group by
+	Unique_Pdt_Identifier_Mainpdt;
+quit;
+
+data kol.kohls_pdt_wise_image;
+set kol.kohls_pdt_wise_image;
+format 
+	kohls_User_Gen_images best32.;
+	kohls_User_Gen_images = (kohls_Number_of_images-kohls_Not_User_Gen_images);
+run;
+
+proc sort data = kol.Kohls_Image_data_v1;
+by
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+proc sort data = kol.kohls_content_data;
+by
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+data kol.kohls_product_image_data;
+Merge
+kol.kohls_content_data(in=ina)
+kol.Kohls_pdt_wise_image;
+by
+Unique_Pdt_Identifier_Mainpdt;
+if ina=1;
+run;
+
+
+proc sort data = kol.kol_amazon_content_price_data;
+by
+kohls_product_id;
+run;
+
+proc sort data = kol.kohls_product_image_data;
+by
+Unique_Pdt_Identifier_Mainpdt;
+run;
+
+data kol.PE_Kohls_final_v1;
+merge
+kol.kol_amazon_content_price_data(in=ina)
+kol.kohls_product_image_data(rename=Unique_Pdt_Identifier_Mainpdt=kohls_product_id);
+by
+kohls_product_id;
+if ina=1;
+run;
+
+proc sort data = kol.PE_Kohls_final_v1;
+by
+ord_week_nmb
+kohls_product_name;
+run;
+
+data kol.PE_Kohls_model_data_final;
+set kol.PE_Kohls_final_v1(keep=ord_week_nmb kohls_product_id Kohls_product_name Net_Sales_volume Gross_sales_volume Kohls_Regular_price Kohls_disc_perc Kohls_final_price Kohls_Shipping 
+amz_Regular_price amz_disc_perc amz_final_price amz_Shipping Target_Regular_price Traget_disc_perc Target_final_price Target_Shipping 
+No_of_variants Price_diff_amz_final_pr Price_diff_target_final_pr Reviews_Count Total_Average_Ratings Avg_helpful_votes Avg_sentiment_score 
+Total_sentiment_score Actual_avg_score Avg_Positive_sentiment_score Total_Positive_sentiment_score Avg_negative_sentiment_score 
+Total_negative_sentiment_score Avg_Weighted_score Total_weighted_score Amz_Number_of_images Amz_Not_User_Gen_images Amz_User_Generated_images 
+kohls_Number_of_images kohls_Not_User_Gen_images kohls_User_Gen_images kohls_reviews_cnt kohls_Total_Avg_Ratings kohls_main_copy_len 
+Kohls_own_Total_sub_pro Amz_Total_sub_pro Target_Total_sub_pro 
+Kohls_own_Total_sub_duff Amz_Total_sub_duff Target_Total_sub_duff 
+Kohls_own_Total_sub_lugg Amz_Total_sub_lugg Target_Total_sub_lugg 
+Kohls_own_Total_sub_kid Amz_Total_sub_kid Target_Total_sub_kid 
+Kohls_own_Total_sub_accr Amz_Total_sub_accr Target_Total_sub_accr 
+kohls_main_copy_len Amazon_main_copy_len Availability_flag 
+Recency_Month Recency_week Total_reviews_last_month Total_reviews_two_months Total_reviews_three_months Total_reviews_six_months);
+run;
+
+data kol.PE_Kohls_model_data_final_v1;
+set kol.PE_Kohls_model_data_final;
+if Gross_sales_volume>0;
+run; /********************************* 756 **************************/
+
+
+
+

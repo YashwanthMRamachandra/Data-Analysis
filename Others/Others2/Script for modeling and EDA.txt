@@ -1,0 +1,391 @@
+
+/******* OD ****************/
+
+data price.od_pt_edited;
+
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+ infile 'D:\OfficeDepot_Karuna_201407\Round2\Data\Data to import\OD_paper_towel_missing_filled.txt' delimiter='09'x MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+ informat od_class $500.;
+ informat od_product_id $10. ;
+ informat SKU best32. ;
+ informat weekno best32. ;
+ informat od_final_price best32. ;
+ informat avail_flag best32. ;
+ informat od_avail best32. ;
+ informat od_cnt best32. ;
+
+ format od_class $500.;
+ format od_product_id $10. ;
+ format SKU best32. ;
+ format weekno best32. ;
+ format od_final_price best32. ;
+ format avail_flag best32. ;
+ format od_avail best32. ;
+ format od_cnt best32. ;
+
+ input
+         od_class $
+ 		 od_product_id $
+		 SKU 
+		 weekno
+		 od_final_price
+		 avail_flag
+		 od_avail
+		 od_cnt;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc sort data = price.od_pt_edited;
+by
+SKU 
+weekno;
+run;
+
+
+/******* Amazon ****************/
+
+data price.Amz_pt_edited;
+
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+ infile 'D:\OfficeDepot_Karuna_201407\Round2\Data\Data to import\Amazon_paper_towel_missing_filled.txt' delimiter='09'x MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+ informat Amz_class $500.;
+ informat Amz_product_id $10. ;
+ informat SKU best32. ;
+ informat weekno best32. ;
+ informat Amz_final_price best32. ;
+ informat avail_flag best32. ;
+ informat Amz_avail best32. ;
+ informat Amz_cnt best32. ;
+
+ format Amz_class $500.;
+ format Amz_product_id $10. ;
+ format SKU best32. ;
+ format weekno best32. ;
+ format Amz_final_price best32. ;
+ format avail_flag best32. ;
+ format Amz_avail best32. ;
+ format Amz_cnt best32. ;
+
+ input
+         Amz_class $
+ 		 Amz_product_id $
+		 SKU 
+		 weekno
+		 Amz_final_price
+		 avail_flag
+		 Amz_avail
+		 Amz_cnt;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc sort data = price.Amz_pt_edited;
+by
+SKU 
+weekno;
+run;
+
+/******* Amazon Marketplace ****************/
+
+data price.Amz_mkt_pt_edited;
+
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+ infile 'D:\OfficeDepot_Karuna_201407\Round2\Data\Data to import\Amazon_mkt_paper_towel_missing_filled.txt' delimiter='09'x MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+ informat Amz_mkt_class $500.;
+ informat Amz_mkt_product_id $10. ;
+ informat SKU best32. ;
+ informat weekno best32. ;
+ informat Amz_mkt_final_price best32. ;
+ informat avail_flag best32. ;
+ informat Amz_mkt_avail best32. ;
+ informat Amz_mkt_cnt best32. ;
+
+ format Amz_mkt_class $500.;
+ format Amz_mkt_product_id $10. ;
+ format SKU best32. ;
+ format weekno best32. ;
+ format Amz_mkt_final_price best32. ;
+ format avail_flag best32. ;
+ format Amz_mkt_avail best32. ;
+ format Amz_mkt_cnt best32. ;
+
+ input
+         Amz_mkt_class $
+ 		 Amz_mkt_product_id $
+		 SKU 
+		 weekno
+		 Amz_mkt_final_price
+		 avail_flag
+		 Amz_mkt_avail
+		 Amz_mkt_cnt;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc sort data = price.Amz_mkt_pt_edited;
+by
+SKU 
+weekno;
+run;
+
+
+/******* Walmart ****************/
+
+data price.Walmart_pt_edited;
+
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+ infile 'D:\OfficeDepot_Karuna_201407\Round2\Data\Data to import\Walmart_paper_towel_misisng_filled.txt' delimiter='09'x MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+ informat Walmart_class $500.;
+ informat Walmart_product_id $10. ;
+ informat SKU best32. ;
+ informat weekno best32. ;
+ informat Walmart_final_price best32. ;
+ informat avail_flag best32. ;
+ informat Walmart_avail best32. ;
+ informat Walmart_cnt best32. ;
+
+ format Walmart_class $500.;
+ format Walmart_product_id $10. ;
+ format SKU best32. ;
+ format weekno best32. ;
+ format Walmart_final_price best32. ;
+ format avail_flag best32. ;
+ format Walmart_avail best32. ;
+ format Walmart_cnt best32. ;
+
+ input
+         Walmart_class $
+ 		 Walmart_product_id $
+		 SKU 
+		 weekno
+		 Walmart_final_price
+		 avail_flag
+		 Walmart_avail
+		 Walmart_cnt;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc sort data = price.Walmart_pt_edited;
+by
+SKU 
+weekno;
+run;
+
+
+/*********** Staples ****************/
+
+data price.staples_pt_edited;
+
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+ infile 'D:\OfficeDepot_Karuna_201407\Round2\Data\Data to import\Staples_paper_towel_missing_handling.txt' delimiter='09'x MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+ informat staples_class $500.;
+ informat staples_product_id $10. ;
+ informat SKU best32. ;
+ informat weekno best32. ;
+ informat staples_final_price best32. ;
+ informat avail_flag best32. ;
+ informat staples_avail best32. ;
+ informat staples_cnt best32. ;
+
+ format staples_class $500.;
+ format staples_product_id $10. ;
+ format SKU best32. ;
+ format weekno best32. ;
+ format staples_final_price best32. ;
+ format avail_flag best32. ;
+ format staples_avail best32. ;
+ format staples_cnt best32. ;
+
+ input
+         staples_class $
+ 		 staples_product_id $
+		 SKU 
+		 weekno
+		 staples_final_price
+		 avail_flag
+		 staples_avail
+		 staples_cnt;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc sort data = price.staples_pt_edited;
+by
+SKU 
+weekno;
+run;
+
+/******* Best buy ****************/
+
+data price.bb_pt_edited;
+
+%let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+
+ infile 'D:\OfficeDepot_Karuna_201407\Round2\Data\Data to import\bb_paper_towel_missing_handling.txt' delimiter='09'x MISSOVER DSD lrecl=32767 firstobs=2 ;
+
+ informat bb_class $500.;
+ informat bb_product_id $10. ;
+ informat SKU best32. ;
+ informat weekno best32. ;
+ informat bb_final_price best32. ;
+ informat avail_flag best32. ;
+ informat bb_avail best32. ;
+ informat bb_cnt best32. ;
+
+ format bb_class $500.;
+ format bb_product_id $10. ;
+ format SKU best32. ;
+ format weekno best32. ;
+ format bb_final_price best32. ;
+ format avail_flag best32. ;
+ format bb_avail best32. ;
+ format bb_cnt best32. ;
+
+ input
+         bb_class $
+ 		 bb_product_id $
+		 SKU 
+		 weekno
+		 bb_final_price
+		 avail_flag
+		 bb_avail
+		 bb_cnt;
+
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc sort data = price.bb_pt_edited;
+by
+SKU 
+weekno;
+run;
+
+
+
+/******************** Merging all the competitor data ********************/
+
+data 
+	  price.price_merged_pt;
+merge 
+	  price.od_pt_edited (in=ina drop = od_class avail_flag)
+      price.Amz_pt_edited (in=ina drop = amz_class avail_flag)
+      price.Amz_mkt_pt_edited (in=ina drop = amz_mkt_class avail_flag)
+	  price.Walmart_pt_edited (in=ina drop = walmart_class avail_flag)
+	  price.staples_pt_edited (in=ina drop = staples_class avail_flag);
+/*    price.bb_pt_edited (in=ina drop = bb_class avail_flag);*/
+by  
+	 SKU
+	 weekno;
+if 
+	ina = 1;
+run;
+
+data price.price_merged_pt;
+set price.price_merged_pt;
+
+where od_final_price>=0;
+run;
+
+
+/******************************************************************************************************** 
+
+						Merging sales and price data by week no and product id 
+
+**********************************************************************************************************/
+
+
+proc sort data = sale.skuwise_total_sales;
+by week_nmb SKU;
+run;
+
+proc sort data = price.price_merged_pt;
+by weekno SKU;
+run;
+
+
+data od.price_sales_pt;
+merge 
+	sale.skuwise_total_sales (in=ina rename =(week_nmb = weekno))
+	price.price_merged_pt (in = inb drop =  od_product_id  od_cnt
+										    amz_product_id Amz_cnt 
+										    amz_mkt_product_id Amz_mkt_cnt 
+/*										    bb_product_id bb_cnt */
+										    staples_product_id staples_cnt 
+										    walmart_product_id Walmart_cnt);	
+by 
+	weekno 
+	SKU;
+if 
+	ina = 1 and inb=1;
+run;
+
+
+proc sort data =  od.price_sales_pt nodup;
+by weekno SKU;
+run;
+
+
+data od.price_sales_pt;
+set od.price_sales_pt;
+
+pr_diff_amz_final_pr = od_final_price - amz_final_price;
+pr_diff_amz_mkt_final_pr = od_final_price - amz_mkt_final_price;
+pr_diff_stpl_final_pr = od_final_price - stpl_final_price;
+pr_diff_walmart_final_pr = od_final_price - walmart_final_price;
+pr_diff_bb_final_pr = od_final_price - bb_final_price;
+
+pr_rat_amz_final_pr = od_final_price / amz_final_price;
+pr_rat_amz_mkt_final_pr = od_final_price / amz_mkt_final_price;
+pr_rat_stpl_final_pr = od_final_price / stpl_final_price;
+pr_rat_walmart_final_pr = od_final_price / walmart_final_price;
+pr_rat_bb_final_pr = od_final_price / bb_final_price;
+
+ln_sales_units = log(sales_units);
+ln_od_final_pr = log(od_final_price);
+ln_amz_final_pr = log(amz_final_price);
+ln_amz_mkt_final_pr = log(amz_mkt_final_price);
+ln_stpl_final_pr = log(stpl_final_price);
+ln_walmart_final_pr = log(walmart_final_price);
+ln_bb_final_pr = log(bb_final_price);
+
+run;
+
+
+data od.price_sales_pt;
+set od.price_sales_pt;
+format min_comp_price best32.;
+min_comp_price = min(amz_final_price,amz_mkt_final_price,stpl_final_price,walmart_final_price,bb_final_price);
+run;
+
+data od.price_sales_pt;
+set od.price_sales_pt;
+ln_min_comp_price = log(min_comp_price);
+run;
+
+
+
+data od.model_Paper_towel;
+set od.price_sales_pt
+(keep = SKU weekno sales_units 
+od_final_price od_avail 
+amz_final_price amz_avail 
+amz_mkt_final_price amz_mkt_avail 
+staples_final_price staples_avail 
+walmart_final_price walmart_avail 
+pr_diff_amz_final_pr pr_diff_amz_mkt_final_pr pr_diff_stpl_final_pr pr_diff_walmart_final_pr 
+pr_rat_amz_final_pr pr_rat_amz_mkt_final_pr pr_rat_stpl_final_pr pr_rat_walmart_final_pr 
+ln_sales_units ln_od_final_pr ln_amz_final_pr ln_amz_mkt_final_pr ln_stpl_final_pr ln_walmart_final_pr 
+min_comp_price ln_min_comp_price);
+run;

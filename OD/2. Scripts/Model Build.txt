@@ -1,0 +1,89 @@
+
+proc sort data = od.model_airfresh;
+by sku;
+run;
+
+data od.model_airfresh;
+set od.model_airfresh;
+by sku;
+sales_lag = lag(sales_units);
+if first.sku then sales_lag = .;
+
+run;
+
+
+PROC SURVEYSELECT DATA=od.model_airfresh OUT=od.airfresh_train METHOD=SRS
+  SAMPSIZE=785 SEED=1234567;
+  RUN;
+
+PROC SURVEYSELECT DATA=od.model_airfresh OUT=od.airfresh_test METHOD=SRS
+  SAMPSIZE=337 SEED=1234567;
+RUN;
+
+
+Proc Mixed Data = od.airfresh_train;  
+class SKU weeknO;
+
+MODEL  ln_sales_units =
+
+ln_od_final_pr
+/*ln_amz_final_pr*/
+/*ln_amz_mkt_final_pr*/
+/*ln_walmart_final_pr*/
+/*ln_stpl_final_pr*/
+
+/*min_comp_final_price*/
+/*ln_min_comp_final_price*/
+
+/*ln_od_regular_pr*/
+/*ln_amz_regular_pr*/
+/*ln_amz_mkt_regular_pr*/
+/*ln_walmart_regular_pr*/
+/*ln_stpl_regular_pr*/
+
+/*od_disc_perc*/
+/*amz_disc_perc*/
+/*amz_mkt_disc_perc*/
+/*walmart_disc_perc*/
+/*staples_disc_perc*/
+
+/*od_ship*/
+/*amz_ship*/
+/*amz_mkt_ship*/
+/*walmart_ship*/
+/*staples_ship*/
+
+/*od_avail*/
+/*amz_avail*/
+/*amz_mkt_avail*/
+/*Walmart_avail*/
+/*staples_avail*/
+
+
+/*pr_diff_amz_final_pr*/
+/*pr_diff_amz_mkt_final_pr*/
+/*pr_diff_stpl_final_pr*/
+/*pr_diff_walmart_final_pr*/
+
+/*pr_rat_amz_final_pr*/
+/*pr_rat_amz_mkt_final_pr*/
+/*pr_rat_stpl_final_pr*/
+/*pr_rat_walmart_final_pr*/
+
+/ Solution OutPM=PAFit OutP=SSFit; 
+
+Random Intercept / Solution Subject= SKU Type=UN G GCorr V VCorr; 
+Run;
+
+
+Proc reg data = od.personal_shredder_train;
+
+Model ln_sales_units =
+
+ln_od_final_pr 
+pr_diff_amz_mkt_final_pr
+walmart_avail
+
+/dw VIF stb;
+
+quit;

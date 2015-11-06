@@ -1,0 +1,13 @@
+Proc sql;
+Create table site_qc as
+Select
+Site_name,
+Pt_department,
+Count(distinct product_id) as cnt
+From
+Price.price
+Group by
+Site_name,
+Pt_department;
+Quit;
+
