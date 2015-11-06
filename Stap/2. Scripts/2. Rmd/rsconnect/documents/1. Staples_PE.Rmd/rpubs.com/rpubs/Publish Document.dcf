@@ -1,0 +1,7 @@
+name: Publish Document
+account: rpubs
+server: rpubs.com
+bundleId:
+        https://api.rpubs.com/api/v1/document/102251/e8da0c943b7148f79aa3aa74dbd29cac
+url: http://rpubs.com/Yash_Ugam/102251
+when: 1441013212.58141

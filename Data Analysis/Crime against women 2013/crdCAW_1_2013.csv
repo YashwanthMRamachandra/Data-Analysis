@@ -1,0 +1,457 @@
+State_UTs,Crime_Head,Cases_Pending_Investigation_from_Previous_Year,Cases_reported_during_the_year,No_of_cases_withdrawn_by_the_Govt_during_investigation,Cases_not_investigated_or_in_which_investigation_was_refused,Cases_declared_false_on_account_of_mistake_of_fact_or_of_law,Cases_in_which_chargesheets_were_laid,Cases_in_which_charge_sheets_were_not_laid_but_final_report_submitted_during_the_year,Total_cases_Chargesheeted_Final_Report_submitted,Cases_pending_investigation_at_the_end_of_the_year,Cases_pending_trial_from_the_previous_year,Cases_sent_for_trial_during_the_year,No_of_cases_withdrawn_by_the_Govt,Total_cases_for_trial_during_the_year,Cases_compounded_or_withdrawn,Cases_in_which_trials_were_completed,Cases_convicted,Cases_acquitted_or_discharged,Cases_pending_trial_at_the_end_of_the_year
+Andhra Pradesh,Assault on women with intent to outrage her Modest,1788,6930,0,0,917,4814,156,4970,2831,7071,4814,0,11885,457,2428,285,2143,9000
+Arunachal Pradesh,Assault on women with intent to outrage her Modest,40,93,0,0,0,53,15,68,65,440,53,0,493,2,15,7,8,476
+Assam,Assault on women with intent to outrage her Modest,1329,2409,0,0,15,1212,706,1918,1805,2389,1212,0,3601,0,813,55,758,2788
+Bihar,Assault on women with intent to outrage her Modest,85,331,0,0,10,268,37,305,101,2313,268,0,2581,42,318,44,274,2221
+Chhattisgarh,Assault on women with intent to outrage her Modest,89,2261,0,0,1,2185,22,2207,142,7977,2185,0,10162,268,1695,553,1142,8199
+Goa,Assault on women with intent to outrage her Modest,44,162,0,0,0,93,9,102,104,101,93,0,194,1,22,3,19,171
+Gujarat,Assault on women with intent to outrage her Modest,96,1243,0,0,4,1162,8,1170,165,7491,1162,0,8653,10,519,32,487,8124
+Haryana,Assault on women with intent to outrage her Modest,28,1560,0,0,218,1263,11,1274,96,1554,1263,0,2817,0,693,213,480,2124
+Himachal Pradesh,Assault on women with intent to outrage her Modest,41,493,0,0,55,398,3,401,78,1517,398,0,1915,35,190,38,152,1690
+Jammu & Kashmir,Assault on women with intent to outrage her Modest,180,1389,0,0,84,1248,2,1250,235,4956,1248,0,6204,352,1321,89,1232,4531
+Jharkhand,Assault on women with intent to outrage her Modest,164,524,0,0,13,453,65,518,157,766,453,0,1219,2,387,99,288,830
+Karnataka,Assault on women with intent to outrage her Modest,924,3913,0,3,167,3409,72,3481,1186,6523,3409,0,9932,206,1829,75,1754,7897
+Kerala,Assault on women with intent to outrage her Modest,692,4362,0,0,209,3761,91,3852,993,14177,3761,0,17938,110,1554,238,1316,16274
+Madhya Pradesh,Assault on women with intent to outrage her Modest,218,8252,0,0,16,7948,44,7992,462,23267,7948,0,31215,2558,4102,1619,2483,24555
+Maharashtra,Assault on women with intent to outrage her Modest,1613,8132,0,0,135,6368,95,6463,3147,28393,6368,1,34760,499,2546,303,2243,31715
+Manipur,Assault on women with intent to outrage her Modest,224,59,0,0,0,6,41,47,236,16,6,0,22,0,0,0,0,22
+Meghalaya,Assault on women with intent to outrage her Modest,129,98,0,0,1,66,19,85,141,244,66,0,310,2,6,2,4,302
+Mizoram,Assault on women with intent to outrage her Modest,18,81,0,0,0,76,3,79,20,84,76,0,160,0,77,55,22,83
+Nagaland,Assault on women with intent to outrage her Modest,3,18,0,0,0,14,2,16,5,17,14,0,31,0,18,17,1,13
+Odisha,Assault on women with intent to outrage her Modest,1045,4618,0,0,221,4205,75,4280,1162,19422,4205,0,23627,0,1703,108,1595,21924
+Punjab,Assault on women with intent to outrage her Modest,320,1045,0,0,95,502,97,599,671,661,502,0,1163,1,260,104,156,902
+Rajasthan,Assault on women with intent to outrage her Modest,33,4829,0,0,1547,3045,26,3071,244,9230,3045,0,12275,435,1582,877,705,10258
+Sikkim,Assault on women with intent to outrage her Modest,8,29,0,0,0,28,1,29,8,33,28,0,61,0,39,24,15,22
+Tamil Nadu,Assault on women with intent to outrage her Modest,813,1271,0,0,174,1201,122,1323,587,3653,1201,0,4854,1,1358,378,980,3495
+Tripura,Assault on women with intent to outrage her Modest,23,407,0,0,0,357,36,393,37,1123,357,0,1480,38,210,35,175,1232
+Uttar Pradesh,Assault on women with intent to outrage her Modest,209,7303,0,0,270,6152,379,6531,711,8507,6152,0,14659,229,2096,1336,760,12334
+Uttarakhand,Assault on women with intent to outrage her Modest,7,295,0,0,10,243,22,265,27,355,243,0,598,0,99,58,41,499
+West Bengal,Assault on women with intent to outrage her Modest,3004,4913,0,0,0,5049,261,5310,2607,15020,5049,0,20069,5,806,96,710,19258
+Total (State),Assault on women with intent to outrage her Modest,13167,67020,0,3,4162,55579,2420,57999,18023,167300,55579,1,222878,5253,26686,6743,19943,190939
+A&N Islands,Assault on women with intent to outrage her Modest,11,45,0,0,0,43,3,46,10,211,43,0,254,0,9,3,6,245
+Chandigarh,Assault on women with intent to outrage her Modest,20,143,0,0,6,96,8,104,53,85,96,0,181,0,52,12,40,129
+D&N Haveli,Assault on women with intent to outrage her Modest,2,1,0,0,0,2,0,2,1,22,2,0,24,0,0,0,0,24
+Daman & Diu,Assault on women with intent to outrage her Modest,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0
+Delhi UT,Assault on women with intent to outrage her Modest,371,3515,0,0,29,2520,111,2631,1226,3715,2520,0,6235,4,763,306,457,5468
+Lakshadweep,Assault on women with intent to outrage her Modest,1,1,0,0,0,0,1,1,1,0,0,0,0,0,0,0,0,0
+Puducherry,Assault on women with intent to outrage her Modest,7,12,0,0,0,16,0,16,3,241,16,0,257,5,18,9,9,234
+Total (UTs),Assault on women with intent to outrage her Modest,412,3719,0,0,35,2677,123,2800,1296,4274,2677,0,6951,9,842,330,512,6100
+Total (All-India),Assault on women with intent to outrage her Modest,13579,70739,0,3,4197,58256,2543,60799,19319,171574,58256,1,229829,5262,27528,7073,20455,197039
+Andhra Pradesh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Arunachal Pradesh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Assam,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Bihar,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Chhattisgarh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Goa,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Gujarat,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Haryana,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Himachal Pradesh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Jammu & Kashmir,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Jharkhand,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Karnataka,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Kerala,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Madhya Pradesh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Maharashtra,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Manipur,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Meghalaya,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Mizoram,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Nagaland,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Odisha,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Punjab,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Rajasthan,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+Sikkim,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tamil Nadu,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tripura,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Uttar Pradesh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Uttarakhand,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+West Bengal,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Total (State),Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+A&N Islands,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Chandigarh,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+D&N Haveli,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Daman & Diu,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Delhi UT,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Lakshadweep,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Total (UTs),Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Total (All-India),Commission of Sati (P) Act,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+Andhra Pradesh,Cruelty by Husband or his relatives,5640,15084,0,0,1157,12201,502,12703,6864,22634,12201,3,34832,2037,4797,782,4015,27998
+Arunachal Pradesh,Cruelty by Husband or his relatives,14,29,0,0,0,20,4,24,19,106,20,0,126,0,8,5,3,118
+Assam,Cruelty by Husband or his relatives,5499,8636,0,0,83,5116,2150,7266,6786,9680,5116,0,14796,287,3374,142,3232,11135
+Bihar,Cruelty by Husband or his relatives,2260,4533,0,0,695,3383,474,3857,2241,7957,3383,0,11340,243,1103,194,909,9994
+Chhattisgarh,Cruelty by Husband or his relatives,101,1181,0,0,0,1158,4,1162,120,4632,1158,0,5790,156,726,142,584,4908
+Goa,Cruelty by Husband or his relatives,33,40,0,0,1,25,9,34,38,53,25,0,78,1,11,0,11,66
+Gujarat,Cruelty by Husband or his relatives,808,7812,1,6,7,7690,18,7708,898,42859,7690,0,50549,211,3488,79,3409,46850
+Haryana,Cruelty by Husband or his relatives,881,3617,0,0,982,2647,252,2899,617,6743,2647,0,9390,22,2109,285,1824,7259
+Himachal Pradesh,Cruelty by Husband or his relatives,61,328,0,0,44,279,0,279,66,1296,279,2,1573,63,131,7,124,1379
+Jammu & Kashmir,Cruelty by Husband or his relatives,108,428,0,0,44,339,0,339,153,749,339,0,1088,93,134,4,130,861
+Jharkhand,Cruelty by Husband or his relatives,702,2084,0,0,74,1366,384,1750,962,1163,1366,0,2529,58,926,219,707,1545
+Karnataka,Cruelty by Husband or his relatives,1118,3276,0,33,193,3053,92,3145,1023,8813,3053,1,11865,193,2139,85,2054,9533
+Kerala,Cruelty by Husband or his relatives,1397,4820,0,1,194,4393,90,4483,1539,20844,4393,0,25237,83,2546,173,2373,22608
+Madhya Pradesh,Cruelty by Husband or his relatives,191,4988,1,0,4,4929,15,4944,230,12621,4929,0,17550,1931,2559,907,1652,13060
+Maharashtra,Cruelty by Husband or his relatives,2477,8542,4,3,120,7453,76,7529,3363,54600,7453,5,62048,986,5467,142,5325,55595
+Manipur,Cruelty by Husband or his relatives,154,29,0,0,0,2,10,12,171,11,2,0,13,0,0,0,0,13
+Meghalaya,Cruelty by Husband or his relatives,52,23,0,0,0,13,4,17,58,52,13,0,65,0,5,0,5,60
+Mizoram,Cruelty by Husband or his relatives,3,5,0,0,0,8,0,8,0,0,8,0,8,0,4,3,1,4
+Nagaland,Cruelty by Husband or his relatives,0,4,0,0,0,1,0,1,3,1,1,0,2,0,1,1,0,1
+Odisha,Cruelty by Husband or his relatives,1212,2792,0,0,79,2331,48,2379,1546,9584,2331,0,11915,0,1110,78,1032,10805
+Punjab,Cruelty by Husband or his relatives,1110,1741,0,0,134,977,244,1221,1496,3971,977,0,4948,7,538,156,382,4403
+Rajasthan,Cruelty by Husband or his relatives,546,15094,0,2,6615,7721,63,7784,1239,28317,7721,0,36038,1186,4565,1665,2900,30287
+Sikkim,Cruelty by Husband or his relatives,1,5,0,0,0,3,1,4,2,10,3,0,13,0,7,5,2,6
+Tamil Nadu,Cruelty by Husband or his relatives,1154,2471,0,0,215,1853,200,2053,1357,4495,1853,0,6348,4,1343,235,1108,5001
+Tripura,Cruelty by Husband or his relatives,84,827,0,0,0,785,60,845,66,1029,785,0,1814,92,676,74,602,1046
+Uttar Pradesh,Cruelty by Husband or his relatives,2504,8781,0,0,138,5609,2256,7865,3282,15705,5609,0,21314,442,3122,1572,1550,17750
+Uttarakhand,Cruelty by Husband or his relatives,100,435,0,0,6,321,85,406,123,1234,321,0,1555,14,130,75,55,1411
+West Bengal,Cruelty by Husband or his relatives,9586,18116,0,0,0,18415,682,19097,8605,109330,18415,0,127745,20,3588,82,3506,124137
+Total (State),Cruelty by Husband or his relatives,37796,115721,6,45,10785,92091,7723,99814,42867,368489,92091,11,460569,8129,44607,7112,37495,407833
+A&N Islands,Cruelty by Husband or his relatives,5,9,0,0,0,9,2,11,3,69,9,0,78,0,10,1,9,68
+Chandigarh,Cruelty by Husband or his relatives,77,92,0,0,9,55,3,58,102,249,55,0,304,0,67,8,59,237
+D&N Haveli,Cruelty by Husband or his relatives,3,1,0,0,0,0,0,0,4,17,0,0,17,0,0,0,0,17
+Daman & Diu,Cruelty by Husband or his relatives,3,2,0,0,0,3,1,4,1,11,3,0,14,0,3,0,3,11
+Delhi UT,Cruelty by Husband or his relatives,5482,3033,0,0,70,1218,79,1297,7148,3838,1218,2,5054,89,731,137,594,4234
+Lakshadweep,Cruelty by Husband or his relatives,1,0,0,0,0,1,0,1,0,0,1,0,1,0,0,0,0,1
+Puducherry,Cruelty by Husband or his relatives,5,8,0,0,0,9,0,9,4,33,9,0,42,0,5,0,5,37
+Total (UTs),Cruelty by Husband or his relatives,5576,3145,0,0,79,1295,85,1380,7262,4217,1295,2,5510,89,816,146,670,4605
+Total (All-India),Cruelty by Husband or his relatives,43372,118866,6,45,10864,93386,7808,101194,50129,372706,93386,13,466079,8218,45423,7258,38165,412438
+Andhra Pradesh,Dowry Deaths,312,492,0,0,32,448,1,449,323,1307,448,0,1755,3,452,52,400,1300
+Arunachal Pradesh,Dowry Deaths,1,0,0,0,0,1,0,1,0,0,1,0,1,0,0,0,0,1
+Assam,Dowry Deaths,268,170,0,0,0,103,19,122,316,465,103,0,568,0,68,23,45,500
+Bihar,Dowry Deaths,1399,1182,0,0,96,1066,128,1194,1291,5344,1066,0,6410,72,577,149,428,5761
+Chhattisgarh,Dowry Deaths,8,109,0,0,0,97,1,98,19,414,97,0,511,1,98,28,70,412
+Goa,Dowry Deaths,1,0,0,0,0,1,0,1,0,9,1,0,10,0,2,1,1,8
+Gujarat,Dowry Deaths,5,29,0,0,0,29,0,29,5,503,29,0,532,0,26,1,25,506
+Haryana,Dowry Deaths,34,263,0,0,36,233,1,234,27,467,233,0,700,0,261,82,179,439
+Himachal Pradesh,Dowry Deaths,0,0,0,0,0,0,0,0,0,22,0,0,22,0,3,0,3,19
+Jammu & Kashmir,Dowry Deaths,2,7,0,0,2,6,0,6,1,60,6,0,66,0,9,1,8,57
+Jharkhand,Dowry Deaths,301,307,0,0,8,247,36,283,317,527,247,0,774,0,216,96,120,558
+Karnataka,Dowry Deaths,70,277,0,3,11,225,13,238,95,768,225,0,993,3,146,24,122,844
+Kerala,Dowry Deaths,25,21,0,0,0,21,0,21,25,182,21,0,203,0,6,1,5,197
+Madhya Pradesh,Dowry Deaths,69,776,0,0,0,753,1,754,91,2337,753,0,3090,10,677,220,457,2403
+Maharashtra,Dowry Deaths,114,320,0,0,2,328,4,332,100,3764,328,0,4092,3,209,17,192,3880
+Manipur,Dowry Deaths,2,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0
+Meghalaya,Dowry Deaths,5,2,0,0,0,1,0,1,6,6,1,0,7,0,0,0,0,7
+Mizoram,Dowry Deaths,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Nagaland,Dowry Deaths,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+Odisha,Dowry Deaths,444,395,0,0,13,397,7,404,422,1777,397,0,2174,0,224,29,195,1950
+Punjab,Dowry Deaths,97,126,0,0,6,93,3,96,121,301,93,0,394,0,120,66,54,274
+Rajasthan,Dowry Deaths,83,453,0,0,95,349,1,350,91,1863,349,0,2212,11,220,97,123,1981
+Sikkim,Dowry Deaths,2,0,0,0,0,2,0,2,0,2,2,0,4,0,4,2,2,0
+Tamil Nadu,Dowry Deaths,131,118,0,0,1,118,5,123,125,565,118,0,683,0,112,27,85,571
+Tripura,Dowry Deaths,19,29,0,0,0,36,2,38,10,118,36,0,154,0,12,3,9,142
+Uttar Pradesh,Dowry Deaths,400,2335,0,0,96,1864,216,2080,559,7435,1864,0,9299,45,1410,690,720,7844
+Uttarakhand,Dowry Deaths,11,43,0,0,1,34,6,40,13,172,34,0,206,1,57,31,26,148
+West Bengal,Dowry Deaths,538,481,0,0,0,437,3,440,579,2565,437,0,3002,0,288,33,255,2714
+Total (State),Dowry Deaths,4341,7936,0,3,399,6889,447,7336,4539,30973,6889,0,37862,149,5197,1673,3524,32516
+A&N Islands,Dowry Deaths,1,1,0,0,0,1,0,1,1,6,1,0,7,0,0,0,0,7
+Chandigarh,Dowry Deaths,1,1,0,0,0,1,0,1,1,6,1,0,7,0,5,2,3,2
+D&N Haveli,Dowry Deaths,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2
+Daman & Diu,Dowry Deaths,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Delhi UT,Dowry Deaths,73,144,0,0,1,121,4,125,91,887,121,0,1008,0,82,33,49,926
+Lakshadweep,Dowry Deaths,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Dowry Deaths,1,1,0,0,0,1,0,1,1,14,1,0,15,0,0,0,0,15
+Total (UTs),Dowry Deaths,76,147,0,0,1,124,4,128,94,915,124,0,1039,0,87,35,52,952
+Total (All-India),Dowry Deaths,4417,8083,0,3,400,7013,451,7464,4633,31888,7013,0,38901,149,5284,1708,3576,33468
+Andhra Pradesh,Dowry Prohibition Act,1063,1631,0,0,82,1570,115,1685,927,3268,1570,0,4838,675,1081,44,1037,3082
+Arunachal Pradesh,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Assam,Dowry Prohibition Act,65,40,0,0,0,56,4,60,45,208,56,0,264,0,23,3,20,241
+Bihar,Dowry Prohibition Act,1008,1893,0,0,166,1284,158,1442,1293,5297,1284,0,6581,83,658,144,514,5840
+Chhattisgarh,Dowry Prohibition Act,0,11,0,0,0,10,0,10,1,31,10,0,41,0,6,3,3,35
+Goa,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Gujarat,Dowry Prohibition Act,0,84,0,0,0,66,2,68,16,27,66,0,93,0,13,0,13,80
+Haryana,Dowry Prohibition Act,2,13,0,0,4,7,2,9,2,20,7,0,27,0,5,1,4,22
+Himachal Pradesh,Dowry Prohibition Act,0,2,0,0,0,0,0,0,2,15,0,0,15,3,2,0,2,10
+Jammu & Kashmir,Dowry Prohibition Act,11,3,0,0,1,2,0,2,11,19,2,0,21,0,0,0,0,21
+Jharkhand,Dowry Prohibition Act,639,1428,0,0,36,983,126,1109,922,1056,983,0,2039,22,774,177,597,1243
+Karnataka,Dowry Prohibition Act,626,1693,0,12,157,1265,19,1284,866,2910,1265,0,4175,19,682,19,663,3474
+Kerala,Dowry Prohibition Act,6,3,0,0,0,4,1,5,4,20,4,0,24,0,1,1,0,23
+Madhya Pradesh,Dowry Prohibition Act,1,72,0,0,0,70,0,70,3,272,70,0,342,1,31,18,13,310
+Maharashtra,Dowry Prohibition Act,4,43,0,0,2,36,0,36,9,308,36,0,344,4,36,5,31,304
+Manipur,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Meghalaya,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Mizoram,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Nagaland,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Odisha,Dowry Prohibition Act,901,2014,0,0,44,1853,36,1889,982,4637,1853,0,6490,0,521,57,464,5969
+Punjab,Dowry Prohibition Act,5,3,0,0,1,3,1,4,3,13,3,0,16,0,3,2,1,13
+Rajasthan,Dowry Prohibition Act,0,57,0,0,27,27,0,27,3,24,27,0,51,4,9,3,6,38
+Sikkim,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tamil Nadu,Dowry Prohibition Act,71,305,0,0,17,252,21,273,86,517,252,0,769,0,150,30,120,619
+Tripura,Dowry Prohibition Act,0,1,0,0,0,0,0,0,1,2,0,0,2,0,0,0,0,2
+Uttar Pradesh,Dowry Prohibition Act,182,1277,0,0,9,750,67,817,633,702,750,0,1452,3,184,112,72,1265
+Uttarakhand,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,3,0,0,3,0,1,0,1,2
+West Bengal,Dowry Prohibition Act,161,107,0,0,0,89,0,89,179,257,89,0,346,0,20,0,20,326
+Total (State),Dowry Prohibition Act,4745,10680,0,12,546,8327,552,8879,5988,19606,8327,0,27933,814,4200,619,3581,22919
+A&N Islands,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+Chandigarh,Dowry Prohibition Act,1,0,0,0,0,1,0,1,0,0,1,0,1,0,1,0,1,0
+D&N Haveli,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+Daman & Diu,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Delhi UT,Dowry Prohibition Act,40,15,0,0,1,10,1,11,43,78,10,0,88,0,2,1,1,86
+Lakshadweep,Dowry Prohibition Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Dowry Prohibition Act,11,14,0,0,2,14,0,14,9,35,14,0,49,0,2,0,2,47
+Total (UTs),Dowry Prohibition Act,52,29,0,0,3,25,1,26,52,115,25,0,140,0,5,1,4,135
+Total (All-India),Dowry Prohibition Act,4797,10709,0,12,549,8352,553,8905,6040,19721,8352,0,28073,814,4205,620,3585,23054
+Andhra Pradesh,Immoral Traffic (P) Act,192,489,0,0,0,430,0,430,251,932,430,0,1362,2,316,49,267,1044
+Arunachal Pradesh,Immoral Traffic (P) Act,1,2,0,0,0,1,1,2,1,1,1,0,2,0,1,0,1,1
+Assam,Immoral Traffic (P) Act,52,18,0,0,0,17,6,23,47,82,17,0,99,0,14,0,14,85
+Bihar,Immoral Traffic (P) Act,39,64,0,0,2,44,7,51,50,137,44,0,181,0,18,12,6,163
+Chhattisgarh,Immoral Traffic (P) Act,0,8,0,0,0,8,0,8,0,34,8,0,42,0,4,0,4,38
+Goa,Immoral Traffic (P) Act,45,28,0,0,0,18,1,19,54,54,18,0,72,0,8,0,8,64
+Gujarat,Immoral Traffic (P) Act,15,76,0,0,0,86,0,86,5,622,86,0,708,0,12,4,8,696
+Haryana,Immoral Traffic (P) Act,9,63,0,0,0,70,0,70,2,309,70,0,379,0,72,15,57,307
+Himachal Pradesh,Immoral Traffic (P) Act,2,4,0,0,1,3,0,3,2,15,3,0,18,0,0,0,0,18
+Jammu & Kashmir,Immoral Traffic (P) Act,6,1,0,0,1,2,0,2,4,32,2,0,34,0,5,0,5,29
+Jharkhand,Immoral Traffic (P) Act,6,11,0,0,0,11,3,14,3,26,11,0,37,0,9,4,5,28
+Karnataka,Immoral Traffic (P) Act,89,340,0,0,2,315,0,315,112,1323,315,0,1638,1,223,58,165,1414
+Kerala,Immoral Traffic (P) Act,14,180,0,0,1,169,1,170,23,860,169,0,1029,3,124,84,40,902
+Madhya Pradesh,Immoral Traffic (P) Act,2,22,0,0,0,20,0,20,4,87,20,0,107,0,13,4,9,94
+Maharashtra,Immoral Traffic (P) Act,753,289,0,0,2,301,0,301,739,3533,301,0,3834,2,75,21,54,3757
+Manipur,Immoral Traffic (P) Act,15,0,0,0,0,0,0,0,15,0,0,0,0,0,0,0,0,0
+Meghalaya,Immoral Traffic (P) Act,12,4,0,0,0,3,4,7,9,2,3,0,5,0,0,0,0,5
+Mizoram,Immoral Traffic (P) Act,5,0,0,0,0,5,0,5,0,0,5,0,5,0,5,4,1,0
+Nagaland,Immoral Traffic (P) Act,0,1,0,0,0,0,0,0,1,3,0,0,3,0,2,2,0,1
+Odisha,Immoral Traffic (P) Act,18,27,0,0,0,34,0,34,11,117,34,0,151,0,12,1,11,139
+Punjab,Immoral Traffic (P) Act,58,137,0,0,1,93,0,93,101,193,93,0,286,0,58,13,45,228
+Rajasthan,Immoral Traffic (P) Act,6,74,0,0,2,71,0,71,7,634,71,0,705,0,38,19,19,667
+Sikkim,Immoral Traffic (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tamil Nadu,Immoral Traffic (P) Act,268,549,0,0,1,565,0,565,251,602,565,0,1167,1,490,317,173,676
+Tripura,Immoral Traffic (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Uttar Pradesh,Immoral Traffic (P) Act,4,37,0,0,1,35,0,35,5,156,35,0,191,0,28,20,8,163
+Uttarakhand,Immoral Traffic (P) Act,3,13,0,0,0,14,0,14,2,15,14,0,29,0,5,3,2,24
+West Bengal,Immoral Traffic (P) Act,142,104,0,0,0,90,4,94,152,260,90,0,350,0,46,17,29,304
+Total (State),Immoral Traffic (P) Act,1756,2541,0,0,14,2405,27,2432,1851,10029,2405,0,12434,9,1578,647,931,10847
+A&N Islands,Immoral Traffic (P) Act,2,4,0,0,0,6,0,6,0,12,6,0,18,0,0,0,0,18
+Chandigarh,Immoral Traffic (P) Act,0,6,0,0,0,2,0,2,4,34,2,0,36,0,12,0,12,24
+D&N Haveli,Immoral Traffic (P) Act,0,2,0,0,0,2,0,2,0,11,2,0,13,0,1,0,1,12
+Daman & Diu,Immoral Traffic (P) Act,8,6,0,0,0,5,0,5,9,22,5,0,27,0,0,0,0,27
+Delhi UT,Immoral Traffic (P) Act,27,20,0,0,0,24,0,24,23,383,24,0,407,0,39,24,15,368
+Lakshadweep,Immoral Traffic (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Immoral Traffic (P) Act,4,0,0,0,0,2,0,2,2,12,2,0,14,0,2,2,0,12
+Total (UTs),Immoral Traffic (P) Act,41,38,0,0,0,41,0,41,38,474,41,0,515,0,54,26,28,461
+Total (All-India),Immoral Traffic (P) Act,1797,2579,0,0,14,2446,27,2473,1889,10503,2446,0,12949,9,1632,673,959,11308
+Andhra Pradesh,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,1,0,0,1,0,0,0,0,1
+Arunachal Pradesh,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Assam,Importation of Girls from Foreign Country,2,2,0,0,0,0,0,0,4,2,0,0,2,0,0,0,0,2
+Bihar,Importation of Girls from Foreign Country,9,7,0,0,0,6,3,9,7,162,6,0,168,0,15,3,12,153
+Chhattisgarh,Importation of Girls from Foreign Country,0,1,0,0,0,0,0,0,1,3,0,0,3,0,1,0,1,2
+Goa,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Gujarat,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Haryana,Importation of Girls from Foreign Country,0,2,0,0,0,1,1,2,0,0,1,0,1,0,0,0,0,1
+Himachal Pradesh,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Jammu & Kashmir,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Jharkhand,Importation of Girls from Foreign Country,0,2,0,0,0,2,0,2,0,6,2,0,8,0,2,0,2,6
+Karnataka,Importation of Girls from Foreign Country,41,0,0,0,4,0,37,37,0,1,0,0,1,0,1,0,1,0
+Kerala,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Madhya Pradesh,Importation of Girls from Foreign Country,1,7,0,0,0,7,0,7,1,41,7,0,48,0,3,2,1,45
+Maharashtra,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Manipur,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Meghalaya,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2
+Mizoram,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Nagaland,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Odisha,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,17,0,0,17,0,0,0,0,17
+Punjab,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Rajasthan,Importation of Girls from Foreign Country,0,1,0,0,0,1,0,1,0,1,1,0,2,0,0,0,0,2
+Sikkim,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tamil Nadu,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tripura,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Uttar Pradesh,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Uttarakhand,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+West Bengal,Importation of Girls from Foreign Country,7,9,0,0,0,9,3,12,4,14,9,0,23,0,4,0,4,19
+Total (State),Importation of Girls from Foreign Country,60,31,0,0,4,26,44,70,17,250,26,0,276,0,26,5,21,250
+A&N Islands,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Chandigarh,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+D&N Haveli,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Daman & Diu,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Delhi UT,Importation of Girls from Foreign Country,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+Lakshadweep,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Importation of Girls from Foreign Country,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Total (UTs),Importation of Girls from Foreign Country,1,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+Total (All-India),Importation of Girls from Foreign Country,61,31,0,0,4,26,44,70,18,250,26,0,276,0,26,5,21,250
+Andhra Pradesh,Indecent Representation of Women (P) Act,5,251,0,0,0,240,2,242,14,24,240,0,264,0,225,218,7,39
+Arunachal Pradesh,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Assam,Indecent Representation of Women (P) Act,3,1,0,0,0,0,0,0,4,3,0,0,3,0,0,0,0,3
+Bihar,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,48,0,0,48,6,0,0,0,42
+Chhattisgarh,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2
+Goa,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,4,0,0,4,0,0,0,0,4
+Gujarat,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,70,0,0,70,0,0,0,0,70
+Haryana,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2
+Himachal Pradesh,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Jammu & Kashmir,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,2,0,0,2,0,0,0,0,2
+Jharkhand,Indecent Representation of Women (P) Act,3,2,0,0,0,2,0,2,3,3,2,0,5,0,1,0,1,4
+Karnataka,Indecent Representation of Women (P) Act,1,2,0,0,0,0,0,0,3,0,0,0,0,0,0,0,0,0
+Kerala,Indecent Representation of Women (P) Act,6,20,0,0,1,15,0,15,10,97,15,0,112,1,7,3,4,104
+Madhya Pradesh,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Maharashtra,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,56,0,0,56,0,0,0,0,56
+Manipur,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Meghalaya,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Mizoram,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Nagaland,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Odisha,Indecent Representation of Women (P) Act,1,2,0,0,0,2,0,2,1,3,2,0,5,0,0,0,0,5
+Punjab,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,4,0,0,4,0,0,0,0,4
+Rajasthan,Indecent Representation of Women (P) Act,2,68,0,0,2,65,0,65,3,630,65,0,695,0,68,51,17,627
+Sikkim,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tamil Nadu,Indecent Representation of Women (P) Act,19,9,0,0,1,23,0,23,4,17,23,0,40,0,35,8,27,5
+Tripura,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Uttar Pradesh,Indecent Representation of Women (P) Act,0,1,0,0,0,1,0,1,0,2,1,0,3,0,0,0,0,3
+Uttarakhand,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+West Bengal,Indecent Representation of Women (P) Act,9,4,0,0,0,3,0,3,10,24,3,0,27,0,5,0,5,22
+Total (State),Indecent Representation of Women (P) Act,49,360,0,0,4,351,2,353,52,991,351,0,1342,7,341,280,61,994
+A&N Islands,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Chandigarh,Indecent Representation of Women (P) Act,1,1,0,0,0,0,0,0,2,1,0,0,1,0,1,0,1,0
+D&N Haveli,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Daman & Diu,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Delhi UT,Indecent Representation of Women (P) Act,4,0,0,0,0,0,0,0,4,5,0,0,5,0,0,0,0,5
+Lakshadweep,Indecent Representation of Women (P) Act,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Indecent Representation of Women (P) Act,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0
+Total (UTs),Indecent Representation of Women (P) Act,5,2,0,0,0,0,0,0,7,6,0,0,6,0,1,0,1,5
+Total (All-India),Indecent Representation of Women (P) Act,54,362,0,0,4,351,2,353,59,997,351,0,1348,7,342,280,62,999
+Andhra Pradesh,Insult to the modesty of Women,832,4702,1,0,324,4141,128,4269,940,4332,4141,0,8473,1185,2273,638,1635,5015
+Arunachal Pradesh,Insult to the modesty of Women,2,3,0,0,0,3,1,4,1,12,3,0,15,0,0,0,0,15
+Assam,Insult to the modesty of Women,12,14,0,0,0,8,2,10,16,10,8,0,18,0,5,0,5,13
+Bihar,Insult to the modesty of Women,2,52,0,0,9,39,3,42,3,61,39,0,100,4,11,1,10,85
+Chhattisgarh,Insult to the modesty of Women,13,180,0,0,0,180,2,182,11,593,180,1,772,26,105,28,77,641
+Goa,Insult to the modesty of Women,18,54,0,0,0,34,4,38,34,32,34,0,66,2,10,3,7,54
+Gujarat,Insult to the modesty of Women,9,77,0,0,0,69,4,73,13,944,69,0,1013,1,79,12,67,933
+Haryana,Insult to the modesty of Women,31,643,0,0,31,606,11,617,26,860,606,0,1466,0,459,191,268,1007
+Himachal Pradesh,Insult to the modesty of Women,24,111,0,0,11,88,10,98,26,233,88,1,320,6,10,0,10,304
+Jammu & Kashmir,Insult to the modesty of Women,66,354,0,0,15,326,2,328,77,1402,326,0,1728,11,424,122,302,1293
+Jharkhand,Insult to the modesty of Women,37,18,0,0,0,31,2,33,22,28,31,0,59,0,13,7,6,46
+Karnataka,Insult to the modesty of Women,69,137,0,0,13,139,16,155,38,113,139,0,252,8,103,5,98,141
+Kerala,Insult to the modesty of Women,91,404,0,0,11,436,6,442,42,1485,436,0,1921,5,262,94,168,1654
+Madhya Pradesh,Insult to the modesty of Women,11,736,0,0,0,699,9,708,39,1846,699,0,2545,205,565,174,391,1775
+Maharashtra,Insult to the modesty of Women,718,2632,0,0,22,2144,48,2192,1136,8673,2144,0,10817,148,662,76,586,10007
+Manipur,Insult to the modesty of Women,2,0,0,0,0,0,0,0,2,1,0,0,1,0,0,0,0,1
+Meghalaya,Insult to the modesty of Women,18,0,0,0,0,0,0,0,18,4,0,0,4,0,0,0,0,4
+Mizoram,Insult to the modesty of Women,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Nagaland,Insult to the modesty of Women,0,1,0,0,0,1,0,1,0,2,1,0,3,0,2,2,0,1
+Odisha,Insult to the modesty of Women,87,426,0,0,19,375,6,381,113,1306,375,0,1681,0,162,12,150,1519
+Punjab,Insult to the modesty of Women,19,67,0,0,2,35,10,45,39,48,35,0,83,0,15,5,10,68
+Rajasthan,Insult to the modesty of Women,1,25,0,0,7,19,0,19,0,94,19,1,112,1,17,11,6,94
+Sikkim,Insult to the modesty of Women,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Tamil Nadu,Insult to the modesty of Women,148,313,0,0,7,262,24,286,168,999,262,0,1261,0,538,250,288,723
+Tripura,Insult to the modesty of Women,0,7,0,0,0,5,2,7,0,16,5,0,21,1,10,4,6,10
+Uttar Pradesh,Insult to the modesty of Women,0,25,0,0,0,17,3,20,5,258,17,0,275,0,250,155,95,25
+Uttarakhand,Insult to the modesty of Women,5,72,0,0,0,69,3,72,5,456,69,0,525,0,64,48,16,461
+West Bengal,Insult to the modesty of Women,220,577,0,0,0,478,96,574,223,251,478,0,729,8,369,187,182,352
+Total (State),Insult to the modesty of Women,2435,11630,1,0,471,10204,392,10596,2997,24059,10204,3,34260,1611,6408,2025,4383,26241
+A&N Islands,Insult to the modesty of Women,3,8,0,0,0,10,0,10,1,36,10,0,46,0,2,1,1,44
+Chandigarh,Insult to the modesty of Women,11,26,0,0,1,24,0,24,12,34,24,0,58,0,17,4,13,41
+D&N Haveli,Insult to the modesty of Women,0,1,0,0,0,1,0,1,0,2,1,0,3,0,0,0,0,3
+Daman & Diu,Insult to the modesty of Women,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Delhi UT,Insult to the modesty of Women,145,916,0,0,9,700,49,749,303,539,700,0,1239,3,174,81,93,1062
+Lakshadweep,Insult to the modesty of Women,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Insult to the modesty of Women,1,8,0,0,1,7,0,7,1,83,7,0,90,2,3,1,2,85
+Total (UTs),Insult to the modesty of Women,160,959,0,0,11,742,49,791,317,694,742,0,1436,5,196,87,109,1235
+Total (All-India),Insult to the modesty of Women,2595,12589,1,0,482,10946,441,11387,3314,24753,10946,3,35696,1616,6604,2112,4492,27476
+Andhra Pradesh,Kidnapping & Abduction of Women & Grils,585,1595,0,0,360,1009,71,1080,740,2750,1009,0,3759,29,708,55,653,3022
+Arunachal Pradesh,Kidnapping & Abduction of Women & Grils,55,86,0,0,0,46,24,70,71,397,46,0,443,2,5,2,3,436
+Assam,Kidnapping & Abduction of Women & Grils,5091,4222,0,0,108,1439,1812,3251,5954,4314,1439,0,5753,38,1108,48,1060,4607
+Bihar,Kidnapping & Abduction of Women & Grils,1993,4419,0,0,959,2518,884,3402,2051,6105,2518,0,8623,9,754,85,669,7860
+Chhattisgarh,Kidnapping & Abduction of Women & Grils,129,1881,0,0,64,449,377,826,1120,1074,449,0,1523,3,269,52,217,1251
+Goa,Kidnapping & Abduction of Women & Grils,22,70,0,0,5,12,27,39,48,50,12,0,62,0,5,2,3,57
+Gujarat,Kidnapping & Abduction of Women & Grils,404,2230,3,82,105,1499,321,1820,624,8570,1499,0,10069,5,537,46,491,9527
+Haryana,Kidnapping & Abduction of Women & Grils,246,1957,0,0,1004,755,133,888,311,1242,755,0,1997,0,423,116,307,1574
+Himachal Pradesh,Kidnapping & Abduction of Women & Grils,64,290,0,0,174,82,9,91,89,275,82,0,357,2,63,10,53,292
+Jammu & Kashmir,Kidnapping & Abduction of Women & Grils,442,949,0,0,504,358,22,380,507,3979,358,0,4337,21,912,14,898,3404
+Jharkhand,Kidnapping & Abduction of Women & Grils,439,926,0,0,80,564,213,777,508,996,564,0,1560,15,353,116,237,1192
+Karnataka,Kidnapping & Abduction of Women & Grils,552,1359,1,6,663,471,114,585,656,1290,471,0,1761,9,198,13,185,1554
+Kerala,Kidnapping & Abduction of Women & Grils,120,185,0,0,6,151,9,160,139,1023,151,0,1174,2,61,4,57,1111
+Madhya Pradesh,Kidnapping & Abduction of Women & Grils,397,2873,0,0,78,1218,237,1455,1737,3011,1218,0,4229,10,827,197,630,3392
+Maharashtra,Kidnapping & Abduction of Women & Grils,867,1874,0,0,254,1080,175,1255,1232,7387,1080,0,8467,24,452,23,429,7991
+Manipur,Kidnapping & Abduction of Women & Grils,485,125,0,0,0,5,77,82,528,19,5,0,24,0,4,1,3,20
+Meghalaya,Kidnapping & Abduction of Women & Grils,138,33,0,0,0,15,7,22,149,91,15,0,106,0,1,0,1,105
+Mizoram,Kidnapping & Abduction of Women & Grils,0,2,0,0,0,1,0,1,1,1,1,0,2,0,1,1,0,1
+Nagaland,Kidnapping & Abduction of Women & Grils,9,11,0,0,0,10,0,10,10,2,10,0,12,0,3,2,1,9
+Odisha,Kidnapping & Abduction of Women & Grils,985,2067,0,0,264,1237,83,1320,1468,3564,1237,0,4801,0,470,35,435,4331
+Punjab,Kidnapping & Abduction of Women & Grils,614,987,0,0,345,438,100,538,718,1091,438,0,1529,5,282,72,210,1242
+Rajasthan,Kidnapping & Abduction of Women & Grils,401,4047,0,1,2281,1228,162,1390,776,5183,1228,0,6411,61,662,199,463,5688
+Sikkim,Kidnapping & Abduction of Women & Grils,10,16,0,0,0,19,1,20,6,24,19,0,43,0,35,16,19,8
+Tamil Nadu,Kidnapping & Abduction of Women & Grils,1437,1516,0,0,408,741,625,1366,1179,1643,741,0,2384,3,832,134,698,1549
+Tripura,Kidnapping & Abduction of Women & Grils,47,124,0,0,0,111,18,129,42,291,111,0,402,3,35,3,32,364
+Uttar Pradesh,Kidnapping & Abduction of Women & Grils,1681,9737,0,0,791,5138,3106,8244,2383,10689,5138,1,15826,110,2311,1124,1187,13405
+Uttarakhand,Kidnapping & Abduction of Women & Grils,39,633,0,0,142,162,298,460,70,594,162,0,756,0,175,109,66,581
+West Bengal,Kidnapping & Abduction of Women & Grils,4371,3830,0,0,0,2965,941,3906,4295,13094,2965,0,16059,7,675,43,632,15377
+Total (State),Kidnapping & Abduction of Women & Grils,21623,48044,4,89,8595,23721,9846,33567,27412,78749,23721,1,102469,358,12161,2522,9639,89950
+A&N Islands,Kidnapping & Abduction of Women & Grils,11,12,0,0,0,7,13,20,3,50,7,0,57,0,4,0,4,53
+Chandigarh,Kidnapping & Abduction of Women & Grils,37,174,0,0,54,48,13,61,96,67,48,0,115,0,39,10,29,76
+D&N Haveli,Kidnapping & Abduction of Women & Grils,9,11,0,0,0,4,10,14,6,34,4,0,38,0,3,0,3,35
+Daman & Diu,Kidnapping & Abduction of Women & Grils,1,6,0,0,0,1,1,2,5,3,1,0,4,0,0,0,0,4
+Delhi UT,Kidnapping & Abduction of Women & Grils,2663,3609,0,0,1121,450,1316,1766,3385,1644,450,0,2094,0,341,114,227,1753
+Lakshadweep,Kidnapping & Abduction of Women & Grils,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Puducherry,Kidnapping & Abduction of Women & Grils,6,25,0,0,20,9,0,9,2,48,9,0,57,0,3,0,3,54
+Total (UTs),Kidnapping & Abduction of Women & Grils,2727,3837,0,0,1195,519,1353,1872,3497,1846,519,0,2365,0,390,124,266,1975
+Total (All-India),Kidnapping & Abduction of Women & Grils,24350,51881,4,89,9790,24240,11199,35439,30909,80595,24240,1,104834,358,12551,2646,9905,91925
+Andhra Pradesh,Rape,831,1635,0,0,90,1149,13,1162,1214,3084,1149,0,4233,9,907,105,802,3317
+Arunachal Pradesh,Rape,52,75,0,0,0,62,14,76,51,517,62,0,579,0,2,1,1,577
+Assam,Rape,3097,1937,0,0,19,1366,372,1738,3277,5597,1366,0,6963,0,884,123,761,6079
+Bihar,Rape,707,1128,0,0,116,840,137,977,742,3546,840,0,4386,0,566,180,386,3820
+Chhattisgarh,Rape,167,1380,0,0,0,1366,8,1374,173,3647,1366,0,5013,5,1313,364,949,3695
+Goa,Rape,55,86,0,0,0,60,5,65,76,110,60,0,170,0,7,2,5,163
+Gujarat,Rape,90,732,0,0,7,662,15,677,138,3169,662,0,3831,2,229,43,186,3600
+Haryana,Rape,79,971,0,0,167,792,10,802,81,1086,792,0,1878,0,899,287,612,979
+Himachal Pradesh,Rape,55,250,0,0,43,199,3,202,60,527,199,0,726,0,228,56,172,498
+Jammu & Kashmir,Rape,63,378,0,1,87,241,4,245,108,1052,241,0,1293,6,374,22,352,913
+Jharkhand,Rape,682,1204,0,0,70,884,158,1042,774,1817,884,0,2701,17,653,264,389,2031
+Karnataka,Rape,248,1030,0,6,26,856,14,870,376,1648,856,0,2504,0,425,90,335,2079
+Kerala,Rape,797,1221,2,2,25,977,40,1017,972,5032,977,0,6009,0,361,92,269,5648
+Madhya Pradesh,Rape,155,4335,0,0,21,4085,16,4101,368,8425,4085,1,12509,98,4369,1079,3290,8042
+Maharashtra,Rape,825,3063,0,1,48,2591,51,2642,1197,13388,2591,1,15978,27,1032,181,851,14919
+Manipur,Rape,226,72,0,0,0,15,15,30,268,74,15,0,89,0,4,2,2,85
+Meghalaya,Rape,394,183,0,0,0,198,7,205,372,621,198,0,819,0,13,7,6,806
+Mizoram,Rape,27,89,0,0,0,69,5,74,42,129,69,0,198,0,59,39,20,139
+Nagaland,Rape,4,31,0,0,0,22,0,22,13,34,22,0,56,1,21,18,3,34
+Odisha,Rape,838,1832,0,0,82,1660,38,1698,890,5149,1660,0,6809,0,675,108,567,6134
+Punjab,Rape,253,888,0,0,79,812,31,843,219,507,812,0,1319,0,926,382,544,393
+Rajasthan,Rape,246,3285,0,0,1081,1947,6,1953,497,3558,1947,0,5505,31,852,270,582,4622
+Sikkim,Rape,11,43,0,0,0,48,1,49,5,100,48,0,148,0,80,59,21,68
+Tamil Nadu,Rape,832,923,0,0,30,1076,45,1121,604,1876,1076,0,2952,0,507,133,374,2445
+Tripura,Rape,87,233,0,0,0,252,10,262,58,784,252,0,1036,6,121,21,100,909
+Uttar Pradesh,Rape,197,3050,0,0,340,2302,183,2485,422,4525,2302,0,6827,19,1234,663,571,5574
+Uttarakhand,Rape,16,228,0,0,19,179,19,198,27,251,179,0,430,0,197,111,86,233
+West Bengal,Rape,2430,1685,0,0,0,2577,127,2704,1411,14174,2577,0,16751,0,1197,151,1046,15554
+Total (State),Rape,13464,31967,2,10,2350,27287,1347,28634,14435,84427,27287,2,111712,221,18135,4853,13282,93356
+A&N Islands,Rape,12,27,0,0,0,35,0,35,4,86,35,0,121,0,14,3,11,107
+Chandigarh,Rape,10,45,0,0,0,29,2,31,24,53,29,0,82,0,43,18,25,39
+D&N Haveli,Rape,1,5,0,0,0,3,0,3,3,13,3,0,16,0,3,0,3,13
+Daman & Diu,Rape,2,8,0,0,0,9,0,9,1,3,9,0,12,0,1,0,1,11
+Delhi UT,Rape,255,1636,0,0,25,1386,26,1412,454,1404,1386,0,2790,0,636,227,409,2154
+Lakshadweep,Rape,0,2,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0
+Puducherry,Rape,6,17,0,0,0,6,0,6,17,46,6,0,52,0,1,0,1,51
+Total (UTs),Rape,286,1740,0,0,25,1468,28,1496,505,1605,1468,0,3073,0,698,248,450,2375
+Total (All-India),Rape,13750,33707,2,10,2375,28755,1375,30130,14940,86032,28755,2,114785,221,18833,5101,13732,95731
+Andhra Pradesh,Total Crimes against Women,11248,32809,1,0,2962,26002,988,26990,14104,45403,26002,3,71402,4397,13187,2228,10959,53818
+Arunachal Pradesh,Total Crimes against Women,165,288,0,0,0,186,59,245,208,1473,186,0,1659,4,31,15,16,1624
+Assam,Total Crimes against Women,15418,17449,0,0,225,9317,5071,14388,18254,22750,9317,0,32067,325,6289,394,5895,25453
+Bihar,Total Crimes against Women,7502,13609,0,0,2053,9448,1831,11279,7779,30970,9448,0,40418,459,4020,812,3208,35939
+Chhattisgarh,Total Crimes against Women,507,7012,0,0,65,5453,414,5867,1587,18407,5453,1,23859,459,4217,1170,3047,19183
+Goa,Total Crimes against Women,218,440,0,0,6,243,55,298,354,413,243,0,656,4,65,11,54,587
+Gujarat,Total Crimes against Women,1427,12283,4,88,123,11263,368,11631,1864,64255,11263,0,75518,229,4903,217,4686,70386
+Haryana,Total Crimes against Women,1310,9089,0,0,2442,6374,421,6795,1162,12283,6374,0,18657,22,4921,1190,3731,13714
+Himachal Pradesh,Total Crimes against Women,247,1478,0,0,328,1049,25,1074,323,3900,1049,3,4946,109,627,111,516,4210
+Jammu & Kashmir,Total Crimes against Women,878,3509,0,1,738,2522,30,2552,1096,12251,2522,0,14773,483,3179,252,2927,11111
+Jharkhand,Total Crimes against Women,2973,6506,0,0,281,4543,987,5530,3668,6388,4543,0,10931,114,3334,982,2352,7483
+Karnataka,Total Crimes against Women,3738,12027,1,63,1236,9733,377,10110,4355,23389,9733,1,33121,439,5746,369,5377,26936
+Kerala,Total Crimes against Women,3148,11216,2,3,447,9927,238,10165,3747,43720,9927,0,53647,204,4922,690,4232,48521
+Madhya Pradesh,Total Crimes against Women,1045,22061,1,0,119,19729,322,20051,2935,51907,19729,1,71635,4813,13146,4220,8926,53676
+Maharashtra,Total Crimes against Women,7371,24895,4,4,585,20301,449,20750,10923,120102,20301,7,140396,1693,10479,768,9711,128224
+Manipur,Total Crimes against Women,1108,285,0,0,0,28,143,171,1222,121,28,0,149,0,8,3,5,141
+Meghalaya,Total Crimes against Women,748,343,0,0,1,296,41,337,753,1022,296,0,1318,2,25,9,16,1291
+Mizoram,Total Crimes against Women,53,177,0,0,0,159,8,167,63,214,159,0,373,0,146,102,44,227
+Nagaland,Total Crimes against Women,16,67,0,0,0,48,2,50,33,59,48,0,107,1,47,42,5,59
+Odisha,Total Crimes against Women,5531,14173,0,0,722,12094,293,12387,6595,45576,12094,0,57670,0,4877,428,4449,52793
+Punjab,Total Crimes against Women,2476,4994,0,0,663,2953,486,3439,3368,6789,2953,0,9742,13,2202,800,1402,7527
+Rajasthan,Total Crimes against Women,1318,27933,0,3,11657,14473,258,14731,2860,49535,14473,1,64007,1729,8013,3192,4821,54265
+Sikkim,Total Crimes against Women,32,93,0,0,0,100,4,104,21,169,100,0,269,0,165,106,59,104
+Tamil Nadu,Total Crimes against Women,4873,7475,0,0,854,6091,1042,7133,4361,14367,6091,0,20458,9,5365,1512,3853,15084
+Tripura,Total Crimes against Women,260,1628,0,0,0,1546,128,1674,214,3363,1546,0,4909,140,1064,140,924,3705
+Uttar Pradesh,Total Crimes against Women,5177,32546,0,0,1645,21868,6210,28078,8000,47979,21868,1,69846,848,10635,5672,4963,58363
+Uttarakhand,Total Crimes against Women,181,1719,0,0,178,1022,433,1455,267,3080,1022,0,4102,15,728,435,293,3359
+West Bengal,Total Crimes against Women,20468,29826,0,0,0,30112,2117,32229,18065,154989,30112,0,185101,40,6998,609,6389,178063
+Total (State),Total Crimes against Women,99436,295930,13,162,27330,226880,22800,249680,118181,784874,226880,18,1011736,16551,119339,26479,92860,875846
+A&N Islands,Total Crimes against Women,45,106,0,0,0,111,18,129,22,471,111,0,582,0,39,8,31,543
+Chandigarh,Total Crimes against Women,158,488,0,0,70,256,26,282,294,529,256,0,785,0,237,54,183,548
+D&N Haveli,Total Crimes against Women,15,21,0,0,0,12,10,22,14,102,12,0,114,0,7,0,7,107
+Daman & Diu,Total Crimes against Women,14,24,0,0,0,18,2,20,18,39,18,0,57,0,4,0,4,53
+Delhi UT,Total Crimes against Women,9061,12888,0,0,1256,6429,1586,8015,12678,12493,6429,2,18920,96,2768,923,1845,16056
+Lakshadweep,Total Crimes against Women,2,3,0,0,0,1,1,2,3,0,1,0,1,0,0,0,0,1
+Puducherry,Total Crimes against Women,41,86,0,0,23,64,0,64,40,512,64,0,576,7,34,12,22,535
+Total (UTs),Total Crimes against Women,9336,13616,0,0,1349,6891,1643,8534,13069,14146,6891,2,21035,103,3089,997,2092,17843
+Total (All-India),Total Crimes against Women,108772,309546,13,162,28679,233771,24443,258214,131250,799020,233771,20,1032771,16654,122428,27476,94952,893689

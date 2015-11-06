@@ -1,0 +1,16 @@
+{
+    "contents" : "\n# This is the server logic for a Shiny web application.\n# You can find out more about building applications with Shiny here:\n# \n# http://www.rstudio.com/shiny/\n#\n\nlibrary(shiny)\n\nshinyServer(function(input, output) {\n   \n  output$distPlot <- renderPlot({\n     \n    # generate and plot an rnorm distribution with the requested\n    # number of observations\n    dist <- rnorm(input$obs)\n    hist(dist)\n    \n  })\n  \n})\n",
+    "created" : 1440486574752.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "524174348",
+    "id" : "43B58B76",
+    "lastKnownWriteTime" : 1440486571,
+    "path" : "~/R/Staples/Shiny/Staples/server.R",
+    "project_path" : "server.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

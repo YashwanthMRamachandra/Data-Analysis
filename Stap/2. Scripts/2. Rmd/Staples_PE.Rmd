@@ -1,0 +1,145 @@
+---
+title: "Staples PE"
+output: html_document
+---
+
+Hypothesis : E of the Product depends on Demand Loyalty than Price Competetiveness.
+
+Null Hypothesis : E of the Product depends on Price Competetiveness than Demand Loyalty.
+
+---
+                                        v/s
+---
+Alternate Hypothesis : E of the Product depends on Demand Loyalty than Price Competetiveness.
+
+
+```{r,echo=FALSE}
+# Reference .Rmd : http://rmarkdown.rstudio.com/  
+# http://rprogramming.net/create-html-or-pdf-files-with-r-knitr-miktex-and-pandoc/
+# rm(list=ls())
+Staples_IP <- read.table("C:/Yashwanth/Staples PE/1. Input/Staples_Input.csv",
+                  header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", as.is=TRUE)
+#str(Staples_IP)
+```
+---
+
+HIGH DL
+
+```{r,echo=FALSE}
+library(psych)
+library(data.table)
+Staples_IP <- data.table(Staples_IP)
+#describe(Staples_IP[,sapply(Staples_IP,is.numeric)])
+#summary(Staples_IP)
+#summary(Staples_IP[,sapply(Staples_IP,is.numeric)])
+
+# Correlation Matrix : All
+#cor(Staples_IP[,sapply(Staples_IP,is.numeric)])
+```
+Correlation Matrix with Equally distributed Observations.
+
+```{r,echo=FALSE}
+Staples_IP$PC_SA <- Staples_IP$Staples_Final_Price/Staples_IP$Amazon_Final_Price
+Staples_IP <- Staples_IP[with(Staples_IP,order(Loyalty,decreasing = TRUE)),]
+Staples_IP$Loyalty_Cut <- rbind(matrix("HIGH",nrow=(nrow(Staples_IP)/2)+1,ncol = 1),matrix("LOW",nrow=nrow(Staples_IP)/2,ncol = 1))
+list(HIGH=cor(Staples_IP[Loyalty_Cut=="HIGH",Conversion,PC_SA]),LOW=cor(Staples_IP[Loyalty_Cut=="LOW",Conversion,PC_SA]))
+table(Staples_IP$Loyalty_Cut)
+```
+- Note : No. of Observations are equally distributed based on DL(Sorted).
+- Inference : When DL is HIGH, Conversion & PC are Weekly Negatively Correlated.
+- Inference : When DL is LOW, Conversion & PC are Weekly Postively Correlated.
+
+---
+
+```{r,echo=FALSE}
+# Correlation Matrix : Price Competitiveness : Staples/Amazon
+Staples_IP$Loyalty_Cut <- ifelse(Staples_IP$Loyalty > 0.70,"HIGH",
+                            ifelse(Staples_IP$Loyalty > 0.60 & Staples_IP$Loyalty < 0.70,"MID","LOW"))
+list(HIGH=cor(Staples_IP[Loyalty_Cut=="HIGH",Conversion,PC_SA]),LOW=cor(Staples_IP[Loyalty_Cut=="LOW",Conversion,PC_SA]),
+          MID=cor(Staples_IP[Loyalty_Cut=="MID",Conversion,PC_SA]))
+table(Staples_IP$Loyalty_Cut)
+```
+- Inference : When DL is HIGH, Conversion & PC are negatively correlated.
+- Inference : When DL is LOW, Conversion & PC are Strongly negatively correlated.
+- Inference : When DL is MID, Conversion & PC are weekly negatively correlated.
+
+---
+
+Below is the correlation matrix after collating "HIGH" & "MID" as one and "LOW" as other. HIGH>75% LOW Otherwise
+
+---
+
+```{r,echo=FALSE}
+# Correlation Matrix : Loyalty Collapse
+Staples_IP$Loyalty_Cat_Collapse <- ifelse(Staples_IP$Loyalty_Cat=="MID","HIGH",Staples_IP$Loyalty_Cat)
+list(HIGH=cor(Staples_IP[Loyalty_Cat_Collapse=="HIGH",Conversion,PC_SA]),
+     LOW=cor(Staples_IP[Loyalty_Cat_Collapse=="LOW",Conversion,PC_SA]))
+table(Staples_IP$Loyalty_Cat_Collapse)
+```
+
+- Inference : When DL is HIGH(combined HIGH & MID), Conversion & PC are weekly negatively correlated.
+- Inference : When DL is LOW, Coversion & PC are Strongly negatively correlated.
+
+---
+
+Relationship between Conversion & Price Competetiveness : Cut-off : HIGH > 75%(default), LOW Otherwise 
+
+```{r,echo=FALSE}
+plot(Staples_IP[Loyalty_Cat_Collapse=="HIGH",PC_SA],Staples_IP[Loyalty_Cat_Collapse=="HIGH",Conversion],
+     type = "p",xlab="Price Competitiveness",ylab="Conversion",main="Conversion vs Price Competitiveness with HIGH DL")
+abline(lm(Staples_IP[Loyalty_Cat_Collapse=="HIGH",Conversion] ~ Staples_IP[Loyalty_Cat_Collapse=="HIGH",PC_SA],
+          data = Staples_IP))
+```
+
+- Inference : When DL is HIGH, as Price competitiveness Increases Conversion decreases.
+
+---
+```{r,echo=FALSE}
+plot(Staples_IP[Loyalty_Cat_Collapse=="LOW",PC_SA],Staples_IP[Loyalty_Cat_Collapse=="LOW",Conversion],
+     type = "p",xlab="Price Competitiveness",ylab="Conversion",main="Conversion vs Price Competitiveness with LOW DL")
+abline(lm(Staples_IP[Loyalty_Cat_Collapse=="LOW",Conversion] ~ Staples_IP[Loyalty_Cat_Collapse=="LOW",PC_SA],
+          data = Staples_IP))
+```
+
+- Inference : If DL is LOW, as Price competitiveness Increases Conversion decreases.
+
+---
+
+Change in Cut-off i.e; HIGH > 67%, LOW otherwise
+
+---
+
+HIGH DL : When Demand Loyalty is HIGH & PC is MID, Conversion is HIGH : Loyalty Cut-off 67%(Median)
+```{r,echo=FALSE}
+# Correlation Matrix : Loyalty Collapse Cut-off : 
+Staples_IP$Loyalty_Cat_Collapse_Cut <- ifelse(Staples_IP$Loyalty > 0.67 & Staples_IP$Competitiveness_SA=="MID","HIGH","LOW")
+list(HIGH=cor(Staples_IP[Loyalty_Cat_Collapse_Cut=="HIGH",Conversion,PC_SA]),
+     LOW=cor(Staples_IP[Loyalty_Cat_Collapse_Cut=="LOW",Conversion,PC_SA]))
+table(Staples_IP$Loyalty_Cat_Collapse_Cut)
+```
+- Inference : When DL is HIGH, Conversion & PC are weekly negatively correlated.
+- Inference : When DL is LOW, Conversion & PC are poorly negatively correlated.
+
+---
+
+Relationship between Conversion & Price Competetiveness : Cut-off : HIGH > 60%, LOW Otherwise
+
+```{r,echo=FALSE}
+plot(Staples_IP[Loyalty_Cat_Collapse_Cut=="HIGH",PC_SA],Staples_IP[Loyalty_Cat_Collapse_Cut=="HIGH",Conversion],
+     type = "p",xlab="Price Competitiveness",ylab="Conversion",main="Conversion vs Price Competitiveness with HIGH DL")
+abline(lm(Staples_IP[Loyalty_Cat_Collapse_Cut=="HIGH",Conversion] ~ Staples_IP[Loyalty_Cat_Collapse_Cut=="HIGH",PC_SA],
+          data = Staples_IP))
+```
+
+- Inference : If DL is HIGH, as Price competitiveness Increases Conversion decreases.
+
+---
+
+```{r,echo=FALSE}
+plot(Staples_IP[Loyalty_Cat_Collapse_Cut=="LOW",PC_SA],Staples_IP[Loyalty_Cat_Collapse_Cut=="LOW",Conversion],
+     type = "p",xlab="Price Competitiveness",ylab="Conversion",main="Conversion vs Price Competitiveness with LOW DL")
+abline(lm(Staples_IP[Loyalty_Cat_Collapse_Cut=="LOW",Conversion] ~ Staples_IP[Loyalty_Cat_Collapse_Cut=="LOW",PC_SA],
+          data = Staples_IP))
+```
+
+- Inference : If DL is HIGH, as Price competitiveness Increases Conversion Increases.

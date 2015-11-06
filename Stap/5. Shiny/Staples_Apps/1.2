@@ -1,0 +1,38 @@
+# Shiny Server Template
+library(shiny)
+setwd("C:/Yashwanth/Staples PE/6. Shiny_Local/2. Staples Model Apps/")
+
+shinyServer(function(input, output) {
+  
+  Staples_Daily <- read.csv("data/Staples_Input_Daily.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+                            as.is=TRUE)
+  Staples_Aggr_Monthly <- read.csv("data/Staples_Aggr_Monthly.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+                                   as.is=TRUE)
+  Staples_Aggr_Weekly <- read.csv("data/Staples_Aggr_Weekly.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+                                  as.is=TRUE)
+  Staples_Aggr_Monthly_by_Prod <- read.csv("data/Staples_Aggr_Monthly_by_Prod.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+                                           as.is=TRUE)
+  
+  # Data View
+  output$table <- renderDataTable({
+    if(input$latency=="Monthly"){Staples_Aggr_Monthly}
+    else if(input$latency=="Daily"){Staples_Daily}
+    else if(input$latency=="Weekly"){Staples_Aggr_Weekly}
+    else{Staples_Aggr_Monthly_by_Prod}
+  })
+  
+  # Correlation
+  output$cor <- renderPrint({
+    if(input$latency=="Monthly"){data1 = data.frame(subset(Staples_Aggr_Monthly,Loyalty_Cat==input$Demand_Loyalty))
+    cor(data1[,c("Conversion","Price_Comp")])}
+    else if(input$latency=="Daily"){data2 = data.frame(subset(Staples_Aggr_Daily,Loyalty_Cat==input$Demand_Loyalty))
+    cor(data2[,c("Conversion","Price_Comp")])}
+    else if(input$latency=="Weekly"){data3 = data.frame(subset(Staples_Aggr_Weekly,Loyalty_Cat==input$Demand_Loyalty))
+    cor(data3[,c("Conversion","Price_Comp")])}
+    else{data4 = data.frame(subset(Staples_Aggr_Monthly_by_Prod,Loyalty_Cat==input$Demand_Loyalty))
+    cor(data4[,c("Conversion","Price_Comp")])}
+  })
+
+})
+
+

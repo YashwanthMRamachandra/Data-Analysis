@@ -1,0 +1,32 @@
+# Shiny UI Template
+
+shinyUI(fluidPage(
+	titlePanel("Staples : Price Sensitivity Model"),
+	
+	sidebarPanel(# About Staples
+				conditionalPanel(condition = "$('li.active a').first().html()==='About Staples'",
+					h2("Staples.com"),
+					p("Staples, Inc. is a large United States-based office supply chain store, with over 2,000 stores worldwide in 26 countries. Headquartered in Framingham, Massachusetts, the company has retail stores serving customers under its original name in Australia, Austria, Brazil, China, Finland, France, Germany, India, Italy, Norway, Portugal, the United Kingdom, and the United States, while operating subsidiaries in Argentina as Officenet-Staples,"),
+					p("In 1991, Staples founded its Canadian subsidiary, The Business Depot, and began opening stores under that name,[citation needed] though over a decade later, all stores were renamed as "Staples". The first store opened in Vaughan, Ontario, Canada north of Toronto. The following year, Staples began expanding into Europe, and opened its first store in Swansea, United Kingdom."),
+					p("Throughout most of the company's history, Staples employed, in its American commercials and advertising promotions, the slogan Yeah, we've got that., signifying their wide selection of products."),
+					br(),
+					tags$a(href = "https://en.wikipedia.org/wiki/Staples_Inc.", "More details Staples"),
+					tags$a(href = "https://twitter.com/Staples?ref_src=twsrc%5Egoogle%7Ctwcamp%5Eserp%7Ctwgr%5Eauthor", "Follow Staples @"),
+					br(),
+					br()),
+					 
+			# Data View	
+			 conditionalPanel(),
+			 
+			 # Correlation
+			 conditionalPanel()
+	),
+	
+	mainPanel(
+	tabsetPanel(
+	tabPanel(),
+	tabPanel()
+	)
+ )
+
+))

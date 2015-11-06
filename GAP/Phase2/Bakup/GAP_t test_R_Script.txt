@@ -1,0 +1,40 @@
+
+setwd("Z:/BIG/Karuna/GAP/Results/")
+
+########## Visits Category
+
+visits_cat <- read.table("Visits_Cat_tr.csv",header = TRUE, sep = ",", quote = "\"", dec = ".",
+                                fill=TRUE, comment.char="", as.is=TRUE)
+
+attach(visits_cat)
+
+# Null Hypothesis : There is no significant difference between Control and test groups 
+# Alternative hypothesis : There is significant difference between Control and test groups
+
+
+t.test(Control,Test,alternative="two.sided") 
+
+# p-value = 0.0003794
+#Since p value is less than 0.05. We reject the null hypothesis and conclude that there is  a significant difference between control and test group
+
+
+detach(visits_cat)
+
+
+########## Visits CLP
+
+visits_clp <- read.table("Visits_CLP_tr.csv",header = TRUE, sep = ",", quote = "\"", dec = ".",
+                         fill=TRUE, comment.char="", as.is=TRUE)
+
+attach(visits_clp)
+
+# Null Hypothesis : There is no significant difference between Control and test groups
+# Alternative hypothesis : There is significant difference between Control and test groups
+
+t.test(Control,Test,alternative="two.sided") 
+
+# p-value = 0.1979
+#Since p value is greater than 0.05. We accept the null hypothesis and conclude that there is no significant difference between control and test group
+
+detach(visits_clp)
+

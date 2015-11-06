@@ -1,0 +1,216 @@
+---
+title: "Staples PE"
+output: html_document
+---
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+Staples_IP <- read.table("C:/Yashwanth/Staples PE/1. Input/Staples_Input_20150827.csv",
+                         header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", as.is=TRUE)
+
+Staples_IP$Extraction_Date <- as.Date(Staples_IP$Extraction_Date)
+Staples_IP$Product_ID <- as.factor(Staples_IP$Product_ID)
+
+library(lubridate)
+library(data.table)
+Staples_IP <- data.table(Staples_IP)
+# Monthly Aggregation
+Staples_IP$Monthly <- floor_date(Staples_IP$Extraction_Date,"month")
+Staples_Aggr_Monthly1 <- Staples_IP[,lapply(.SD,mean),by=c("Monthly","Product_ID"),.SDcols=c("Staples_Final_Price","Amz_Final_Price")]
+Staples_Aggr_Monthly2 <- Staples_IP[,lapply(.SD,sum),by=c("Monthly","Product_ID"),
+                                    .SDcols=-c("Staples_Final_Price","Amz_Final_Price","Extraction_Date")]
+Staples_Aggr_Monthly <- cbind(data.frame(Staples_Aggr_Monthly1),data.frame(Staples_Aggr_Monthly2)[,-c(1,2)])
+Staples_Aggr_Monthly <- Staples_Aggr_Monthly[with(Staples_Aggr_Monthly,order(Staples_Aggr_Monthly$Product_ID)),]
+rm(Staples_Aggr_Monthly1,Staples_Aggr_Monthly2)
+
+#---------------------------------------------------------------------------------------------------------------
+#                                       Define Attributes : Monthly
+#---------------------------------------------------------------------------------------------------------------
+
+# OCPVisit & OCPVisitor
+Staples_Aggr_Monthly$Google_OCPVisit <- Staples_Aggr_Monthly$Google_Order/Staples_Aggr_Monthly$Google_Visits
+Staples_Aggr_Monthly$Google_OCPVisit[is.nan(Staples_Aggr_Monthly$Google_OCPVisit)] <- 0
+Staples_Aggr_Monthly$SC_OCPVisit <- Staples_Aggr_Monthly$SC_Order/Staples_Aggr_Monthly$SC_Visits
+Staples_Aggr_Monthly$SC_OCPVisit[is.nan(Staples_Aggr_Monthly$SC_OCPVisit)] <- 0
+Staples_Aggr_Monthly$Direct_OCPVisit <- Staples_Aggr_Monthly$Direct_Order/Staples_Aggr_Monthly$Direct_Visits
+Staples_Aggr_Monthly$Direct_OCPVisit[is.nan(Staples_Aggr_Monthly$Direct_OCPVisit)] <- 0
+
+Staples_Aggr_Monthly$Google_OCPVisitor <- Staples_Aggr_Monthly$Google_Order/Staples_Aggr_Monthly$Google_Unique_Visitors
+Staples_Aggr_Monthly$Google_OCPVisitor[is.nan(Staples_Aggr_Monthly$Google_OCPVisitor)] <- 0
+Staples_Aggr_Monthly$SC_OCPVisitor <- Staples_Aggr_Monthly$SC_Order/Staples_Aggr_Monthly$SC_Unique_Visitors
+Staples_Aggr_Monthly$SC_OCPVisitor[is.nan(Staples_Aggr_Monthly$SC_OCPVisitor)] <- 0
+Staples_Aggr_Monthly$Direct_OCPVisitor <- Staples_Aggr_Monthly$Direct_Order/Staples_Aggr_Monthly$Direct_Unique_Visitors
+Staples_Aggr_Monthly$Direct_OCPVisitor[is.nan(Staples_Aggr_Monthly$Direct_OCPVisitor)] <- 0
+
+# Overall 
+attach(Staples_Aggr_Monthly)
+Staples_Aggr_Monthly$OA_Visits <- Google_Visits+SC_Visits+Direct_Visits
+Staples_Aggr_Monthly$OA_Revenue <- Google_Revenue+SC_Revenue+Direct_Revenue 
+Staples_Aggr_Monthly$OA_Orders <- Google_Order+SC_Order+Direct_Order
+Staples_Aggr_Monthly$OA_Uniq_Visitor <- Google_Unique_Visitors+SC_Unique_Visitors+Direct_Unique_Visitors
+Staples_Aggr_Monthly$OA_Aggr_Search_Vol <- Google_Aggr_Search_Vol+SC_Aggr_Search_Vol+Direct_Aggr_Search_Vol
+Staples_Aggr_Monthly$OA_Bounce_rate <- Google_Bounce_rate+SC_Bounce_rate+Direct_Bounce_rate
+Staples_Aggr_Monthly$OA_Cart_Views <- Google_Cart_Views+SC_Cart_Views+Direct_Cart_Views
+Staples_Aggr_Monthly$OA_Shipping <- Google_Shipping+SC_Shipping+Direct_Shipping
+Staples_Aggr_Monthly$OA_Visit_Freq <- Google_Visit_Freq+SC_Visit_Freq+Direct_Visit_Freq
+detach(Staples_Aggr_Monthly)
+
+Staples_Aggr_Monthly$OA_OCPVisit <- Staples_Aggr_Monthly$OA_Orders/Staples_Aggr_Monthly$OA_Visits
+Staples_Aggr_Monthly$OA_OCPVisit[is.nan(Staples_Aggr_Monthly$OA_OCPVisit)] <- 0
+Staples_Aggr_Monthly$OA_OCPVisitor <- Staples_Aggr_Monthly$OA_Orders/Staples_Aggr_Monthly$OA_Uniq_Visitor
+Staples_Aggr_Monthly$OA_OCPVisitor[is.na(Staples_Aggr_Monthly$OA_OCPVisitor)] <- 0
+
+# Result
+attach(Staples_Aggr_Monthly)
+Staples_Aggr_Monthly$Goog_Per_Visit <- round((Google_Unique_Visitors+SC_Unique_Visitors)/OA_Uniq_Visitor,2)
+Staples_Aggr_Monthly$Goog_Per_Visit[is.nan(Staples_Aggr_Monthly$Goog_Per_Visit)] <- 0
+Staples_Aggr_Monthly$Goog_Per_Visit[is.infinite(Staples_Aggr_Monthly$Goog_Per_Visit)] <- 0
+Staples_Aggr_Monthly$Dir_Per_Visit <- Direct_Unique_Visitors/OA_Uniq_Visitor
+Staples_Aggr_Monthly$Dir_Per_Visit[is.nan(Staples_Aggr_Monthly$Dir_Per_Visit)] <- 0
+detach(Staples_Aggr_Monthly)
+
+Staples_Aggr_Monthly$Per_Visit_Diff <- Staples_Aggr_Monthly$Dir_Per_Visit-Staples_Aggr_Monthly$Goog_Per_Visit
+
+
+#---------------------------------------------------------------------------------------------------------------
+#                                       Define Loyalties : Monthly
+#---------------------------------------------------------------------------------------------------------------
+
+Staples_Aggr_Monthly$Loyalty <- Staples_Aggr_Monthly$Dir_Per_Visit
+Staples_Aggr_Monthly$Conversion <- Staples_Aggr_Monthly$OA_OCPVisit
+Staples_Aggr_Monthly$Conversion_Visitor <- Staples_Aggr_Monthly$OA_OCPVisitor
+Staples_Aggr_Monthly$Price_Comp <-  round(Staples_Aggr_Monthly$Staples_Final_Price/Staples_Aggr_Monthly$Amz_Final_Price,2)
+
+Staples_Aggr_Monthly$Loyalty_Cat <-  ifelse(Staples_Aggr_Monthly$Loyalty > 0.75,"HIGH",ifelse(Staples_Aggr_Monthly$Loyalty < 0.60,"MID","LOW"))
+Staples_Aggr_Monthly$Conversion_Cat <- ifelse(Staples_Aggr_Monthly$Conversion > 0.40,"HIGH",ifelse(Staples_Aggr_Monthly$Conversion < 0.25,"MID","LOW"))
+Staples_Aggr_Monthly$Price_Comp_Cat <- ifelse(Staples_Aggr_Monthly$Price_Comp > 1,"HIGH",ifelse(Staples_Aggr_Monthly$Price_Comp < 0.9,"MID","LOW"))
+
+Staples_Aggr_Monthly <- data.table(Staples_Aggr_Monthly)
+cols <- grep("Visits|Order|Uniq|Cat|ID|ly|cart",names(Staples_Aggr_Monthly),value = T,invert = T)
+Staples_Aggr_Monthly <- Staples_Aggr_Monthly[,(cols) := round(.SD,2), .SDcols=cols]
+cols <- grep("Visits|Order|Uniq|cart",names(Staples_Aggr_Monthly),value = T)
+Staples_Aggr_Monthly <- Staples_Aggr_Monthly[,(cols) := ceiling(.SD), .SDcols=cols];rm(cols)
+
+Staples_Aggr_Monthly <- data.frame(Staples_Aggr_Monthly)
+Staples_Aggr_Monthly <- Staples_Aggr_Monthly[,c(grep("Month|Prod",names(Staples_Aggr_Monthly)),grep("Final_Price",names(Staples_Aggr_Monthly)),
+                                                grep("Google",names(Staples_Aggr_Monthly)),grep("SC",names(Staples_Aggr_Monthly)),
+                                                grep("Direct",names(Staples_Aggr_Monthly)),grep("OA",names(Staples_Aggr_Monthly)),
+                                                grep("Month|Prod|Final|Google|SC|Direct|OA",names(Staples_Aggr_Monthly),invert = TRUE))]
+
+#---------------------------------------------------------------------------------------------------------------
+#                                           Aggregate By Product
+#---------------------------------------------------------------------------------------------------------------
+
+Staples_Aggr_Monthly <- data.table(Staples_Aggr_Monthly)
+Staples_Aggr_Monthly_by_Prod1 <- Staples_Aggr_Monthly[,lapply(.SD,mean),by="Product_ID",.SDcols=c("Staples_Final_Price","Amz_Final_Price")]
+Staples_Aggr_Monthly_by_Prod2 <- Staples_Aggr_Monthly[,lapply(.SD,sum),by="Product_ID",
+                            .SDcols=-c("Staples_Final_Price","Amz_Final_Price","Loyalty_Cat","Conversion_Cat","Price_Comp_Cat",
+                            "Goog_Per_Visit","Dir_Per_Visit","Per_Visit_Diff","Loyalty","Conversion","Conversion_Visitor","Price_Comp")]
+Staples_Aggr_Monthly_by_Prod <- cbind(data.frame(Staples_Aggr_Monthly_by_Prod1),data.frame(Staples_Aggr_Monthly_by_Prod2)[,-c(1,2)])
+rm(Staples_Aggr_Monthly_by_Prod1,Staples_Aggr_Monthly_by_Prod2)
+
+Staples_Aggr_Monthly_by_Prod$Conversion <- Staples_Aggr_Monthly_by_Prod$OA_Orders/Staples_Aggr_Monthly_by_Prod$OA_Visits
+Staples_Aggr_Monthly_by_Prod$Conversion_Visitor <- Staples_Aggr_Monthly_by_Prod$OA_Orders/Staples_Aggr_Monthly_by_Prod$OA_Uniq_Visitor
+Staples_Aggr_Monthly_by_Prod$Price_Comp <- Staples_Aggr_Monthly_by_Prod$Staples_Final_Price/Staples_Aggr_Monthly_by_Prod$Amz_Final_Price
+
+# Round off
+Staples_Aggr_Monthly_by_Prod <- data.table(Staples_Aggr_Monthly_by_Prod)
+cols <- grep("Revenue|Conversion|_Comp|Final",names(Staples_Aggr_Monthly_by_Prod),value = T)
+Staples_Aggr_Monthly_by_Prod <- Staples_Aggr_Monthly_by_Prod[,(cols) := round(.SD,2), .SDcols=cols]
+cols <- grep("Visits|Order|Uniq",names(Staples_Aggr_Monthly_by_Prod),value = T)
+Staples_Aggr_Monthly_by_Prod <- Staples_Aggr_Monthly_by_Prod[,(cols) := ceiling(.SD), .SDcols=cols];rm(cols)
+
+# Correlation by Product
+Staples_Aggr_Monthly <- data.table(Staples_Aggr_Monthly)
+Staples_Corr_By_Prod <- Staples_Aggr_Monthly[,{Staples_Aggr_Monthly[,cor(Conversion,Price_Comp),by=Product_ID]}]
+colnames(Staples_Corr_By_Prod) <- c("Product_ID","Correlation")
+setkey(Staples_Corr_By_Prod,"Correlation")
+
+Staples_Corr_By_Prod$Decision_Criterion <- ifelse(Staples_Corr_By_Prod$Correlation<=-0.30,1,
+                                                  ifelse(Staples_Corr_By_Prod$Correlation>=0.30,2,0))
+
+```
+
+---
+
+Decision Tree Model
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+#---------------------------------------------------------------------------------------------------------------
+#                                            Decision Tree : Over time
+#---------------------------------------------------------------------------------------------------------------
+
+library(data.table)
+Staples_Aggr_Monthly <- data.table(Staples_Aggr_Monthly)
+Staples_Aggr_Monthly_Dec <- merge(Staples_Aggr_Monthly,Staples_Corr_By_Prod,by="Product_ID")
+Staples_Aggr_Monthly_Dec <- Staples_Aggr_Monthly_Dec[Decision_Criterion==1 | Decision_Criterion==2]
+Staples_Aggr_Monthly_Dec$Decision_Criterion <- as.factor(Staples_Aggr_Monthly_Dec$Decision_Criterion)
+
+# Sampling
+set.seed(400)
+Staples_Aggr_Monthly_Dec_IND <- sample(nrow(Staples_Aggr_Monthly_Dec),size=round(((nrow(Staples_Aggr_Monthly_Dec)/100)*70)+1,0))
+Staples_Aggr_Monthly_Dec_Train <- Staples_Aggr_Monthly_Dec[Staples_Aggr_Monthly_Dec_IND,]
+Staples_Aggr_Monthly_Dec_Test <- Staples_Aggr_Monthly_Dec[-Staples_Aggr_Monthly_Dec_IND,]
+
+# Build the Tree
+library(rpart)
+Staples_DT <- rpart(Decision_Criterion ~ Conversion+Price_Comp+OA_Bounce_rate+OA_Cart_Views+OA_Visit_Freq, 
+                    data = Staples_Aggr_Monthly_Dec_Train)
+summary(Staples_DT)
+```
+
+Decision Tree
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+library(rpart.plot)
+library(rattle)
+library(colorspace)
+fancyRpartPlot(Staples_DT,cex = 0.6,sub = "Correlation Distribution",main = "Correlation Decision for products over time")
+```
+---
+
+Model Validation
+
+---
+
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+# Validate the Model or Classsification Accuracy
+library(xtable)
+library(reshape)
+Staples_Aggr_Monthly_Dec_Test <- data.frame(cbind(Staples_Aggr_Monthly_Dec_Test,
+  Actual = Staples_Aggr_Monthly_Dec_Test$Decision_Criterion,Pred = predict(Staples_DT,Staples_Aggr_Monthly_Dec_Test,type = "class"),
+  Prob = predict(Staples_DT,Staples_Aggr_Monthly_Dec_Test,type = "prob")))
+
+table(Actual=Staples_Aggr_Monthly_Dec_Test$Ac,Predict=Staples_Aggr_Monthly_Dec_Test$Pred)
+DT <- cbind(melt(table(Actual=Staples_Aggr_Monthly_Dec_Test$Decision_Criterion,Predict=Staples_Aggr_Monthly_Dec_Test$Pred)),
+            Decision=c("False Negative","True Negative","False Positive","True Positive"))
+DT <- data.table(DT)
+setorderv(DT,"Decision",order = -1);DT
+
+Class_Table <- xtable(table(Actual=Staples_Aggr_Monthly_Dec_Test$Decision_Criterion,Predict=Staples_Aggr_Monthly_Dec_Test$Pred))
+cbind(Class_Table <- xtable(table(Actual=Staples_Aggr_Monthly_Dec_Test$Decision_Criterion,Predict=Staples_Aggr_Monthly_Dec_Test$Pred)),
+      Per_Correct = c((Class_Table[1,1]/nrow(Staples_Aggr_Monthly_Dec_Test)*100),(Class_Table[2,2]/nrow(Staples_Aggr_Monthly_Dec_Test)*100)))
+sum(cbind(Class_Table <- xtable(table(Actual=Staples_Aggr_Monthly_Dec_Test$Decision_Criterion,Predict=Staples_Aggr_Monthly_Dec_Test$Pred)),
+          Per_Correct = c((Class_Table[1,1]/nrow(Staples_Aggr_Monthly_Dec_Test)*100),(Class_Table[2,2]/nrow(Staples_Aggr_Monthly_Dec_Test)*100)))[3])
+rm(Class_Table,DT,Staples_Aggr_Monthly_Dec_IND)
+```
+
+---
+
+Classification Accuracy
+
+---
+```{r,echo=FALSE,warning=FALSE,message=FALSE}
+# ROC
+library(ROCR)
+Prediction <- prediction(as.numeric(Staples_Aggr_Monthly_Dec_Test$Pred),as.numeric(Staples_Aggr_Monthly_Dec_Test$Decision_Criterion))
+par(mfrow=c(1,2),mar=c(3,2,2,1))
+Perf1 <- performance(Prediction,measure="tpr",x.measure="fpr")    # True versus False
+plot(Perf1,main="ROC Curve")
+
+# Perf2 <- performance(Prediction,measure="sens",x.measure="spec") # True versus True
+# plot(Perf2,main="Sensitivity & Specificity")
+# rm(Perf1,Perf2,Prediction)
+
+# library(pROC)
+# ROC <- roc(Staples_Aggr_Monthly_Dec_Test$Pred,as.numeric(Staples_Aggr_Monthly_Dec_Test$Decision_Criterion),plot=TRUE)                     # True versus True
+```

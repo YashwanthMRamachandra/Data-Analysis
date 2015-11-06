@@ -1,0 +1,35 @@
+
+Sports Authority
+
+# Notes
+
+1. Rank the varibles as 1 for highly sold(Revenue) products. ~ 500
+
+2. Since 75 products out of 500 products against ~ 2800 non-top-products are identified as top-products, build model by each Category.
+
+3. Post calculating WOE & IV which explains that, IV > 0.1(Medium Predictive) when most of the review fall into the Bin 1 across all Quarters.
+	a. Hence drill down(Conditionalise) data to where it has Reviews = 1 & re-rank the products.
+	b. We have to identify products which has both "Revenue" & "Reviews" & then re-rank the products.
+	Note : Hence it is not ideally correct to rank the products based on Revenue alone.
+	c. There are no enough top-products(1) falling(proportion) into "Good"("Bad") when Reviews are high.
+	
+4. When WOE & IV are calculated by-category,
+	a. Cleats & Trainind Aid : Reviews across all quarters shows "Unpredictive" but "Weak Predictive" particularly when Reviews = 1 & 3.
+	b. Activity monitor : Reviews across all quarters shows "Ünpredictive" but "Weak Predictive" & "Medium predictive" particularly when Reviews = 1.
+	c. Baseball Bat : Reviews are "Weak Predictive" under Q2 & Q3 particularly when Reviews = 1 & 2.
+	d. Golf Complete Sets : Reviews across all quarters are "Medium Predictive" & "Weak predictive" particularly when Reviews = 0.
+	e. NFL Apparel : Reviews across Q2,Q3,Q4 are "Medium Predictive" & "Weak predictive" particularly when Reviews = 1.
+	f. Treadmill : Reviews are "Weak Predictive" particularly when Reviews = 0.
+	g. Women's Running Shoes : Reviews are "Medium Predictive" & "Week predctive" particularly when Reviews = 0 & 1. 
+	
+	
+5. Dimensionality of the data is way to less for Analysis.
+	For example here is how the drill down goes for Activity Monitors,
+		1.	Total number of records available from the Review crawled data = 229564-records..
+		2.	Filtering data into time period consideration(2014-04-01 to 2015-03-31) dimension reduces to = 135408-records..
+		3.	Further drilled to mapped products, data got reduced = 88.(reason being, most of the listed products either doesn’t have reviews(reviews = 0) or has duplicates(reviews > 1).
+		4.	Lastly when we aggregate it on Quarterly level, it finally turned down = 23-records.
+
+
+
+	

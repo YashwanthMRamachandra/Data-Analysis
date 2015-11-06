@@ -1,0 +1,25 @@
+# Shiny Server Template
+library(shiny)
+
+setwd("C:/Yashwanth/Staples PE/6. Shiny_Local/2. Staples Model Apps/")
+Staples_Daily <- read.csv("data/Staples_Input_Daily.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+                          as.is=TRUE)
+Staples_Aggr_Monthly <- read.csv("data/Staples_Aggr_Monthly.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+                                 as.is=TRUE)
+# Staples_Aggr_Monthly_by_Prod <- read.csv("data/Staples_Aggr_Monthly_by_Prod.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+#                                  as.is=TRUE)
+# Staples_Aggr_Weekly <- read.csv("data/Staples_Aggr_Weekly.csv",header = TRUE, sep = ",", quote = "\"", dec = "." ,fill=TRUE, comment.char="", 
+#                                  as.is=TRUE)
+
+shinyServer(function(input, output, session) {
+  
+  output$Daily <- renderDataTable(Staples_Daily,options = list(pageLength = 5,
+                                  initComplete = I("function(settings, json) {alert('Done.');}"))
+                                  )
+  
+  output$Monthly <- renderDataTable(Staples_Aggr_Monthly,options = list(pageLength = 5,
+                                   initComplete = I("function(settings, json) {alert('Done.');}"))
+                                  ) 
+})
+
+

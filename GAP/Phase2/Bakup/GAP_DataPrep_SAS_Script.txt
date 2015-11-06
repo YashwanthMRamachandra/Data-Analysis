@@ -1,0 +1,260 @@
+
+
+libname gap 'D:\Gap_Karuna_201504\SAS Data';      
+
+
+/********************** Visits ******************************/
+
+data gap.VISITS;
+
+         %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+      
+        infile 'D:\Gap_Karuna_201504\Data to import\visits_2015.csv' delimiter = ',' MISSOVER DSD lrecl=32767 firstobs=2 ;
+	
+         informat Category $16. ;
+         informat Pair $7. ;
+         informat Page $30. ;
+         informat Pair_page $500. ;
+         informat Dt_24_03_2015 best12. ;
+         informat Dt_25_03_2015 best12. ;
+         informat Dt_26_03_2015 best12. ;
+         informat Dt_27_03_2015 best12. ;
+         informat Dt_28_03_2015 best12. ;
+         informat Dt_29_03_2015 best12. ;
+         informat Dt_30_03_2015 best12. ;
+         informat Dt_31_03_2015 best12. ;
+         informat Dt_01_04_2015 best12. ;
+         informat Dt_02_04_2015 best12. ;
+         informat Dt_03_04_2015 best12. ;
+         informat Dt_04_04_2015 best12. ;
+         informat Dt_05_04_2015 best12. ;
+         informat Dt_06_04_2015 best12. ;
+         informat Dt_07_04_2015 best12. ;
+         informat Dt_08_04_2015 best12. ;
+         informat Dt_09_04_2015 best12. ;
+         informat Dt_10_04_2015 best12. ;
+         informat Dt_11_04_2015 best12. ;
+         informat Dt_12_04_2015 best12. ;
+         informat Dt_13_04_2015 best12. ;
+         informat Dt_14_04_2015 best12. ;
+         informat Dt_15_04_2015 best12. ;
+         informat Dt_16_04_2015 best12. ;
+         informat Dt_17_04_2015 best12. ;
+         informat Dt_18_04_2015 best12. ;
+         informat Dt_19_04_2015 best12. ;
+         informat Dt_20_04_2015 best12. ;
+         informat Dt_21_04_2015 best12. ;
+         informat Dt_22_04_2015 best12. ;
+         informat Dt_23_04_2015 best12. ;
+         informat Dt_24_04_2015 best12. ;
+         informat Dt_25_04_2015 best12. ;
+         informat Dt_26_04_2015 best12. ;
+         informat Dt_27_04_2015 best12. ;
+	 
+	     format Category $16. ;
+         format Pair $7. ;
+         format Page $30. ;
+         format Pair_page $500. ;
+         format Dt_24_03_2015 best12. ;
+         format Dt_25_03_2015 best12. ;
+         format Dt_26_03_2015 best12. ;
+         format Dt_27_03_2015 best12. ;
+         format Dt_28_03_2015 best12. ;
+         format Dt_29_03_2015 best12. ;
+         format Dt_30_03_2015 best12. ;
+         format Dt_31_03_2015 best12. ;
+         format Dt_01_04_2015 best12. ;
+         format Dt_02_04_2015 best12. ;
+         format Dt_03_04_2015 best12. ;
+         format Dt_04_04_2015 best12. ;
+         format Dt_05_04_2015 best12. ;
+         format Dt_06_04_2015 best12. ;
+         format Dt_07_04_2015 best12. ;
+         format Dt_08_04_2015 best12. ;
+         format Dt_09_04_2015 best12. ;
+         format Dt_10_04_2015 best12. ;
+         format Dt_11_04_2015 best12. ;
+         format Dt_12_04_2015 best12. ;
+         format Dt_13_04_2015 best12. ;
+         format Dt_14_04_2015 best12. ;
+         format Dt_15_04_2015 best12. ;
+         format Dt_16_04_2015 best12. ;
+         format Dt_17_04_2015 best12. ;
+         format Dt_18_04_2015 best12. ;
+         format Dt_19_04_2015 best12. ;
+         format Dt_20_04_2015 best12. ;
+         format Dt_21_04_2015 best12. ;
+         format Dt_22_04_2015 best12. ;
+         format Dt_23_04_2015 best12. ;
+         format Dt_24_04_2015 best12. ;
+         format Dt_25_04_2015 best12. ;
+         format Dt_26_04_2015 best12. ;
+         format Dt_27_04_2015 best12. ;
+
+      input
+                  Category $
+                  Pair $
+                  Page $
+                  Pair_page $
+                  Dt_24_03_2015
+                  Dt_25_03_2015
+                  Dt_26_03_2015
+                  Dt_27_03_2015
+                  Dt_28_03_2015
+                  Dt_29_03_2015
+                  Dt_30_03_2015
+                  Dt_31_03_2015
+                  Dt_01_04_2015
+                  Dt_02_04_2015
+                  Dt_03_04_2015
+                  Dt_04_04_2015
+                  Dt_05_04_2015
+                  Dt_06_04_2015
+                  Dt_07_04_2015
+                  Dt_08_04_2015
+                  Dt_09_04_2015
+                  Dt_10_04_2015
+                  Dt_11_04_2015
+                  Dt_12_04_2015
+                  Dt_13_04_2015
+                  Dt_14_04_2015
+                  Dt_15_04_2015
+                  Dt_16_04_2015
+                  Dt_17_04_2015
+                  Dt_18_04_2015
+                  Dt_19_04_2015
+                  Dt_20_04_2015
+                  Dt_21_04_2015
+                  Dt_22_04_2015
+                  Dt_23_04_2015
+                  Dt_24_04_2015
+                  Dt_25_04_2015
+                  Dt_26_04_2015
+                  Dt_27_04_2015;
+if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+run;
+
+proc freq data = gap.visits;
+tables category;
+run;
+
+
+
+/* Seprating the data for category and CLP */
+
+data gap.visits_cat;
+set gap.visits;
+where
+category in("Category Control","Category Test");
+run;
+
+/* Sorting the data by pair_page */
+
+proc sort data = gap.visits_cat;
+by pair_page;
+run;
+
+/* Transposing the data to get the data in required format */
+
+proc transpose data = gap.visits_cat out = gap.visits_cat_tr;
+by pair_page;
+run;
+
+/* Rename the columns */
+
+data gap.visits_cat_tr;
+set gap.visits_cat_tr (rename = (_name_ = Dt) rename = (col1 = Control ) rename = (col2 = Test)) ;
+run;
+
+/* Export the data */
+
+Data _null_;
+      %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+      %let _EFIREC_ = 0;     /* clear export record count macro variable */
+      file 'X:\BIG\Karuna\GAP\Results\Visits_Cat_tr.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+      if _n_ = 1 then        /* write column names or labels */
+       do;
+         put
+            "Pair_page"
+         ','
+            "Dt"
+         ','
+            "Control"
+         ','
+            "Test"
+         ;
+       end;
+     set  GAP.Visits_clp_tr   end=EFIEOD;
+         format Pair_page $54. ;
+         format dt $13. ;
+         format Control best12. ;
+         format Test best12. ;
+       do;
+         EFIOUT + 1;
+         put Pair_page $ @;
+         put dt $ @;
+         put Control @;
+         put Test ;
+         ;
+       end;
+      if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+      if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+      run;
+
+
+
+data gap.visits_clp;
+set gap.visits;
+where
+category in("CLP Control","CLP Test");
+run;
+
+proc sort data = gap.visits_clp;
+by pair_page;
+run;
+
+proc transpose data = gap.visits_clp out = gap.visits_clp_tr;
+by pair_page;
+run;
+
+data gap.visits_clp_tr;
+set gap.visits_clp_tr (rename = (col1 = Control ) rename = (col2 = Test)) ;
+run;
+
+
+/* Export the data */
+
+Data _null_;
+      %let _EFIERR_ = 0; /* set the ERROR detection macro variable */
+      %let _EFIREC_ = 0;     /* clear export record count macro variable */
+      file 'X:\BIG\Karuna\GAP\Results\Visits_CLP_tr.csv' delimiter=',' DSD DROPOVER lrecl=32767;
+      if _n_ = 1 then        /* write column names or labels */
+       do;
+         put
+            "Pair_page"
+         ','
+            "Dt"
+         ','
+            "Control"
+         ','
+            "Test"
+         ;
+       end;
+     set  GAP.Visits_clp_tr   end=EFIEOD;
+         format Pair_page $54. ;
+         format dt $13. ;
+         format Control best12. ;
+         format Test best12. ;
+       do;
+         EFIOUT + 1;
+         put Pair_page $ @;
+         put dt $ @;
+         put Control @;
+         put Test ;
+         ;
+       end;
+      if _ERROR_ then call symputx('_EFIERR_',1);  /* set ERROR detection macro variable */
+      if EFIEOD then call symputx('_EFIREC_',EFIOUT);
+      run;
+
+

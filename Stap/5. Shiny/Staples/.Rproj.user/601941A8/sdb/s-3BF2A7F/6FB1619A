@@ -1,0 +1,16 @@
+{
+    "contents" : "\n# This is the user-interface definition of a Shiny web application.\n# You can find out more about building applications with Shiny here:\n# \n# http://www.rstudio.com/shiny/\n#\n\nlibrary(shiny)\n\nshinyUI(pageWithSidebar(\n  \n  # Application title\n  headerPanel(\"New Application\"),\n  \n  # Sidebar with a slider input for number of observations\n  sidebarPanel(\n    sliderInput(\"obs\", \n                \"Number of observations:\", \n                min = 1, \n                max = 1000, \n                value = 500)\n  ),\n  \n  # Show a plot of the generated distribution\n  mainPanel(\n    plotOutput(\"distPlot\")\n  )\n))\n",
+    "created" : 1440486574371.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2477421616",
+    "id" : "6FB1619A",
+    "lastKnownWriteTime" : 1440486571,
+    "path" : "~/R/Staples/Shiny/Staples/ui.R",
+    "project_path" : "ui.R",
+    "properties" : {
+    },
+    "source_on_save" : false,
+    "type" : "r_source"
+}

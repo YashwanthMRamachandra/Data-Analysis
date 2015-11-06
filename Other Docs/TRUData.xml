@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<PMML version="4.2" xmlns="http://www.dmg.org/PMML-4_2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dmg.org/PMML-4_2 http://www.dmg.org/v4-2/pmml-4-2.xsd">
+ <Header copyright="Copyright (c) 2014 yashwanth.r" description="Linear Regression Model">
+  <Extension name="user" value="yashwanth.r" extender="Rattle/PMML"/>
+  <Application name="Rattle/PMML" version="1.4"/>
+  <Timestamp>2014-11-26 15:15:19</Timestamp>
+ </Header>
+ <DataDictionary numberOfFields="3">
+  <DataField name="Sales" optype="continuous" dataType="double"/>
+  <DataField name="log(Toys_Final_Price)" optype="continuous" dataType="double"/>
+  <DataField name="log(Amazon_Final_Price)" optype="continuous" dataType="double"/>
+ </DataDictionary>
+ <RegressionModel modelName="Linear_Regression_Model" functionName="regression" algorithmName="least squares">
+  <MiningSchema>
+   <MiningField name="Sales" usageType="predicted"/>
+   <MiningField name="log(Toys_Final_Price)" usageType="active"/>
+   <MiningField name="log(Amazon_Final_Price)" usageType="active"/>
+  </MiningSchema>
+  <Output>
+   <OutputField name="Predicted_Sales" feature="predictedValue"/>
+  </Output>
+  <RegressionTable intercept="1669.65695543975">
+   <NumericPredictor name="log(Toys_Final_Price)" exponent="1" coefficient="35.7855549232887"/>
+   <NumericPredictor name="log(Amazon_Final_Price)" exponent="1" coefficient="-47.5405230630912"/>
+  </RegressionTable>
+ </RegressionModel>
+</PMML>

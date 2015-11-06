@@ -1,0 +1,278 @@
+########################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+########################################################################################################################################################################################################################################################################################################################################################################################################################################################################################
+
+							###########################################################################
+
+						              	          # Preparing Price_trac Data #
+
+							###########################################################################
+
+
+
+# kol.price_data is the 40 weeks merged file for luggage category. 
+# */ This is the basic raw file for PricetRac */
+
+# */ Imoprt the data */ 
+
+system.time(  
+  read.csv("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Kohls_Luggage_Merged_Weekly_Updated_Data.csv", header = TRUE, sep = ",", 
+           quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+)
+kol.price_data <- read.table("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Kohls_Luggage_Merged_Weekly_Updated_Data.csv",header = TRUE, sep = ",",
+                             quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+
+kol.price_data$Extraction_Date <- as.Date(kol.price_data$Extraction_Date)
+
+
+
+
+########################## Splitting the entire PriceTrac data set per retailer ##########################
+########################## Preparing Kohls data ##########################
+
+
+# */ Import Kohls data */
+
+kol.price_Kohls <- data.frame(subset(kol.price_data,Site_Name=="kohls" | Site_Name=="Kohls",
+                                     select=c(Extraction_Date,ord_week_nmb,Site_Name,TCIN,Product_ID,Product_Name,
+                                              Regular_price,Regular_Price_Range,Shipping,disc_perc,markdown_price,
+                                              final_price,Product_Description,availability,additional_information,
+                                              price_promo)),row.names=NULL)  
+
+
+# */ Removing duplicate TCIN */
+
+kol.price_Kohls <- data.frame(with(kol.price_Kohls,kol.price_Kohls[order(ord_week_nmb,Product_ID,TCIN),]),row.names=NULL)
+kol.price_Kohls$Unique_Key <- paste(kol.price_Kohls$ord_week_nmb,kol.price_Kohls$Product_ID) 
+
+kol.price_Kohls_nodupkey <- sqldf("select * from 'kol.price_Kohls' group by unique_key order by ord_week_nmb, product_id")
+
+kol.price_Kohls_nodupkey <- kol.price_Kohls_nodupkey[-c(17)]
+
+
+
+# */ Import Amazon data */
+  
+kol.price_Amazon <- data.frame(subset(kol.price_data,Site_Name=="Amazon",
+                                        select=c(Extraction_Date,ord_week_nmb,Site_Name,TCIN,Product_ID,Product_Name,
+                                                 Regular_price,Regular_Price_Range,Shipping,disc_perc,markdown_price,
+                                                 final_price,Product_Description,availability,additional_information,
+                                                 price_promo)),row.names=NULL)   
+  
+  
+# */ Removing duplicate TCIN */
+  
+kol.price_Amazon <- data.frame(with(kol.price_Amazon,kol.price_Amazon[order(ord_week_nmb,Product_ID,TCIN),]),row.names=NULL)
+kol.price_Amazon$Unique_Key <- paste(kol.price_Amazon$ord_week_nmb,kol.price_Amazon$Product_ID) 
+
+kol.price_Amazon_nodupkey <- sqldf("select * from 'kol.price_Amazon' group by unique_key order by ord_week_nmb, product_id")
+
+kol.price_Amazon_nodupkey <- kol.price_Amazon_nodupkey[-c(17)]
+
+
+
+# */ Import Target data */
+  
+kol.price_Target <- data.frame(subset(kol.price_data,Site_Name=="Target",
+                                        select=c(Extraction_Date,ord_week_nmb,Site_Name,TCIN,Product_ID,Product_Name,
+                                                 Regular_price,Regular_Price_Range,Shipping,disc_perc,markdown_price,
+                                                 final_price,Product_Description,availability,additional_information,
+                                                 price_promo)),row.names=NULL)  
+  
+  
+# */ Removing duplicate TCIN */
+  
+kol.price_Target <- data.frame(with(kol.price_Target,kol.price_Target[order(ord_week_nmb,Product_ID,TCIN),]),row.names=NULL)
+kol.price_Target$Unique_Key <- paste(kol.price_Target$ord_week_nmb,kol.price_Target$Product_ID) 
+
+kol.price_Target_nodupkey <- sqldf("select * from 'kol.price_Target' group by unique_key order by ord_week_nmb, product_id")
+
+kol.price_Target_nodupkey <- kol.price_Target_nodupkey[-c(17)]
+
+
+
+  
+######################## Preparing file for competitor pricing. Here the prices of competitors will be mapped against Kohls 
+## Kohls  ##
+  
+require(plyr)
+kol.price_Kohls_dedup <- rename(kol.price_Kohls_nodupkey,
+                                c("Product_ID" = "kohl_product_ID",
+                                    "Product_Name"  = "kohl_product_name",
+                                    "Regular_price"  = "kohl_Regular_price",
+                                    "disc_perc"  = "kohl_disc_perc",
+                                    "markdown_price"  = "kohl_markdown_price",
+                                    "final_price"  = "kohl_final_price",
+                                    "Shipping"  = "kohl_Shipping",
+                                    "Product_Description"  = "kohl_Product_Description",
+                                    "availability"  = "kohl_availability",
+                                    "additional_information"  = "kohl_additional_info",
+                                    "price_promo"  = "kohl_price_promo"))
+
+  
+  
+kol.price_Kohls_dedup <- data.frame(with(kol.price_Kohls_dedup,kol.price_Kohls_dedup[order(ord_week_nmb,TCIN),]),
+                                      row.names=NULL)
+
+
+## Amazon  ##
+  
+kol.price_Amazon_dedup <- rename(kol.price_Amazon_nodupkey,
+                                   c("Product_ID" = "amazon_product_ID",
+                                     "Product_Name"  = "amazon_product_name",
+                                     "Regular_price"  = "amazon_Regular_price",
+                                     "disc_perc"  = "amazon_disc_perc",
+                                     "markdown_price"  = "amazon_markdown_price",
+                                     "final_price"  = "amazon_final_price",
+                                     "Shipping"  = "amazon_Shipping",
+                                     "Product_Description"  = "amazon_Product_Description",
+                                     "availability"  = "amazon_availability",
+                                     "additional_information"  = "amazon_additional_info",
+                                     "price_promo"  = "amazon_price_promo"))
+
+  
+  
+kol.price_Amazon_dedup <- data.frame(with(kol.price_Amazon_dedup,kol.price_Amazon_dedup[order(ord_week_nmb,TCIN),]),
+                                       row.names=NULL)
+
+
+## Target  ##
+  
+kol.price_Target_dedup <- rename(kol.price_Target_nodupkey,
+                                   c("Product_ID" = "Target_product_ID",
+                                     "Product_Name"  = "Target_product_name",
+                                     "Regular_price"  = "Target_Regular_price",
+                                     "disc_perc"  = "Target_disc_perc",
+                                     "markdown_price"  = "Target_markdown_price",
+                                     "final_price"  = "Target_final_price",
+                                     "Shipping"  = "Target_Shipping",
+                                     "Product_Description"  = "Target_Product_Description",
+                                     "availability"  = "Target_availability",
+                                     "additional_information"  = "Target_additional_info",
+                                     "price_promo"  = "Target_price_promo"))
+  
+  
+kol.price_Target_dedup <- data.frame(with(kol.price_Target_dedup,kol.price_Target_dedup[order(ord_week_nmb,TCIN),]),
+                                       row.names=NULL)
+
+  
+## */ Merge data w.r.t Kolhs, amazon and target */
+  
+Kol.price <-  merge(kol.price_Kohls_dedup[,-c(3,8)],
+                      kol.price_Amazon_dedup[,-c(1,3,8)],all.x=TRUE,
+                      by= c("ord_week_nmb","TCIN"))
+  
+Kol.price <- merge(Kol.price,
+                     kol.price_Target_dedup[,-c(1,3,8)],all.x=TRUE,
+                     by= c("ord_week_nmb","TCIN"))
+
+
+Kol.price <- data.frame(with(Kol.price,Kol.price[order(ord_week_nmb,TCIN),]),row.names=NULL)
+
+  
+  
+Kol.price$kohl_availability_flag <- as.numeric(Kol.price$kohl_availability=="Yes")
+Kol.price$amazon_availability_flag <- as.numeric(Kol.price$amazon_availability=="Yes")
+Kol.price$Target_availability_flag <- as.numeric(Kol.price$Target_availability=="Yes")
+  
+Kol.price$amazon_availability_flag[is.na(Kol.price$amazon_availability_flag)] <- 0
+  
+  
+Kol.price$kohl_pdt_desc_length <- nchar(Kol.price$kohl_Product_Description)
+Kol.price$Amz_pdt_desc_length <- nchar(Kol.price$amazon_Product_Description)
+Kol.price$Target_pdt_desc_length <- nchar(Kol.price$Target_Product_Description)
+  
+
+
+# */ Check number of unique id's for each competitor */
+  
+## Kohls  ##
+data.frame(CrossTable(Kol.price$kohl_product_ID,Kol.price$ord_week_nmb,prop.t=FALSE,prop.chiq=FALSE,digits=2))
+max(ftable(Kol.price[,c(1,4)]))
+
+
+## Amazon  ##
+Kol.price$amazon_product_ID[is.na(Kol.price$amazon_product_ID)] <- 0
+table(Kol.price$amazon_product_ID,Kol.price$ord_week_nmb,useNA="no")  
+
+
+CrossTable(Kol.price$amazon_product_ID,Kol.price$ord_week_nmb,prop.t=FALSE,prop.chiq=FALSE,digits=2)
+max(ftable(Kol.price[,c(1,15)]))
+
+
+
+## Target  ##
+CrossTable(Kol.price$Target_product_ID,Kol.price$ord_week_nmb,prop.t=FALSE,prop.chiq=FALSE,digits=2)
+max(ftable(Kol.price[,c(1,26)]))
+
+
+  
+################################ Calculating price difference ######################################################################################################################
+  
+attach(Kol.price)
+Kol.price$Price_diff_amazon_final_pr <- kohl_final_price - amazon_final_price;
+Kol.price$Price_diff_target_final_pr <- kohl_final_price - Target_final_price;
+
+Kol.price$Price_diff_amazon_reg_pr <- kohl_Regular_price - amazon_Regular_price;
+Kol.price$Price_diff_target_reg_pr <- kohl_Regular_price - Target_Regular_price;
+  
+Kol.price$Price_rat_amazon_final_pr <- kohl_final_price / amazon_final_price;
+Kol.price$Price_rat_target_final_pr <- kohl_final_price / Target_final_price;
+  
+Kol.price$Price_rat_amazon_reg_pr <- kohl_Regular_price / amazon_Regular_price;
+Kol.price$Price_rat_target_reg_pr <- kohl_Regular_price / Target_Regular_price;
+  
+Kol.price$Availability <-  as.numeric(Kol.price$kohl_availability=="Yes")
+  
+detach(Kol.price)  
+
+
+################################ Calculating Recency of the product ######################################################################################################################
+  
+Kol.price <- data.frame(with(Kol.price,Kol.price[order(kohl_product_ID),]),row.names=NULL)
+
+Kol.Prodtime <- cbind(aggregate(Kol.price[,3],by=list(Kol.price$kohl_product_ID),min),
+                      aggregate(Kol.price[,3],by=list(Kol.price$kohl_product_ID),max))
+
+Kol.Prodtime <- cbind(Kol.Prodtime,data.frame(table(Kol.price$kohl_product_ID)))
+Kol.Prodtime <- Kol.Prodtime[-c(3,5)]
+names(Kol.Prodtime) <- c("kohl_product_ID","firstDate","lastDate","Freq")
+
+
+Kol.Prodtime <- cbind(Kol.Prodtime,Recency_week=as.integer(round((as.Date(Sys.time())-Kol.Prodtime$firstDate)/7,0)),
+      Recency_month=as.integer(round((as.Date(Sys.time())-Kol.Prodtime$firstDate)/30,1)) )
+
+
+
+# /* Merging recency variables with price data */
+  
+Kol.price_temp <- merge(Kol.price,Kol.Prodtime[-4],all.x=TRUE,by="kohl_product_ID")
+
+  
+# /*Counting product variants of colour available with Target during pricetrac crawl*/
+  
+
+tcin_count <- sqldf('select ord_week_nmb,Product_ID as kohl_product_ID,
+                count(distinct TCIN) as TCIN_var,
+                max(final_price) as max_tcin_price,
+                 min(final_price) as min_tcin_price
+                 from "kol.price_Kohls" group by ord_week_nmb,Product_ID')
+
+ 
+Kol.price <- data.frame(with(Kol.price,Kol.price[order(ord_week_nmb,kohl_product_ID),]),
+                        row.names=NULL)
+  
+  
+# /* Merging tcin count variables with price data */
+
+
+Kol.price <- merge(Kol.price_temp,tcin_count,all=TRUE,
+                by=c("ord_week_nmb","kohl_product_ID"))
+
+
+## Done till here  ## Good Luck for rest !!  
+
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+######################################################################################################################################################################################################################################
+ 

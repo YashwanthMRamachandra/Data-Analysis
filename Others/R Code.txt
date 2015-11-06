@@ -1,0 +1,83 @@
+# Load Data
+data = read.csv(file.choose())
+attach(data)
+
+# Create Date
+# install.packages("stringr")
+library(stringr)
+
+
+# Create Unique variable
+data$Unique_field = paste(Product_ID, Extraction_Date)
+attach(data)
+
+#Unique data set
+data$Unique_check = duplicated(data$Unique_field)
+data = data[data$Unique_check=='FALSE',]
+attach(data)
+
+#Final Price Clean
+data$Price_clean = ifelse(final_price=='n/a',1,0)
+data = data[data$Price_clean==0,]
+attach(data)
+
+# What is the day of the week
+data$weekdaycheck = weekdays(Extraction_Date)
+attach(data)
+
+#Is Weekend?
+data$IsWeekend = ifelse(weekdaycheck=='Sunday' | weekdaycheck=='Saturday',"Yes","No")
+attach(data)
+
+#Order Data
+data = data[order(Unique_field),]
+attach(data)
+
+#Add ZValue
+attach(data)
+#install.packages("plyr")
+library(plyr)
+data2 = aggregate(as.numeric(as.character(final_price)), list(Product_ID), sd)
+data2 = rename(data2, replace=c("Group.1"="Product_ID"))
+data2 = rename(data2, replace=c("x"="STDEV"))
+data <- merge(data,data2,by="Product_ID")
+attach(data)
+data3 = aggregate(as.numeric(as.character(final_price)), list(Product_ID), mean)
+data3 = rename(data3, replace=c("Group.1"="Product_ID"))
+data3 = rename(data3, replace=c("x"="Final_Price_Mean"))
+data <- merge(data,data3,by="Product_ID")
+attach(data)
+data$zvalue = ((as.numeric(as.character(final_price))- as.numeric(as.character(Final_Price_Mean)))) / as.numeric(as.character(STDEV))
+attach(data)
+data$zvaluen = ifelse(is.nan(zvalue),as.numeric(as.character(0)),as.numeric(as.character(zvalue)))
+attach(data)
+data$zvalcheck = ifelse(as.numeric(as.character(zvaluen))>0,"High",ifelse(as.numeric(as.character(zvaluen))<0,"Low",ifelse(as.numeric(as.character(zvaluen))==0,"Same","Error")))
+attach(data)
+
+
+#IS Best Seller
+data$Bestseller = ifelse(as.numeric(as.character((Review_Rating))) >3.5 & as.numeric(as.character((Review_Counts)))>50,"Yes","No")
+
+
+#Price Change
+
+data = data[order(Unique_field),]
+attach(data)
+
+data$Price_Change[1]<-"No Change"
+
+for(i in 2: nrow(data))
+{
+  #i=2
+  data$Price_Change[i] = ifelse(data$Product_ID[i]==data$Product_ID[i-1], ifelse(data$final_price[i]==data$final_price[i-1],"No Change",ifelse(as.numeric(as.character(data$final_price[i]))>as.numeric(as.character(data$final_price[i-1])),"Increase","Decrease")),"No Change")  
+  
+}
+
+
+#Calculate Relative Price to mean
+data$Relative_Price = ifelse(as.numeric(as.character(final_price)) > as.numeric(as.character(Final_Price_Mean)), "Higher", ifelse(as.numeric(as.character(final_price)) == as.numeric(as.character(Final_Price_Mean)),"Same","Lower"))
+attach(data)
+names(data)
+
+##########################OUTPUT################################
+write.csv(data,file ="C:/data.csv")

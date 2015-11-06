@@ -1,0 +1,12 @@
+# Shiny Server Template
+
+library(shiny)
+
+shinyServer(function(input, output, session) {
+			
+			# Data View
+			output$table <- renderDataTable({})
+			
+			# Correlation
+			output$cor <- renderTable({})
+	})

@@ -1,0 +1,11 @@
+
+1. http://people.duke.edu/~rnau/testing.htm
+2. http://www.statisticssolutions.com/assumptions-of-linear-regression/
+
+3. http://www.datasciencecentral.com/profiles/blogs/66-job-interview-questions-for-data-scientists  # Data Scientist Interview Question
+4. http://examples.yourdictionary.com/examples-of-hypothesis.html # Hypothesis explanation
+	http://www.sciencebuddies.org/science-fair-projects/project_hypothesis.shtml	# Hypothesis explanation
+	https://en.wikipedia.org/wiki/Hypothesis
+5. http://www.sagepub.com/sites/default/files/upm-binaries/40007_Chapter8.pdf  # Hypothesis Testing 
+	http://www.sci.utah.edu/~arpaiva/classes/UT_ece3530/hypothesis_testing.pdf
+	https://www3.nd.edu/~rwilliam/stats1/x24.pdf

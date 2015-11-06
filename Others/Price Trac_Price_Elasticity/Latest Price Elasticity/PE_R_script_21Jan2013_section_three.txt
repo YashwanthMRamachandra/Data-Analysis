@@ -1,0 +1,209 @@
+#/**************************************************************************************************************** 
+#                                  SECTION 3 - PREPARING CONTENT DATA 
+
+# ******************************************************************************************************************/
+#  /*************************** AMAZON DATA ************************************/ 
+#  /***** Importing review data ***************************/
+  
+system.time(  
+read.csv("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/Amazon_Review_Luggage.csv", header = TRUE, sep = ",", 
+           quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+)
+kol.Amazon_Review <- read.table("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Content/New data/Amazon_Review_Luggage.csv",header = TRUE, sep = ",",
+                                   quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+
+#kol.Amazon_Review$Extraction_Date <- as.Date(kol.Amazon_Review$Extraction_Date)
+kol.Amazon_Review$Review_Creation_Date <- as.Date(kol.Amazon_Review$Review_Creation_Date)
+kol.Amazon_Review$from_date <- as.Date(kol.Amazon_Review$from_date)
+kol.Amazon_Review$to_date <- as.Date(kol.Amazon_Review$to_date)
+kol.Amazon_Review$month_back <- as.Date(kol.Amazon_Review$month_back)
+kol.Amazon_Review$two_month_back <- as.Date(kol.Amazon_Review$two_month_back)
+kol.Amazon_Review$three_month_back <- as.Date(kol.Amazon_Review$three_month_back)
+kol.Amazon_Review$six_month_back <- as.Date(kol.Amazon_Review$six_month_back)
+
+
+# /***** calculating variables using rating score ***************************/
+
+kol.Amazon_Review_temp <- kol.Amazon_Review[-c(1:11,13:17,19:20,24:25,27:32,34:39)]
+
+
+kol.Amazon_Review_temp$amz_rating_1 <- as.numeric(kol.Amazon_Review_temp$Review_Rating_Score==1)
+kol.Amazon_Review_temp$amz_rating_2 <- as.numeric(kol.Amazon_Review_temp$Review_Rating_Score==2)
+kol.Amazon_Review_temp$amz_rating_3 <- as.numeric(kol.Amazon_Review_temp$Review_Rating_Score==3)
+kol.Amazon_Review_temp$amz_rating_4 <- as.numeric(kol.Amazon_Review_temp$Review_Rating_Score==4)
+kol.Amazon_Review_temp$amz_rating_5 <- as.numeric(kol.Amazon_Review_temp$Review_Rating_Score==5)
+
+kol.amz_review_aggr <- sqldf('select  week_nmb,Unique_Pdt_Identifier_MainPdt,
+	                            sum(amz_rating_1) as Amz_rating1,
+	                            sum(amz_rating_2) as Amz_rating2,
+	                            sum(amz_rating_3) as Amz_rating3,
+	                            sum(amz_rating_4) as Amz_rating4,
+	                            sum(amz_rating_5) as Amz_rating5,
+	                            count(Review_text) as Amz_Review_count,
+	                            avg(review_rating_score) as Amz_Avg_rating
+                              from "kol.Amazon_Review_temp"
+                              group by	week_nmb,	Unique_Pdt_Identifier_MainPdt')
+
+
+attach(kol.amz_review_aggr)
+kol.amz_review_aggr$amz_rating_4_5 = Amz_rating4 + Amz_rating5;
+kol.amz_review_aggr$amz_rating_4_5_cnt = (Amz_rating4 + Amz_rating5)/Amz_Review_count;
+kol.amz_review_aggr$amz_rating_1_2 = Amz_rating1 + Amz_rating2;
+kol.amz_review_aggr$amz_rating_1_2_cnt = (Amz_rating1 + Amz_rating2)/Amz_Review_count;
+kol.amz_review_aggr$rating1_cnt = Amz_rating1/Amz_Review_count;
+kol.amz_review_aggr$rating5_cnt = Amz_rating5/Amz_Review_count;
+detach(kol.amz_review_aggr)
+
+
+# /****************************************** Review velocity **************************************************/
+  
+# /* In case of review creation date is Monday then it is going to previous week. Hence rectifying the gap */
+
+kol.Amazon_Review$from_date <- ifelse(kol.Amazon_Review$week_nmb<0 & kol.Amazon_Review$Review_Creation_Date>kol.Amazon_Review$to_date,
+                              as.Date((kol.Amazon_Review$from_date)+7),
+                              as.Date((kol.Amazon_Review$from_date)))
+kol.Amazon_Review$from_date <- as.Date(kol.Amazon_Review$from_date,"1970-01-01")
+
+
+kol.Amazon_Review$month_back <- ifelse(kol.Amazon_Review$week_nmb<0 & kol.Amazon_Review$Review_Creation_Date>kol.Amazon_Review$to_date,
+                                       as.Date((kol.Amazon_Review$month_back)+7),
+                                       as.Date((kol.Amazon_Review$month_back)))
+kol.Amazon_Review$month_back <- as.Date(kol.Amazon_Review$month_back,"1970-01-01")
+
+
+kol.Amazon_Review$two_month_back <- ifelse(kol.Amazon_Review$week_nmb<0 & kol.Amazon_Review$Review_Creation_Date>kol.Amazon_Review$to_date,
+                                           as.Date((kol.Amazon_Review$two_month_back)+7),
+                                           as.Date((kol.Amazon_Review$two_month_back)))
+kol.Amazon_Review$two_month_back <- as.Date(kol.Amazon_Review$two_month_back,"1970-01-01")
+
+
+kol.Amazon_Review$three_month_back <- ifelse(kol.Amazon_Review$week_nmb<0 & kol.Amazon_Review$Review_Creation_Date>kol.Amazon_Review$to_date,
+                                             as.Date((kol.Amazon_Review$three_month_back)+7),
+                                             as.Date((kol.Amazon_Review$three_month_back)))
+kol.Amazon_Review$three_month_back <- as.Date(kol.Amazon_Review$three_month_back,"1970-01-01")
+
+
+kol.Amazon_Review$six_month_back <- ifelse(kol.Amazon_Review$week_nmb<0 & kol.Amazon_Review$Review_Creation_Date>kol.Amazon_Review$to_date,
+                                           as.Date((kol.Amazon_Review$six_month_back)+7),
+                                           as.Date((kol.Amazon_Review$six_month_back)))
+kol.Amazon_Review$six_month_back <- as.Date(kol.Amazon_Review$six_month_back,"1970-01-01")
+
+
+kol.Amazon_Review$to_date <- ifelse(kol.Amazon_Review$week_nmb<0 & kol.Amazon_Review$Review_Creation_Date>kol.Amazon_Review$to_date,
+                                    as.Date((kol.Amazon_Review$to_date)+7),
+                                    as.Date((kol.Amazon_Review$to_date)))
+kol.Amazon_Review$to_date <- as.Date(kol.Amazon_Review$to_date,"1970-01-01")
+
+
+# /* Calculating reviews between week ending and one month prior */
+
+kol.review_velocity_1m  <- sqldf('select
+                            a.unique_Pdt_Identifier_MainPdt, 
+                            sub.week_nmb, count(*) as reviews_1_M
+                            from "kol.Amazon_Review" as a,
+                            (
+                            select distinct  week_nmb,month_back,to_date,unique_Pdt_Identifier_MainPdt
+                            from  "kol.Amazon_Review"
+                            where  week_nmb in (select distinct week_nmb from "kol.Amazon_Review")
+                            )as sub
+                            where
+                            a.unique_Pdt_Identifier_MainPdt =  sub.unique_Pdt_Identifier_MainPdt and 
+                            a.review_Creation_Date>=sub.month_back and a.review_Creation_Date<=sub.to_date
+                            group by
+                            a.unique_Pdt_Identifier_MainPdt,sub.week_nmb')
+
+
+# /* Calculating reviews between week ending and two months prior */
+  
+kol.review_velocity_2m <- sqldf('select
+                            a.unique_Pdt_Identifier_MainPdt,sub.week_nmb,count(*) as reviews_2_M
+                            from "kol.Amazon_Review" as a,
+                            (
+                            select distinct week_nmb,two_month_back,to_date,unique_Pdt_Identifier_MainPdt
+                            from "kol.Amazon_Review"
+                            where
+                            week_nmb in (select distinct week_nmb from "kol.Amazon_Review")
+                            )as sub
+                            where
+                            a.unique_Pdt_Identifier_MainPdt =  sub.unique_Pdt_Identifier_MainPdt and 
+                            a.review_Creation_Date>=sub.two_month_back and a.review_Creation_Date<=sub.to_date
+                            group by
+                            a.unique_Pdt_Identifier_MainPdt, sub.week_nmb')
+
+
+# /* Calculating reviews between week ending and three months prior */
+
+kol.review_velocity_3m <- sqldf('select
+                        a.unique_Pdt_Identifier_MainPdt,sub.week_nmb,count(*) as reviews_3_M
+                        from "kol.Amazon_Review" as a,
+                        (
+                        select distinct  week_nmb,three_month_back,to_date,unique_Pdt_Identifier_MainPdt
+                        from  "kol.Amazon_Review"
+                        where  week_nmb in (select distinct week_nmb from "kol.Amazon_Review")
+                        )as sub
+                        where
+                        a.unique_Pdt_Identifier_MainPdt =  sub.unique_Pdt_Identifier_MainPdt and 
+                        a.review_Creation_Date>=sub.three_month_back and a.review_Creation_Date<=sub.to_date
+                        group by
+                        a.unique_Pdt_Identifier_MainPdt,sub.week_nmb')
+
+
+# /* Calculating reviews between week ending and six months prior */
+  
+kol.review_velocity_6m <- sqldf('select
+                      a.unique_Pdt_Identifier_MainPdt,sub.week_nmb,count(*) as reviews_6_M
+                      from "kol.Amazon_Review" as a,
+                      (
+                      select distinct  week_nmb,six_month_back,to_date,unique_Pdt_Identifier_MainPdt
+                      from  "kol.Amazon_Review"
+                      where
+                      week_nmb in (select distinct week_nmb from "kol.Amazon_Review")
+                      )as sub
+                      where 
+                      a.unique_Pdt_Identifier_MainPdt =  sub.unique_Pdt_Identifier_MainPdt and 
+                      a.review_Creation_Date>=sub.six_month_back and a.review_Creation_Date<=sub.to_date
+                      group by
+                      a.unique_Pdt_Identifier_MainPdt,sub.week_nmb')
+
+kol.review_velocity_1m <- data.frame(with(kol.review_velocity_1m,kol.review_velocity_1m[order(week_nmb,Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+kol.review_velocity_2m <- data.frame(with(kol.review_velocity_2m,kol.review_velocity_2m[order(week_nmb,Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+kol.review_velocity_3m <- data.frame(with(kol.review_velocity_3m,kol.review_velocity_3m[order(week_nmb,Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+kol.review_velocity_6m <- data.frame(with(kol.review_velocity_6m,kol.review_velocity_6m[order(week_nmb,Unique_Pdt_Identifier_Mainpdt),]),row.names=NULL)
+
+
+
+kol.review_velocity <- merge(kol.review_velocity_1m,kol.review_velocity_2m,all=TRUE,
+                             by=c("week_nmb","Unique_Pdt_Identifier_Mainpdt"))
+
+kol.review_velocity <- merge(kol.review_velocity,kol.review_velocity_3m,all=TRUE,
+                             by=c("week_nmb","Unique_Pdt_Identifier_Mainpdt"))
+
+kol.review_velocity <- merge(kol.review_velocity,kol.review_velocity_6m,all=TRUE,
+                             by=c("week_nmb","Unique_Pdt_Identifier_Mainpdt"))
+
+
+
+# /*** Merging calculated variables with sales_price data *****/
+
+Kol.price_sales <- data.frame(with(Kol.price_sales,Kol.price_sales[order(week_nmb,amazon_product_ID),]),row.names=NULL)
+kol.amz_review_aggr <- data.frame(with(kol.amz_review_aggr,kol.amz_review_aggr[order(week_nmb,amazon_product_ID),]),row.names=NULL)
+kol.review_velocity <- data.frame(with(kol.review_velocity,kol.review_velocity[order(week_nmb,amazon_product_ID),],),row.names=NULL)
+
+
+kol.amz_review_aggr <- rename(kol.amz_review_aggr,
+                              c("Unique_Pdt_Identifier_Mainpdt"="amazon_product_ID"))
+
+kol.review_velocity <- rename(kol.review_velocity,
+                                c("Unique_Pdt_Identifier_Mainpdt"="amazon_product_ID"))
+
+
+kol.price_sales_temp <- merge(Kol.price_sales,kol.amz_review_aggr,all.x=TRUE,
+                              by=c("week_nmb","amazon_product_ID"))
+
+
+kol.price_sales_temp <- merge(kol.price_sales_temp,kol.review_velocity,all.x=TRUE,
+                              by=c("week_nmb","amazon_product_ID"))
+
+
+#/****** Done till here. Good luck for rest !! *******************************************************
+

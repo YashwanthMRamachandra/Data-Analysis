@@ -1,0 +1,224 @@
+
+
+
+						###########################################################################
+									# Preparing Sales Data #
+						###########################################################################
+  
+
+# /* Importing sales data received from the client */  
+# Import data 
+
+system.time(  
+  read.csv("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Kohls_luggage_sales_data_basefile_v1.csv", header = TRUE, sep = ",", 
+           quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+)
+kol.kohls_sales_data <- read.table("Y:/BIG/Yashwanth/Price Trac_Price_Elasticity/Data files/Kohls_luggage_sales_data_basefile_v1.csv",header = TRUE, sep = ",",
+                             quote = "\"",dec = ".",fill=TRUE,comment.char="",as.is=TRUE)
+
+
+
+attach(kol.kohls_sales_data)
+
+kol.kohls_sales_data$Week1_Gross_Sales <- Week1_Sales_Units-Week1_Return_Units
+kol.kohls_sales_data$Week2_Gross_Sales <- Week2_Sales_Units-Week2_Return_Units
+kol.kohls_sales_data$Week3_Gross_Sales <- Week3_Sales_Units-Week3_Return_Units
+kol.kohls_sales_data$Week4_Gross_Sales <- Week4_Sales_Units-Week4_Return_Units
+kol.kohls_sales_data$Week5_Gross_Sales <- Week5_Sales_Units-Week5_Return_Units
+kol.kohls_sales_data$Week6_Gross_Sales <- Week6_Sales_Units-Week6_Return_Units
+kol.kohls_sales_data$Week7_Gross_Sales <- Week7_Sales_Units-Week7_Return_Units
+kol.kohls_sales_data$Week8_Gross_Sales <- Week8_Sales_Units-Week8_Return_Units
+kol.kohls_sales_data$Week9_Gross_Sales <- Week9_Sales_Units-Week9_Return_Units
+kol.kohls_sales_data$Week10_Gross_Sales <- Week10_Sales_Units-Week10_Return_Units
+kol.kohls_sales_data$Week11_Gross_Sales <- Week11_Sales_Units-Week11_Return_Units
+kol.kohls_sales_data$Week12_Gross_Sales <- Week12_Sales_Units-Week12_Return_Units
+kol.kohls_sales_data$Week13_Gross_Sales <- Week13_Sales_Units-Week13_Return_Units
+kol.kohls_sales_data$Week14_Gross_Sales <- Week14_Sales_Units-Week14_Return_Units
+kol.kohls_sales_data$Week15_Gross_Sales <- Week15_Sales_Units-Week15_Return_Units
+kol.kohls_sales_data$Week16_Gross_Sales <- Week16_Sales_Units-Week16_Return_Units
+kol.kohls_sales_data$Week17_Gross_Sales <- Week17_Sales_Units-Week17_Return_Units
+kol.kohls_sales_data$Week18_Gross_Sales <- Week18_Sales_Units-Week18_Return_Units
+kol.kohls_sales_data$Week19_Gross_Sales <- Week19_Sales_Units-Week19_Return_Units
+kol.kohls_sales_data$Week20_Gross_Sales <- Week20_Sales_Units-Week20_Return_Units
+kol.kohls_sales_data$Week21_Gross_Sales <- Week21_Sales_Units-Week21_Return_Units
+kol.kohls_sales_data$Week22_Gross_Sales <- Week22_Sales_Units-Week22_Return_Units
+kol.kohls_sales_data$Week23_Gross_Sales <- Week23_Sales_Units-Week23_Return_Units
+kol.kohls_sales_data$Week24_Gross_Sales <- Week24_Sales_Units-Week24_Return_Units
+kol.kohls_sales_data$Week25_Gross_Sales <- Week25_Sales_Units-Week25_Return_Units
+kol.kohls_sales_data$Week26_Gross_Sales <- Week26_Sales_Units-Week26_Return_Units
+kol.kohls_sales_data$Week27_Gross_Sales <- Week27_Sales_Units-Week27_Return_Units
+kol.kohls_sales_data$Week28_Gross_Sales <- Week28_Sales_Units-Week28_Return_Units
+kol.kohls_sales_data$Week29_Gross_Sales <- Week29_Sales_Units-Week29_Return_Units
+kol.kohls_sales_data$Week30_Gross_Sales <- Week30_Sales_Units-Week30_Return_Units
+kol.kohls_sales_data$Week31_Gross_Sales <- Week31_Sales_Units-Week31_Return_Units
+kol.kohls_sales_data$Week32_Gross_Sales <- Week32_Sales_Units-Week32_Return_Units
+kol.kohls_sales_data$Week33_Gross_Sales <- Week33_Sales_Units-Week33_Return_Units
+kol.kohls_sales_data$Week34_Gross_Sales <- Week34_Sales_Units-Week34_Return_Units
+kol.kohls_sales_data$Week35_Gross_Sales <- Week35_Sales_Units-Week35_Return_Units
+kol.kohls_sales_data$Week36_Gross_Sales <- Week36_Sales_Units-Week36_Return_Units
+kol.kohls_sales_data$Week37_Gross_Sales <- Week37_Sales_Units-Week37_Return_Units
+kol.kohls_sales_data$Week38_Gross_Sales <- Week38_Sales_Units-Week38_Return_Units
+kol.kohls_sales_data$Week39_Gross_Sales <- Week39_Sales_Units-Week39_Return_Units
+kol.kohls_sales_data$Week40_Gross_Sales <- Week40_Sales_Units-Week40_Return_Units
+
+detach(kol.kohls_sales_data)
+
+
+kol.Kohls_rolled_up <- sqldf('select product_id,
+              sum(Week1_Gross_Sales) as Week1_Gross_Sales,
+              sum(Week2_Gross_Sales) as Week2_Gross_Sales,
+              sum(Week3_Gross_Sales) as Week3_Gross_Sales,
+              sum(Week4_Gross_Sales) as Week4_Gross_Sales,
+              sum(Week5_Gross_Sales) as Week5_Gross_Sales,
+              sum(Week6_Gross_Sales) as Week6_Gross_Sales,
+              sum(Week7_Gross_Sales) as Week7_Gross_Sales,
+              sum(Week8_Gross_Sales) as Week8_Gross_Sales,
+              sum(Week9_Gross_Sales) as Week9_Gross_Sales,
+              sum(Week10_Gross_Sales) as Week10_Gross_Sales,
+              sum(Week11_Gross_Sales) as Week11_Gross_Sales,
+              sum(Week12_Gross_Sales) as Week12_Gross_Sales,
+              sum(Week13_Gross_Sales) as Week13_Gross_Sales,
+              sum(Week14_Gross_Sales) as Week14_Gross_Sales,
+              sum(Week15_Gross_Sales) as Week15_Gross_Sales,
+              sum(Week16_Gross_Sales) as Week16_Gross_Sales,
+              sum(Week17_Gross_Sales) as Week17_Gross_Sales,
+              sum(Week18_Gross_Sales) as Week18_Gross_Sales,
+              sum(Week19_Gross_Sales) as Week19_Gross_Sales,
+              sum(Week20_Gross_Sales) as Week20_Gross_Sales,
+              sum(Week21_Gross_Sales) as Week21_Gross_Sales,
+              sum(Week22_Gross_Sales) as Week22_Gross_Sales,
+              sum(Week23_Gross_Sales) as Week23_Gross_Sales,
+              sum(Week24_Gross_Sales) as Week24_Gross_Sales,
+              sum(Week25_Gross_Sales) as Week25_Gross_Sales,
+              sum(Week26_Gross_Sales) as Week26_Gross_Sales,
+              sum(Week27_Gross_Sales) as Week27_Gross_Sales,
+              sum(Week28_Gross_Sales) as Week28_Gross_Sales,
+              sum(Week29_Gross_Sales) as Week29_Gross_Sales,
+              sum(Week30_Gross_Sales) as Week30_Gross_Sales,
+              sum(Week31_Gross_Sales) as Week31_Gross_Sales,
+              sum(Week32_Gross_Sales) as Week32_Gross_Sales,
+              sum(Week33_Gross_Sales) as Week33_Gross_Sales,
+              sum(Week34_Gross_Sales) as Week34_Gross_Sales,
+              sum(Week35_Gross_Sales) as Week35_Gross_Sales,
+              sum(Week36_Gross_Sales) as Week36_Gross_Sales,
+              sum(Week37_Gross_Sales) as Week37_Gross_Sales,
+              sum(Week38_Gross_Sales) as Week38_Gross_Sales,
+              sum(Week39_Gross_Sales) as Week39_Gross_Sales,
+              sum(Week40_Gross_Sales) as Week40_Gross_Sales,
+              sum(Week1_Sales_Units)  as Week1_Sales_Units,
+              sum(Week2_Sales_Units)  as Week2_Sales_Units,
+              sum(Week3_Sales_Units)  as Week3_Sales_Units,
+              sum(Week4_Sales_Units)  as Week4_Sales_Units,
+              sum(Week5_Sales_Units)  as Week5_Sales_Units,
+              sum(Week6_Sales_Units)  as Week6_Sales_Units,
+              sum(Week7_Sales_Units)  as Week7_Sales_Units,
+              sum(Week8_Sales_Units)  as Week8_Sales_Units,
+              sum(Week9_Sales_Units)  as Week9_Sales_Units,
+              sum(Week10_Sales_Units)  as Week10_Sales_Units,
+              sum(Week11_Sales_Units)  as Week11_Sales_Units,
+              sum(Week12_Sales_Units)  as Week12_Sales_Units,
+              sum(Week13_Sales_Units)  as Week13_Sales_Units,
+              sum(Week14_Sales_Units)  as Week14_Sales_Units,
+              sum(Week15_Sales_Units)  as Week15_Sales_Units,
+              sum(Week16_Sales_Units)  as Week16_Sales_Units,
+              sum(Week17_Sales_Units)  as Week17_Sales_Units,
+              sum(Week18_Sales_Units)  as Week18_Sales_Units,
+              sum(Week19_Sales_Units)  as Week19_Sales_Units,
+              sum(Week20_Sales_Units)  as Week20_Sales_Units,
+              sum(Week21_Sales_Units)  as Week21_Sales_Units,
+              sum(Week22_Sales_Units)  as Week22_Sales_Units,
+              sum(Week23_Sales_Units)  as Week23_Sales_Units,
+              sum(Week24_Sales_Units)  as Week24_Sales_Units,
+              sum(Week25_Sales_Units)  as Week25_Sales_Units,
+              sum(Week26_Sales_Units)  as Week26_Sales_Units,
+              sum(Week27_Sales_Units)  as Week27_Sales_Units,
+              sum(Week28_Sales_Units)  as Week28_Sales_Units,
+              sum(Week29_Sales_Units)  as Week29_Sales_Units,
+              sum(Week30_Sales_Units)  as Week30_Sales_Units,
+              sum(Week31_Sales_Units)  as Week31_Sales_Units,
+              sum(Week32_Sales_Units)  as Week32_Sales_Units,
+              sum(Week33_Sales_Units)  as Week33_Sales_Units,
+              sum(Week34_Sales_Units)  as Week34_Sales_Units,
+              sum(Week35_Sales_Units)  as Week35_Sales_Units,
+              sum(Week36_Sales_Units)  as Week36_Sales_Units,
+              sum(Week37_Sales_Units)  as Week37_Sales_Units,
+              sum(Week38_Sales_Units)  as Week38_Sales_Units,
+              sum(Week39_Sales_Units)  as Week39_Sales_Units,
+              sum(Week40_Sales_Units)  as Week40_Sales_Units
+           from
+           "kol.kohls_sales_data"
+           group by product_id')
+
+
+  
+# /****** Transposing gross sales volume **************************/
+  
+
+kol.kohls_gross_sales <- data.frame(with(melt(kol.Kohls_rolled_up[,1:41]),
+                              melt(kol.Kohls_rolled_up[,1:41])[order(product_id),]),
+                              row.names=NULL)
+
+kol.kohls_gross_sales$week_number <- rep(1:40,2705)
+
+names(kol.kohls_gross_sales) <- c("product_id","NAME_OF_FORMER_VARIABLE",
+                                    "Gross_Sales_volume1","Week_number")
+
+kol.kohls_gross_sales <- data.frame(with(kol.kohls_gross_sales,
+                                    kol.kohls_gross_sales[order(Week_number,product_id),]),
+                                    row.names=NULL)
+
+
+# /****** Transposing net sales volume **************************/
+  
+
+kol.kohls_net_sales <- data.frame(with(melt(kol.Kohls_rolled_up[,c(1,42:81)]),
+                        melt(kol.Kohls_rolled_up[,c(1,42:81)])[order(product_id),]),
+                        row.names=NULL)
+
+kol.kohls_net_sales$week_number <- rep(1:40,2705)
+
+names(kol.kohls_net_sales) <- c("product_id","NAME_OF_FORMER_VARIABLE",
+                                "net_Sales_volume1","Week_number")
+
+kol.kohls_net_sales <- data.frame(with(kol.kohls_net_sales,
+                                       kol.kohls_net_sales[order(Week_number,product_id),]),
+                                       row.names=NULL)
+
+
+# /****** Merge gross & net sales volume **************************/
+
+
+Kol.Kohl_sales_temp <- merge(kol.kohls_gross_sales[-2],kol.kohls_net_sales[-2],
+                              by=c("product_id","Week_number"))
+
+
+Kol.Kohl_sales_temp <- data.frame(with(Kol.Kohl_sales_temp,
+                                       Kol.Kohl_sales_temp[order(Week_number),]),
+                                  row.names=NULL)
+
+
+Kol.Kohl_sales <- rename(Kol.Kohl_sales_temp,
+                              c("Week_number" = "week_nmb",
+                              "product_id"="kohl_product_id",
+                              "Gross_Sales_volume1" = "gross_sales",
+                              "net_Sales_volume1" = "net_Sales"))
+
+
+
+# /************ Merging sales and price data by week nmb and product id ************************/
+
+
+Kol.Kohl_sales <- data.frame(with(Kol.Kohl_sales,
+                                  Kol.Kohl_sales[order(week_nmb,kohl_product_id),]),
+                                  row.names=NULL)  
+  
+
+Kol.price <- data.frame(with(Kol.price,
+                             Kol.price[order(ord_week_nmb,kohl_product_ID),]),
+                              row.names=NULL)
+
+Kol.price <- rename(Kol.price,c("ord_week_nmb"="week_nmb","kohl_product_ID"="kohl_product_id"))
+
+Kol.price_sales <- merge(Kol.Kohl_sales,Kol.price[-c(56,57,58)],all.y=TRUE, 
+                        by=c("week_nmb","kohl_product_id"))
+  
