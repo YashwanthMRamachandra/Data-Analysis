@@ -1,0 +1,2 @@
+1. IBM cloud hosts 30% more top websites than anyone else in the world.
+2. What we're after isn't just raw data. We want the knowledge that comes from analyzing that data.(Big data concept)
