@@ -1,0 +1,943 @@
+
+/***********************   DIRECTORY SETTING    ***************************************/
+
+libname inv 'D:\Karuna Sawant\Inventory';
+libname order 'D:\Karuna Sawant\OrderInfo';
+
+/**********************   INVENTORY FILE REDUCTION AND INITIAL CHECKS   ****************************************/
+
+proc sql;
+create table vendor as
+select distinct vendor_analysis_name from inv.inventory;
+quit;
+
+
+/* Filtering for Alice+Olivia data */
+
+data 
+	inv.vinceinv;
+set 
+	inv.inventory;
+where 
+	vendor_analysis_name = "VINCE";
+run;/**119440**/
+
+data 
+	inv.vinceinv;
+set 
+	inv.vinceinv (keep = cmos_style Offer Item_No Unit_Retail Gross_Demand Cancel  
+	Return  Twelve_mth_MFG_Receipts  Nine_mth_MFG_Receipt LTD_MFG_Receipt Backorder  
+	Available_inventory  Activity_From_Date Activity_To_Date  Vendor_Analysis_Name 
+	Edison_Color  Edison_Color_Desc Edison_Size  Edison_Size_Desc Edison_Class_description 
+	Edison_Subclass_description Parent_vendor_analysis_name Highest_Retail  LWR INV_Category 
+	INV_Category_Date Web_last Last_Demand LTD_RTV  Online_Sellable_Date Shared long_sku win_disc);
+run;
+
+
+/*checking for and deleting rows where long sku or CMOS style is blank in inventory file  and order header and order item file and company_code <> 6*/
+
+data 
+	check;
+set 
+	inv.vinceinv;
+where 
+	cmos_style = "" or cmos_style = '0';
+run;
+
+
+data 
+	check;
+set 
+	order.item;
+where 
+	sku_value = "" or sku_value = '0' and company_code ^= 6;
+run;
+
+/*calculating discount % and creating discount % categories*/
+
+data 
+	inv.vinceinv;
+set 
+	inv.vinceinv;
+format 
+	disc_slab $10.;
+	disc_perc = 1-(unit_retail/highest_retail);
+if 
+	disc_perc = . then disc_slab = "";
+else if 
+	disc_perc =0 then disc_slab ="0";
+else if 
+	disc_perc <=0.2 then disc_slab = "0-20%";
+else if 
+	disc_perc <=0.4 then disc_slab = "20-40%";
+else if 
+	disc_perc <=0.6 then disc_slab = "40-60%";
+else if 
+	disc_perc <=0.8 then disc_slab = "60-80%";
+else 
+	disc_slab = "80-100%";
+run;
+
+/***************************************************************************************************************    
+								ORDER INFO TABLE CREATION     
+****************************************************************************************************************/
+
+/* Combining order header and order item files to a order info file, finding earliest transaction within an order_item */
+
+/*figuring out the start date of analysis*/
+
+proc means data = inv.vinceinv min;
+var activity_to_date;
+output out = startdate min(activity_to_date) = startdate;
+run;
+
+/*extracting date values from numerical datetime fields in order header and order item tables*/
+
+data 
+	order.item;
+set 
+	order.item;
+format 
+	txn_dt mmddyy10.;
+	dtstr = put(int(transaction_datetime),8.);
+	txn_dt = input(dtstr,anydtdte8.);
+run;
+
+data 
+	order.header;
+set 
+	order.header;
+format 
+	orig_dt mmddyy10.;
+	dtstr = put(int(original_datetime),8.);
+	orig_dt = input(dtstr,anydtdte8.);
+run;
+
+
+/*remove duplicate rows for same order_id, order date combinations*/
+
+proc sort data= order.header nodupkey out = order.header_sorted dupout = check3;
+by order_id original_datetime;
+run;
+
+
+/*check that all order_ids that are duplicate have the same original_datetime and can be arbitrarily deleted - this should be 0 duplicates*/
+/* order.header_sorted_2 should be 0, If not 0 then need to investigate */
+
+proc sort data= order.header_sorted nodupkey out = order.header_sorted_2; 
+by order_id;
+run;
+
+proc sort data = order.item;
+by order_id;
+run;
+
+
+/*get original_datetime and location from order header table*/
+
+data 
+	order.order_info;
+merge 
+	order.item (in=ina) 
+	order.header_sorted (keep = order_id original_datetime web_order_confirmation_nbr location orig_dt);
+by 
+	order_id;
+if 
+	ina = 1;
+run;
+
+
+/*get the first transaction time for each order_item, flag as first transaction on order_item table, flag if first txn is same as orig_datetime, 
+mark wk no for each txn*/
+
+proc sort data = order.order_info;
+by order_item_id transaction_datetime;
+run;
+
+
+data 
+	order.order_info;
+set 
+	order.order_info;
+by 
+	order_item_id transaction_datetime;
+if 
+	first.order_item_id then firsttxn_flag = "Y";
+else 
+	firsttxn_flag = "N";
+if 
+	last.order_item_id then lasttxn_flag = "Y";
+else 
+	lasttxn_flag = "N";
+run;
+
+
+data 
+	cancel;
+set 
+	order.order_info (keep = order_item_id transaction_type purchase_quantity);
+if 
+	transaction_type = "CX";
+run;
+
+proc means data=cancel sum noprint;
+var purchase_quantity;
+by order_item_id;  
+output out = cancel_total sum(purchase_quantity)= cancelled_qty;
+run;
+
+data 
+	cancel_total;
+set 
+	cancel_total(keep = order_item_id cancelled_qty);
+	cancelled_flag = "Y";
+run;
+
+data 
+	order.order_info_temp;
+merge 
+	order.order_info cancel_total;
+by 
+	order_item_id;
+run;
+
+data 
+	order.order_info;
+set 
+	order.order_info_temp;
+run;
+
+
+data 
+	order.order_info;
+set 
+	order.order_info;
+
+if 
+	txn_dt < '16-feb-2013'd then week_nmb=0; 
+else 
+	week_nmb = int((txn_dt - '16-feb-2013'd)/7)+1;
+
+if 
+	orig_dt < '16-feb-2013'd then ord_week_nmb=0; 
+else 
+	ord_week_nmb = int((orig_dt - '16-feb-2013'd)/7)+1;
+
+if 
+	cancelled_flag = "Y" then gross_sales = purchase_quantity - cancelled_qty;
+else 
+	gross_sales = purchase_quantity;
+
+if 
+	cancelled_flag = "Y" and gross_sales > 0 then cancelled_flag = "P";
+run;
+
+
+/*Add in return flag - needed for additional analysis only*/
+/*Get order id's which have returns */
+
+data 
+	return;
+set 
+	order.order_info (keep = order_item_id firsttxn_flag cancelled_flag transaction_type orig_order_item_id);
+if 
+	firsttxn_flag = "Y" and transaction_type in ("RX","RN","CB","RT","PL","PD");
+run;
+
+proc sort data = return nodupkey;
+by orig_order_item_id;
+run;
+
+data 
+	return;
+set 
+	return (keep = orig_order_item_id );
+	return_flag = "Y";
+run;
+
+data 
+	order.order_info_temp;
+merge 
+	order.order_info(in =ina) 
+	return (rename=(orig_order_item_id = order_item_id) in = inb);
+by 
+	order_item_id;
+if 
+	ina = 1;
+if 
+	inb = 0 then return_flag = "N";
+run;
+
+/* Final Order_info file */
+
+data 
+	order.order_info;
+set 
+	order.order_info_temp;
+run;
+
+
+
+/************************     WEEKLY INVENTORY FLAG CREATION    **************************************/
+
+/*Figuring out inventory positions for all sizes is there across sizes */
+
+/*filter inventory for wk1 report*/
+
+data 
+	inv.vinceinv_wk;
+set 
+	inv.vinceinv;
+if 
+	index(win_disc,"N") >0 then bo_all_flag = "Y";
+if 
+	win_disc = "" then bo_all_flag = "Y";
+run;
+
+/*give serial numbers to the sizes and get available inv for all sizes in one row for a style*/
+
+proc sort data = inv.vinceinv_wk;
+by activity_to_date cmos_style edison_size;
+run;
+
+data 
+	inv.vinceinv_wk_serial;
+set 
+	inv.vinceinv_wk (keep = activity_to_date cmos_style long_sku available_inventory shared win_disc bo_all_flag);
+	i + 1;
+by 
+	activity_to_date 
+	cmos_style;
+if 
+	first.cmos_style then i = 1;
+	stylenum = cats("Size",i);
+run;
+
+proc transpose data = inv.vinceinv_wk_serial
+	out = inv.vince_wk_tr;
+	var available_inventory;
+	by activity_to_date cmos_style;
+	id stylenum;
+run;
+
+/*find the number of sizes in each style, then mark if av_stock >0 for all sizes, or some sizes*/
+
+proc means data=inv.vinceinv_wk_serial max noprint;
+var i;
+by activity_to_date cmos_style;
+output out = wk_numsize_all_week max(i) = numsize;
+run;
+
+
+data inv.vince_wk_tr_avinv;
+merge inv.vince_wk_tr wk_numsize_all_week(drop = _type_ _freq_);
+by activity_to_date cmos_style;
+run;
+
+/* Find out maximum size that will be given as array size by using inv.vince_wk_tr table before running below query*/
+
+/* Identifying total stock and stockfull options */
+
+data 
+	inv.vince_wk_tr_avinv;
+	set inv.vince_wk_tr_avinv;
+	array size (33) size1 - size33;
+	Stockfull = "Y";
+	Total_stock = 0;
+	do i = 1 to numsize;
+	if size(i) = 0 then stockfull = "N";
+	Total_stock = Total_stock + size(i);
+end;
+	if Total_Stock >0 and stockfull = "N" then stockfull = "I";
+run;
+
+
+/*Identify broken shared sizes, broken backorder sizes*/
+
+proc transpose data = inv.vinceinv_wk_serial
+	out = inv.vince_wk_tr_sh;
+	var shared;
+	by activity_to_date cmos_style;
+	id stylenum;
+run;
+
+proc sort data = inv.vince_wk_tr_sh;
+by 
+	activity_to_date 
+	cmos_style;
+run;
+
+data inv.vince_wk_tr_sh_temp;
+merge inv.vince_wk_tr_sh wk_numsize_all_week(drop = _type_ _freq_);
+by activity_to_date cmos_style;
+run;
+
+data inv.vince_wk_tr_sh;
+set inv.vince_wk_tr_sh_temp;
+run;
+
+
+data 
+	inv.vince_wk_tr_sh_br;
+set 
+	inv.vince_wk_tr_sh;
+	array size (33) size1- size33;
+	partial_shared_flag = "N";
+	stopdo = 0;
+	do i = 2 to numsize while (stopdo = 0);
+	if size(i) ^= size1 then partial_shared_flag = "Y"; 
+	if partial_shared_flag = "Y" then stopdo = 1;
+end;
+run;
+
+proc transpose data = inv.vinceinv_wk_serial
+	out = inv.vince_wk_tr_bo;
+	var bo_all_flag;
+	by activity_to_date cmos_style;
+	id stylenum;
+run;
+
+proc sort data = inv.vince_wk_tr_bo;
+by 
+	activity_to_date 
+	cmos_style;
+run;
+
+data 
+	inv.vince_wk_tr_bo_temp;
+merge 
+	inv.vince_wk_tr_bo 
+	wk_numsize_all_week(drop = _type_ _freq_);
+by 
+	activity_to_date cmos_style;
+run;
+
+data inv.vince_wk_tr_bo;
+set inv.vince_wk_tr_bo_temp;
+run;
+
+
+/* Identifying Partial backorder flag */
+
+data 
+	inv.vince_wk_tr_bo_br;
+set 
+	inv.vince_wk_tr_bo;
+	array size (33) size1- size33;
+	partial_backorder_flag = "N";
+	stopdo = 0;
+	do i = 2 to numsize while (stopdo = 0);
+	if size(i) ^= size1 then partial_backorder_flag = "Y";
+	if partial_backorder_flag = "Y" then stopdo = 1;
+end;
+run;
+
+/*Merge back info on stock position, broken shared and broken backorder to wk1 inventory table*/
+
+proc sort data = inv.vince_wk_tr_bo_br;
+by 
+	activity_to_date 
+	cmos_style;
+run;
+
+data 
+	inv.vinceinv_wk_temp;
+merge 
+	inv.vinceinv_wk (in = ina) 
+	inv.vince_wk_tr_avinv (keep = activity_to_date cmos_style stockfull total_stock in = inb) 
+	inv.vince_wk_tr_sh_br (keep = activity_to_date cmos_style partial_shared_flag) 
+	inv.vince_wk_tr_bo_br(keep = activity_to_date cmos_style partial_backorder_flag);
+by 
+	activity_to_date cmos_style;
+run;
+
+
+data 
+	inv.vinceinv_wk;
+set 
+	inv.vinceinv_wk_temp;
+run;
+
+
+/*Create pre-order and active sharing flags*/
+
+data 
+	inv.vinceinv_wk;
+set 
+	inv.vinceinv_wk;
+if 
+	Web_last = activity_to_date and Total_Stock =0 
+then 
+	preorder_flag = "Y"; 
+else 
+	preorder_flag = "N";
+
+if 
+	shared = "Y" and stockfull ^= "Y" 
+then 
+	active_sharing_flag = "Y";
+else 
+	active_sharing_flag = "N";
+
+if 
+	active_sharing_flag = "Y" and available_inventory = 0 
+then 
+	check_for_demand_flag = "Y";
+
+if 
+	Activity_to_date < '16-feb-2013'd then Act_week_nmb=0; 
+else 
+	Act_week_nmb = int((Activity_to_date - '16-feb-2013'd)/7)+1;
+run;
+
+proc sql;
+create table total_dates as
+select distinct activity_to_date,act_week_nmb from inv.vinceinv_wk;
+quit;
+
+
+/************************************************************************************************************************         
+										WEEKLY TRUE DEMAND CALCULATION   
+*************************************************************************************************************************/
+
+
+/* Getting demand for the shared CMOS styles from order info file */
+
+/* Get to 1 row per order_item value as long as the order was not cancelled fully */
+
+data order.demand;
+set order.order_info;
+if transaction_type in ("BO","DS","QU","PT","RP","RD","VS","MI","RI","RB") 
+and firsttxn_flag = "Y" and (cancelled_flag = "" or cancelled_flag = "P");
+run;
+
+
+/* Sorting the demand table */
+proc sort data = order.demand;
+by sku_value;
+run;
+
+proc sql;
+create table total_dates_order as
+select max(orig_dt),max(ord_week_nmb) from order.demand;
+quit;
+
+/*Check for sales demand on shared styles where inv is 0 by week*/
+
+/*Get the sku's for which we need to check demand for week1*/
+
+data 
+	wk_demandcheck;
+set 
+	inv.vinceinv_wk;
+if 
+	check_for_demand_flag = "Y";
+run;
+
+proc sort data = wk_demandcheck;
+by act_week_nmb long_sku;
+run;
+
+
+/*Get the sales for the sku's for which we need to check demand in that particular week*/
+
+proc sql;
+create table Vince_demandcheck_sales as
+	select 
+		dc.*,
+		d.*
+	from
+		wk_demandcheck as dc,
+        order.demand as d
+	where
+		dc.long_sku = d.sku_value and
+        dc.act_week_nmb=d.ord_week_nmb and
+        transaction_category_code = "1" and
+        location in ('50', '83','8601','80');
+ quit;
+
+
+ /*create a flag for those sku's where there is proven sales and merge back*/
+
+ data 
+	wk_demandcheck_sales;
+set 
+	Vince_demandcheck_sales(keep = act_week_nmb long_sku);
+	demandexists_flag = "Y";
+run;
+
+proc sort data = wk_demandcheck_sales nodupkey;
+by act_week_nmb long_sku;
+run;
+
+/* Merging demandexists_flag to demand check table */
+
+data 
+	wk_demandcheck_temp;
+merge 
+	wk_demandcheck (in=ina) 
+	wk_demandcheck_sales;
+by 
+	act_week_nmb
+	long_sku;
+if 
+	ina=1;
+run;
+
+data 
+	wk_demandcheck;
+set 
+	wk_demandcheck_temp;
+run;
+
+/*Where there is any sku within a style with no sales, create a flag to exclude the style from 
+size calculation*/
+
+data 
+	wk_shared_to_filter_out;
+set 
+	wk_demandcheck (keep =act_week_nmb cmos_style demandexists_flag);
+if 
+	demandexists_flag = "";
+	shared_exclude_flag = "Y";
+run;
+
+proc sort data = wk_shared_to_filter_out nodupkey;
+by act_week_nmb cmos_style;
+run;
+
+/*Merge back the flag into the inventory table*/
+
+proc sort data = inv.vinceinv_wk;
+by act_week_nmb long_sku;
+run;
+
+data 
+	Vince_inv_wk_temp;
+merge 
+	inv.vinceinv_wk(in=ina) 
+	wk_shared_to_filter_out (drop = demandexists_flag);
+by 
+	act_week_nmb
+	cmos_style;
+if 
+	ina=1;
+run;
+
+data 
+	inv.vinceinv_wk_final;
+set 
+	Vince_inv_wk_temp;
+run;
+
+proc sort data=inv.vinceinv_wk_final;
+by act_week_nmb long_sku;
+run;
+
+/*Now for final set of filters*/
+
+proc sql;
+create table order.vince_demand_final as
+	select 
+		d.*,
+		inv.cmos_style ,
+		inv.Vendor_Analysis_Name,
+		inv.available_inventory,
+		inv.activity_to_date,
+		inv.long_sku,
+		inv.edison_class_description,
+		Edison_Subclass_description,
+		inv.edison_size_desc,
+		inv.inv_category ,
+		inv.web_last,
+		inv.partial_backorder_flag ,
+		inv.partial_shared_flag ,
+		inv.stockfull ,
+		inv.total_stock ,
+		inv.bo_all_flag ,
+		inv.shared, 
+		inv.win_disc ,
+		inv.preorder_flag ,
+		inv.active_sharing_flag ,
+		inv.check_for_demand_flag  ,
+		inv.shared_exclude_flag ,
+		inv.disc_perc,
+		inv.disc_slab
+	from
+		inv.vinceinv_wk_final as inv,
+        order.demand as d
+	where
+	     inv.long_sku = d.sku_value and
+         inv.act_week_nmb=d.ord_week_nmb and
+         partial_backorder_flag = "N" and partial_shared_flag = "N" and
+	    (stockfull = "Y" or bo_all_flag = "Y" or preorder_flag = "Y" or 
+	    (active_sharing_flag = "Y" and shared_exclude_flag ^= "Y")) and
+	     transaction_category_code = "1" and
+        location in ('50', '83','8601','80');
+ quit;
+
+
+/****************** Preparing final table for export. Table name for export is weeklyqty  *******************/
+
+proc sort data = order.vince_demand_final;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+run;
+
+proc means data = order.vince_demand_final noprint sum;
+var 
+	gross_sales;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+output out = Vince_Weeklyqty sum(gross_sales) = grosssales;
+run;
+
+proc sql;
+create table uniq_style as
+select distinct edison_class_description from order.vince_demand_all_v1;
+quit;
+
+
+/*******************************************************************************************************************     
+									SUMMARY DATA     
+********************************************************************************************************************/
+
+/*Calculate gross sales for products */
+
+proc sort data = inv.vinceinv nodupkey out = inv.uniquesku;
+by long_sku vendor_analysis_name ;
+run;
+
+data 
+	order.vince_demand_all_v1;
+merge 
+	order.demand(rename=(sku_value=long_sku) in=inb) 
+	inv.uniquesku(keep = cmos_style vendor_analysis_name long_sku edison_class_description Edison_Subclass_description edison_size_desc in=ina);
+by 
+	long_sku;
+if 
+	ina = 1 and inb = 1;
+if 
+	 transaction_category_code = "1" and ord_week_nmb > 0 and ord_week_nmb < 22 and location in ('50', '83','8601','80'); 
+run;
+
+proc sort data = order.vince_demand_all_v1;
+by edison_class_description edison_size_desc;
+run;
+
+proc means data =order.vince_demand_all_v1 noprint sum;
+var purchase_amount; 
+by edison_class_description edison_size_desc;
+output out= vince_dollarsales_regular_pr sum(purchase_amount) = Sales;
+run;
+
+proc means data =order.vince_demand_all_v1 noprint sum;
+var purchase_quantity; 
+by edison_class_description edison_size_desc;
+output out= vince_totalqty_regular_pr sum(purchase_quantity) = Sales;
+run;
+
+
+
+/**********************************************************************************************************
+			Calculate gross sales for broken sizes
+**********************************************************************************************************/
+
+
+/*Calculate gross sales for broken sizes */
+
+data 
+	vince_inv_wk_sku;
+set 
+	inv.vinceinv_wk_final;
+if 
+	stockfull = "I" and bo_all_flag = "" and preorder_flag = "N" and active_sharing_flag = "N" and 
+	partial_backorder_flag = "N" and partial_shared_flag = "N"; 
+if 
+	(edison_class_description in ("11 Pants","117 Denim","117 Jean") and edison_size_desc in
+	("10","12","L")and available_inventory=0) or 
+   
+	(edison_class_description in ("15 Sweaters") and edison_size_desc in ("L") and
+	available_inventory=0) or 
+
+	(edison_class_description in ("13 Woven Tops","14 Knit Tops","167 Tops") and
+	 edison_size_desc in ("L")and available_inventory=0) or
+
+	 (edison_class_description in ("16 Jackets") and edison_size_desc in ("12","L") and
+	 available_inventory=0) or
+
+	 (edison_class_description in ("19 Daytime Dresses","19 Dresses") and
+	 edison_size_desc in ("M","L") and available_inventory=0) or 
+
+	 (edison_class_description in ("48 Shorts") and edison_size_desc in ("0","10","12") and
+	 available_inventory=0);
+if
+	 act_week_nmb > 0 and act_week_nmb < 22;
+run;
+
+
+proc sort data = vince_inv_wk_sku nodupkey;
+by act_week_nmb cmos_style;
+run;
+
+data 
+	vince_inv_wk;
+merge 
+	inv.vinceinv_wk_final (in=ina) 
+	vince_inv_wk_sku (keep = act_week_nmb cmos_style in=inb);
+by 
+	act_week_nmb
+	cmos_style;
+if 
+	ina =1 and inb=1;
+ run;
+
+ proc sql;
+ create table order.vince_demand_wk_partial as
+ select
+ 	d.*,
+	i.cmos_style,
+	i.Vendor_Analysis_Name,
+	i.long_sku,
+	i.partial_backorder_flag,
+	i.shared,
+	i.shared_exclude_flag,
+	i.available_inventory,
+	i.edison_class_description,
+	i.Edison_Subclass_description,
+	i.partial_shared_flag,
+	i.win_disc,
+	i.disc_perc,
+	i.activity_to_date,
+	i.edison_size_desc,
+	i.stockfull,
+	i.preorder_flag,
+	i.disc_slab,
+	i.inv_category,
+	i.total_stock,
+	i.active_sharing_flag,
+	i.web_last,
+	i.bo_all_flag,
+	i.check_for_demand_flag
+from
+	order.demand as d,
+    vince_inv_wk as i
+where
+	d.sku_value=i.long_sku and
+	d.ord_week_nmb=i.act_week_nmb and
+    transaction_category_code = "1" and
+    location in ('50','83','8601','80');
+quit;
+
+proc sort data = order.vince_demand_wk_partial;
+by ord_week_nmb edison_class_description edison_size_desc;
+run;
+
+proc means data = order.vince_demand_wk_partial noprint sum;
+var gross_sales;
+by ord_week_nmb edison_class_description edison_size_desc;
+output out = vince_weeklyqty_partial sum(gross_sales) = grosssales;
+run;
+
+/*********************************** Calculating Un utilised data **********************************************/
+
+
+proc sql;
+create table order.vince_base_table_v1 as
+	select 
+		d.*,
+		inv.*
+	from
+		inv.vinceinv_wk_final as inv,
+        order.demand as d
+	where
+	     inv.long_sku = d.sku_value and
+         inv.act_week_nmb=d.ord_week_nmb and
+         partial_backorder_flag = "N" and partial_shared_flag = "N" and
+         location in ('50', '83','8601','80');
+ quit;
+
+proc sort data = order.vince_base_table_v1;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+run;
+
+proc means data = order.vince_base_table_v1 noprint sum;
+var 
+	gross_sales;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+output out = Vince_total_gr_sales sum(gross_sales) = grosssales;
+run;
+
+
+/* Creating table after removing inventory criteria*/
+
+proc sql;
+create table order.vince_demand_final_wo_avl as
+	select 
+		v.*
+	from
+		order.vince_base_table_v1 as v
+	where
+	     transaction_category_code = "1";
+ quit;
+
+proc sort data = order.vince_demand_final_wo_avl;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+run;
+
+proc means data = order.vince_demand_final_wo_avl noprint sum;
+var 
+	gross_sales;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+output out = Vince_gr_sales_with_RP_filter sum(gross_sales) = grosssales;
+run;
+
+
+/******************** Creating table with both the conditions ***********************/
+
+proc sql;
+create table order.vince_demand_final_allstock as
+	select 
+		v.*
+	from
+		order.vince_base_table_v1 as v
+	where
+	    (stockfull = "Y" or bo_all_flag = "Y" or preorder_flag = "Y" or 
+	    (active_sharing_flag = "Y" and shared_exclude_flag ^= "Y")) and
+	    transaction_category_code = "1";
+ quit;
+
+proc sort data = order.vince_demand_final_allstock;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+run;
+
+proc means data = order.vince_demand_final_allstock noprint sum;
+var 
+	gross_sales;
+by 
+	ord_week_nmb 
+	edison_class_description 
+	edison_size_desc;
+output out = Vince_gr_sales_allstock sum(gross_sales) = grosssales;
+run;
+
+

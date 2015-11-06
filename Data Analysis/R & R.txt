@@ -1,0 +1,18 @@
+PROJECT PROFILE:
+
+Employer : Ugam Solutions
+
+Project: Pricing ; Best Seller Prediction Modeling
+Roles & Responsibilities:
+
+* Top-down retailers based on product/service performance were predicted enabling business aspects.
+* Seller's list was pro-actively derived which ensures product drop-down lists.
+* EDA(Exploratory Data Analysis) were carried out describes certainity of  Initial analysis.
+* Market based research pilots were relatively defined over many other statistical concepts helps in making business decisions.
+
+
+Role: Market Research - Analyst
+
+Designation: Senior Analyst
+
+Statistical language : R
