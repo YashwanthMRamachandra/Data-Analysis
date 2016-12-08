@@ -1,0 +1,78 @@
+Location
+Lowes Store number. Lowe's location.  Locations include retail stores, distribution centers, and area, regional, and corporate offices
+Merchandise Division
+Item Type
+Weekly Item Store Stock Flag
+Metrics:
+CAD Sales $
+Sales $ is the dollars amount of sales.  Sum(tot_sal_amt)
+Sum(NTV_TOT_SAL_AMT)
+{~+}
+CAD Sales $ Comp
+Sales $ is the dollars amount of sales.  Sum(tot_sal_amt) for Comp (3) locations.
+Sum(NTV_TOT_SAL_AMT)
+{Comp Flag for Current Fiscal Year} = 3:COMP LOCATION                          
+{~+}
+Comp Weekly Sales Units
+Sum(TOT_ITM_QTY)
+{Comp Flag for Current Fiscal Year} = 3:COMP LOCATION                          
+{~+}
+Sales Units
+Sales Units  is the Quantity values of sales.  
+Sum(tot_sal_qty)
+ApplyAgg("sum(cast(#0 as float))",TOT_ITM_QTY)
+{~+}
+
+
+
+
+
+Margin %
+Margin %
+{CAD Margin $} / {CAD Sales $}
+CAD Margin $ (Comp)
+Margin $ shows Sales $ - Margin $ + Margin Correction $.  (Sale $ - Cost $) + Margin Corrections for COMP locations only.
+This metric should not be used in reports showing daily information. Use the Daily Margin $ Metric.
+({CAD Sales $ Comp} - {CAD Cost $ Comp}) + {CAD Margin Correction $ Comp}
+
+
+
+
+CAD Margin $
+Margin $ shows Sales dollars - Margin dollars + Margin Correction dollars.  (Sale $ - Cost $) + Margin Corrections.
+This metric should not be used in reports showing daily information. Use the Daily Margin $ Metric.
+
+({CAD Sales $} - {CAD Cost $}) + {CAD Margin Correction $}
+
+CAD Cost $
+Calculated as the sum of Cost Dollars.
+Sum(NTV_TOT_CST_AMT)
+{~+}
+
+
+
+
+
+CAD Average Selling Price
+Average Selling price calculated as:  (Sum([TOT_SAL_AMT])  / Sum([TOT_ITM_QTY])
+{CAD Sales $} / {Sales Units}
+
+
+CAD Inventory On Hand $
+Inventory On Hand $ is the inventory on hand dollar amount.  (sum of inv_on_hnd_amt)
+Sum({Inventory On Hand Amount in Canadian Dollars})
+{~+}
+
+
+
+
+Inventory On Hand Units
+Inventory On Hand Units  is the inventory on hand unit amount.  (sum of inv_on_hnd_qty)
+Sum(INV_ON_HND_QTY)
+{~+}
+CAD Unit Price
+Calculated as:  ([Price Ordered Amount] / [Quantity On Order])
+{CAD Price Ordered Amount} / {Quantity On Order}
+Count Sales Units - Invoice Count
+Count({Item Sales Units from I0002A_IVO_DTL Only})
+{~+}

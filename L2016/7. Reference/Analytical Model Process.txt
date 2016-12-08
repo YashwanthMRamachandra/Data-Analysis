@@ -1,0 +1,12 @@
+Analytical Model Process:
+1.	Objective or business problem should be thoroughly defined to analyze data & 
+2.	Source of the data should be identified
+3.	Data should be gathered from the data ware house.
+4.	Basic EDA should be carried out; for example online analytical processing(OLAP) for multi-dimensional data analysis(ex., roll-up, drill down, slicing & dicing)
+5.	Data cleaning step to get rid of all inconsistencies such as missing values, outliers & duplication of data
+6.	Transformation such as binning, alpha to numeric coding, geographical aggregation & so forth
+7.	In a modelling step, it will be estimated on pre-processed & transformed data
+8.	Once the model is built, it will be interpreted & evaluated by business experts.
+9.	Post model has been appropriately validated & evaluated, it can be put into production as an analytical application/platform.
+10.	Ensure analytical model can be appropriately monitored & back tested on an ongoing basis
+Note: Data selection & pre-processing steps usually takes around 80% of the total effort needed to build an analytical model.

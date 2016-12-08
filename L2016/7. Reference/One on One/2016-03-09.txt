@@ -1,0 +1,17 @@
+Reporting:
+1. Orchard transition is 80% completed for now & tommorow ATG transition will start.From next week onwards 
+	I will own the orchard & week next after may be ATG.
+2. Lot of escalation happening around CC & that transition too will happen shortly.
+3. One more which is Alacrity will also start by next week.
+
+
+Analysis work:
+Scope : we putting a proposal of a well-defined solution & you just have to let us know if it adds value to the organisation going forward.
+1. Agenda behind this work/exploration of data is to understand the canada market as we discussed previously.
+2. So we took the business problem usually arises under pricing strategies.
+2.a. we can even drill down/get into as granular as possible in indentifying the areas of improvement. Can be inventory, customer performance, store, RFM bla bla bla.
+2.b. We need more clarity about on which level the analysis can be evaluted, whether prod-level or assort-level etc
+3. We listed out some of the current pricing strategies of lowes.ca such as
+4. These strategies has tremendous impact on margin%. Ex, in Q4 OPE has avg margin% of-435%.
+5. a.As next step, we also have to identify as many as sales driven attributes/metrics as possible.
+5.b. will conceive & leverage metrics from available on teradata tables. 

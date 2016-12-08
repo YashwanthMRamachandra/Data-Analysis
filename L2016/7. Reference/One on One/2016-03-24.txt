@@ -1,0 +1,16 @@
+1. Continue exploring canada data considering it as substantial task & also trying to collate as many attributes & metrics as possible. 
+   Followed by it, we are trying to put it in place as in repository which can be used in near future.
+
+2. We are unhappy about not receiving any anaytical/problem solving requests coming in from Allied. Discussed this in weekly catach up 
+   with neha. Hopefully We expect requests to come.
+
+3. Teradata exploration of tables is started, I have started recording every tables in regard of data dictionary, so that we can expect
+  less effort in case of any requests on HOW to do it, WHY to do it.
+
+4. I am really so graceful to have conservations with Neha & the team, especially after change in place. I also want you to keep track of
+   how changes are being taking place within me expecially after the feedback. I agree took longer time than expected in understanding the
+   organisational structure & workflow as I come from completely different system.
+
+5. Lastly, I expect potential for my participation more in terms of actively involving in forums like Newsletter, any social welfare, 
+   TGIF, Travel etc.
+   

@@ -1,0 +1,40 @@
+############################## Google Analytics ####################################
+# https://analytics.google.com/analytics/web/#report/defaultid/a44204574w74466506p76888515/
+# https://console.developers.google.com/apis/credentials?project=yashwanthganalytics
+# http://www.r-bloggers.com/how-to-extract-google-analytics-data-in-r-using-rgoogleanalytics/
+# http://www.r-bloggers.com/using-google-analytics-with-r/
+# https://developers.google.com/analytics/solutions/r-google-analytics?hl=en
+
+oauth_token <- Auth(client.id = "564597335604-ivs9dtr8v72ipe8f9b36sinqq35fpviq.apps.googleusercontent.com",
+ client.secret = "GD7FzaBrCgwWBQHTd1kDhE1E")
+
+> library(RGoogleAnalytics)
+
+#Use a local file to cache OAuth access credentials between R sessions?
+#1: Yes
+#2: No
+
+#Selection: Yes
+#Adding .httr-oauth to .gitignore
+#httpuv not installed, defaulting to out-of-band authentication
+#Please point your browser to the following url: 
+
+#  https://accounts.google.com/o/oauth2/auth?client_id=564597335604-ivs9dtr8v72ipe8f9b36sinqq35fpviq.apps.googleusercontent.com&scope=https%3A%2F%2Fwww.googleapis.com%2Fauth%2Fanalytics.readonly&redirect_uri=urn%3Aietf%3Awg%3Aoauth%3A2.0%3Aoob&response_type=code
+
+#Enter authorization code: 4/-ZBjcPvk5QZgiLczdgTEXyVr4H5WNDFXIwwdloGBAdM
+
+# Get the Sessions & Transactions for each Source/Medium sorted in 
+# descending order by the Transactions
+query.list <- Init(start.date = "2014-08-01",
+                   end.date = "2016-01-01",
+                   dimensions = "ga:sourceMedium",
+                   metrics = "ga:sessions,ga:transactions",
+                   max.results = 10000,
+                   sort = "-ga:transactions",
+                   table.id = "ga:123456")
+
+# Create the Query Builder object so that the query parameters are validated
+ga.query <- QueryBuilder(query.list)
+
+ga.data <- GetReportData(ga.query,oauth_token)
+
