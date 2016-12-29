@@ -1,0 +1,19 @@
+1.https://www.analyticsvidhya.com/blog/2016/02/complete-tutorial-learn-data-science-scratch/
+https://www.analyticsvidhya.com/blog/2016/01/guide-data-exploration/
+https://www.analyticsvidhya.com/blog/2016/12/detailed-solutions-for-skilltest-tree-based-algorithms/
+https://www.analyticsvidhya.com/blog/2016/04/complete-tutorial-tree-based-nswers-general-for-2016/184
+
+http://www.datasciencecentral.com/profiles/blogs/25-questions-to-detect-fake-data-scientists
+https://www.google.co.in/search?q=difference%20between%20predictive%20analytics%20and%20machine%20learning&rct=j&safe=active&ssui=on
+
+https://www.analyticsvidhya.com/blog/2015/07/difference-machine-learning-statistical-modeling/
+https://www.analyticsvidhya.com/blog/2014/06/introduction-random-forest-simplified/
+https://www.analyticsvidhya.com/blog/2016/01/complete-tutorial-learn-data-science-python-scratch-2/
+
+https://www.google.co.in/search?q=transfer%20PF%20amount%20to%20another%20PF%20account&rct=j&safe=active&ssui=on
+
+https://www.analyticsvidhya.com/blog/2016/07/apply-analytics-data-science-masters-us-universities/
+
+# Machine learning terms
+https://www.analyticsvidhya.com/glossary-of-common-statistics-and-machine-learning-terms/
+
