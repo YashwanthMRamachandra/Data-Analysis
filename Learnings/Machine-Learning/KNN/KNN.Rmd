@@ -1,0 +1,103 @@
+---
+title: "KNN"
+output: html_notebook
+---
+
+### **K-Nearest Neighbor** 
+
+```{r,echo=FALSE,warning=FALSE}
+library(openxlsx)
+Pros_Cancer_Input <- read.xlsx("H:/Yashwanth/Learnings/Machine Learning/KNN/Prostate_Cancer.xlsx",
+                           sheet = 1)
+Pros_Cancer <- Pros_Cancer_Input
+Pros_Cancer[sapply(Pros_Cancer,is.character)] <- lapply(Pros_Cancer[sapply(Pros_Cancer,is.character)],as.factor)
+```
+
+---
+
+##### **Stratified Random Sampling**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(sampling)
+Pros_Cancer_FT <- data.frame(table(Pros_Cancer$diagnosis_result))
+Pros_Cancer_FT$Per <- (Pros_Cancer_FT$Freq/sum(Pros_Cancer_FT$Freq))*100
+names(Pros_Cancer_FT)[1] <- "diagnosis_result"
+
+# Consider 70% of the data as sample
+Pros_Cancer_FT$Strata_Size <- ceiling((Pros_Cancer_FT$Freq*(ceiling((dim(Pros_Cancer)[1]/100)*70)/sum(Pros_Cancer_FT$Freq))))
+Pros_Cancer_FT <- with(Pros_Cancer_FT,Pros_Cancer_FT[order(diagnosis_result,decreasing = FALSE),])
+Pros_Cancer <- with(Pros_Cancer,Pros_Cancer[order(diagnosis_result,decreasing = FALSE),])
+
+# Stratification
+Pros_Cancer_Strata <- strata(Pros_Cancer,c("diagnosis_result"),size = Pros_Cancer_FT$Strata_Size, method = "srswor")
+Pros_Cancer_StRS_Train <- getdata(Pros_Cancer,Pros_Cancer_Strata)
+head(Pros_Cancer_StRS_Train)
+
+# Test data
+library(sqldf)
+Pros_Cancer_StRS_Test <- sqldf("select a.* from Pros_Cancer a 
+                           left join Pros_Cancer_StRS_Train b on a.id=b.id
+                           where b.id is NULL")
+```
+
+---
+
+##### **Identify optimal value of K**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(ISLR)
+library(caret)
+Pros_Cancer_StRS_Train[,c("id","ID_unit","Prob","Stratum")] <- NULL
+Pros_Cancer_StRS_Test[,c("id")] <- NULL
+Pros_Cancer_StRS_Train <- Pros_Cancer_StRS_Train[c(ncol(Pros_Cancer_StRS_Train),1:ncol(Pros_Cancer_StRS_Train)-1)]
+
+# Run k-NN: https://discuss.analyticsvidhya.com/t/how-to-choose-the-value-of-k-in-knn-algorithm/2606/3
+set.seed(400)
+ctrl <- trainControl(method="repeatedcv",repeats = 3)
+knnFit <- train(diagnosis_result ~ ., data = Pros_Cancer_StRS_Train, method = "knn", trControl = ctrl, 
+                preProcess = c("center","scale"),tuneLength = 20)
+knnFit
+
+#Use plots to see optimal number of clusters:
+#Plotting yields Number of Neighbours Vs accuracy (based on repeated cross validation)
+plot(knnFit)
+```
+
+---
+
+##### **Run KNN**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(class)
+library(gmodels)
+
+# https://discuss.analyticsvidhya.com/t/how-to-resolve-error-na-nan-inf-in-foreign-function-call-arg-6-in-knn/7280/4
+Pros_Cancer_StRS_Train$diagnosis_result <- ifelse(Pros_Cancer_StRS_Train$diagnosis_result=="M",1,0) 
+Pros_Cancer_StRS_Test$diagnosis_result <- ifelse(Pros_Cancer_StRS_Test$diagnosis_result=="M",1,0)
+Pros_Cancer_KNN <- knn3Train(train = Pros_Cancer_StRS_Train, test = Pros_Cancer_StRS_Test,
+                       cl = Pros_Cancer_StRS_Train$diagnosis_result, k = 17, prob = T)
+```
+
+---
+
+##### **Predictions**
+
+```{r, echo=FALSE, warnings=FALSE}
+CrossTable(Pros_Cancer_StRS_Test$diagnosis_result, Pros_Cancer_KNN)
+Pros_Cancer_KNN_Pred <- data.frame(attributes(Pros_Cancer_KNN)$prob,
+                                   pred=ifelse(attributes(Pros_Cancer_KNN)$prob[,2]>0.5,1,0),
+                                   actual=Pros_Cancer_StRS_Test$diagnosis_result)
+
+confusionMatrix(data=Pros_Cancer_KNN_Pred$pred,reference = Pros_Cancer_KNN_Pred$actual, positive = "1")
+
+# Precision & Recall & F-measure
+library(ROSE)
+accuracy.meas(Pros_Cancer_KNN_Pred$actual,attributes(Pros_Cancer_KNN)$prob[,2])
+
+# ROC-curve http://gim.unmc.edu/dxtests/roc3.htm
+roc.curve(Pros_Cancer_KNN_Pred$actual,attributes(Pros_Cancer_KNN)$prob[,2], plotit = F)
+```
+
+
+
+
