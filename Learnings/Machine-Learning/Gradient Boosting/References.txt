@@ -1,0 +1,7 @@
+https://www.quora.com/What-is-an-intuitive-explanation-of-Gradient-Boosting
+http://www.dataminingblog.com/gradient-boosting-machine-a-brief-introduction/
+https://www.probabilitycourse.com/chapter10/10_2_4_white_noise.php
+
+http://arogozhnikov.github.io/2016/06/24/gradient_boosting_explained.html
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC3885826/
+https://www.quora.com/What-is-hypothesis-in-machine-learning
