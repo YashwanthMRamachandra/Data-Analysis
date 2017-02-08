@@ -1,0 +1,125 @@
+---
+title: "Random Forest"
+output: html_notebook
+---
+
+### **Research question : Predict which client will subscribe to the term deposit** [Reference](http://dni-institute.in/blogs/random-forest-using-r-step-by-step-tutorial/)
+
+
+```{r,echo=FALSE,warning=FALSE}
+library(openxlsx)
+DMC_PBI_Input <- read.xlsx("H:/Yashwanth/Learnings/Machine Learning/Decision Tree/bank-additional-full.xlsx",
+                           sheet = 1)
+DMC_PBI <- DMC_PBI_Input
+DMC_PBI[sapply(DMC_PBI,is.character)] <- lapply(DMC_PBI[sapply(DMC_PBI,is.character)],as.factor)
+DMC_PBI$row_id <- row.names(DMC_PBI)
+```
+
+---
+
+##### **Stratified Random Sampling**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(sampling)
+DMC_PBI_FT <- data.frame(table(DMC_PBI$job))
+DMC_PBI_FT$Per <- (DMC_PBI_FT$Freq/sum(DMC_PBI_FT$Freq))*100
+names(DMC_PBI_FT)[1] <- "job"
+
+# Consider 70% of the data as sample
+DMC_PBI_FT$Strata_Size <- ceiling((DMC_PBI_FT$Freq*(ceiling((dim(DMC_PBI)[1]/100)*70)/sum(DMC_PBI_FT$Freq))))
+DMC_PBI_FT <- with(DMC_PBI_FT,DMC_PBI_FT[order(job,decreasing = FALSE),])
+DMC_PBI <- with(DMC_PBI,DMC_PBI[order(job,decreasing = FALSE),])
+
+# Stratification
+set.seed(1256)
+DMC_PBI_Strata <- strata(DMC_PBI,c("job"),size = DMC_PBI_FT$Strata_Size, method = "srswor")
+DMC_PBI_StRS <- getdata(DMC_PBI,DMC_PBI_Strata)
+head(DMC_PBI_StRS)
+
+# Test data
+library(sqldf)
+DMC_PBI_StRS_Test <- sqldf("select a.* from DMC_PBI a 
+                           left join DMC_PBI_StRS b on a.row_id=b.row_id
+                           where b.row_id is NULL")
+```
+
+---
+
+### **Ensemble method using Bagging & Random-Forest**
+#### **Determine number of trees**
+
+```{r, echo=FALSE, warning=FALSE}
+library(randomForest)
+DMC_PBI_StRS$row_id <- NULL
+DMC_PBI_StRS <- DMC_PBI_StRS[,1:(ncol(DMC_PBI_StRS)-3)]
+
+# Exclude id or response variable
+varNames <- names(DMC_PBI_StRS)
+varNames <- varNames[!varNames %in% c("y")]
+
+# add + sign b/n exploratory variables
+varNames1 <- paste(varNames, collapse = "+")
+
+# Add response variable & convert to a formula object
+rf.form <- as.formula(paste("y", varNames1, sep = "~"))
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# Find ideal number of trees
+DMC_PBI_RF_Ntree <- randomForest(rf.form, data = DMC_PBI_StRS, importance = TRUE)
+plot(DMC_PBI_RF_Ntree)
+```
+##### **Insight**
+* There is no significant reduction in error-rate after 100-trees
+
+---
+
+```{r, echo=FALSE, warning=FALSE}
+# Run RF with ideal number of trees
+DMC_PBI_RF <- randomForest(rf.form, data = DMC_PBI_StRS, importance = TRUE, ntree = 100)
+plot(DMC_PBI_RF)
+```
+
+---
+
+#### **Variable Importance plot & table**
+```{r, echo=FALSE, warning=FALSE}
+# variable importance plot
+varImpPlot(DMC_PBI_RF, sort = T, main = "Variable Importance plot", n.var = 5)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# variable importance table
+varImp <- data.frame(importance(DMC_PBI_RF), type = 2)
+varImp$variables <- row.names(varImp)
+varImp[order(varImp$MeanDecreaseGini, decreasing = T),c(3,4,6)]
+```
+
+---
+
+#### **Predictions**
+```{r, echo=FALSE, warning=FALSE}
+# Confusion matrix
+library(e1071)
+library(caret)
+DMC_PBI_RF_Pred$predicted_response <- predict(DMC_PBI_RF,DMC_PBI_StRS_Test, type = "response")
+confusionMatrix(reference = DMC_PBI_StRS_Test$y, data=DMC_PBI_RF_Pred$predicted_response, positive = "yes")
+
+# Precision & Recall & F-measure
+library(ROSE)
+DMC_PBI_RF_Pred <- data.frame(predict(DMC_PBI_RF,DMC_PBI_StRS_Test, type = "prob")) # or type="vote"
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_RF_Pred[,2])
+
+# ROC-curve http://gim.unmc.edu/dxtests/roc3.htm
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_RF_Pred[,2], plotit = F)
+```
+##### **Insights**
+* RandomForest AUC is greater than DT AUC.
+* RandomForest model has More accuracy rate than DT.
+
+---
+
+#### **Boosting Methods**
+```{r, echo=FALSE, warning=FALSE}
+
+```
