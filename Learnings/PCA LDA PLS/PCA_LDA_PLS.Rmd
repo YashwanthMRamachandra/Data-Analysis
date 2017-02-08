@@ -1,0 +1,135 @@
+---
+title: "PCA LDA & PLS"
+output: html_notebook
+---
+
+### **Research question : Create groups(components) which can expalin better varainces** 
+
+```{r, echo=FALSE, warnings=FALSE}
+library(openxlsx)
+HR_Analytics <- read.xlsx("H:/Yashwanth/Kaggle/HR_comma_sep.xlsx",sheet = 1)
+HR_Analytics$left <- factor(HR_Analytics$left, labels = c("Retain","Left"))
+HR_Analytics$Work_accident <- as.factor(HR_Analytics$Work_accident)
+HR_Analytics$promotion_last_5years <- as.factor(HR_Analytics$promotion_last_5years)
+HR_Analytics$row_id <- row.names(HR_Analytics)
+```
+
+---
+
+#### **Principal Component Analysis** [Reference](https://www.analyticsvidhya.com/blog/2016/03/practical-guide-principal-component-analysis-python/)
+
+```{r, echo=FALSE, warning=FALSE}
+# PCA
+PCA <- prcomp(HR_Analytics[sapply(HR_Analytics,is.numeric)][2:5],cor=TRUE, scale. = TRUE, retx = TRUE);PCA
+summary(PCA)
+
+#plot of variance of each PCA. It will be useful to decide how many principal components should be retained.
+screeplot(PCA, type="lines",col=3) # 3-components can be retained
+
+#biplot of first two principal components Ref: https://gist.github.com/thigm85/8424654
+biplot(PCA,cex=0.8)
+abline(h = 0, v = 0, lty = 2, col = 8)
+title("Bi-Plot")
+
+PCA_Plot <- data.frame(pca=PCA$x,left=HR_Analytics$left)
+library(ggplot2)
+library(scales)
+ggplot(PCA_Plot) + geom_point(aes(pca.PC1, pca.PC2, colour = left, shape = left), size = 2.5) +
+  labs(x = paste("PC1 (", percent((PCA$sdev/sum(PCA$sdev))[1]), ")", sep=""),
+       y = paste("PC2 (", percent((PCA$sdev/sum(PCA$sdev))[2]), ")", sep=""))
+
+#cumulative scree plot
+plot(cumsum(prop_varex), xlab = "Principal Component",
+              ylab = "Cumulative Proportion of Variance Explained",
+              type = "b")
+
+# Identify which variable to drop
+library(raster)
+print(t(lapply(HR_Analytics[sapply(HR_Analytics,is.numeric)],sd)))
+print(t(lapply(HR_Analytics[sapply(HR_Analytics,is.numeric)],cv)))
+
+```
+
+* Drop time_spend_company variable & continue transformation with first-3-components. time_spend_company(PC2) falls apart from rest of the variables(PC1)
+* Bi-plot helps us to identify which variables are more contributing to components & hence variables associated with those components can be chosen to build a predicitive model
+* Note: As there are only few Variables, PCA is unable/not-suitable to explain more variances. Hence regression might not be prefered on PCA loadings
+
+---
+
+<!-- Note: Partial least square (PLS) is a supervised alternative to PCA. PLS assigns higher weight to variables which are strongly related to response variable to determine principal components. -->
+
+---
+
+#### **Discriminant Analysis** [Reference1](https://tgmstat.wordpress.com/2013/11/21/introduction-to-principal-component-analysis-pca/) [Reference2](https://www.r-bloggers.com/computing-and-visualizing-lda-in-r/) 
+[Reference3](http://www.statisticssolutions.com/discriminant-analysis/)
+
+##### **Stratified Random Sampling**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(sampling)
+HR_Analytics_FT <- data.frame(table(HR_Analytics$salary))
+HR_Analytics_FT$Per <- (HR_Analytics_FT$Freq/sum(HR_Analytics_FT$Freq))*100
+names(HR_Analytics_FT)[1] <- "salary"
+
+# Consider 70% of the data as sample
+HR_Analytics_FT$Strata_Size <- ceiling((HR_Analytics_FT$Freq*(ceiling((dim(HR_Analytics)[1]/100)*70)/sum(HR_Analytics_FT$Freq))))
+HR_Analytics_FT <- with(HR_Analytics_FT,HR_Analytics_FT[order(salary,decreasing = FALSE),])
+HR_Analytics <- with(HR_Analytics,HR_Analytics[order(salary,decreasing = FALSE),])
+
+# Stratification
+set.seed(1256)
+HR_Analytics_Strata <- strata(HR_Analytics,c("salary"),size = HR_Analytics_FT$Strata_Size, method = "srswor")
+HR_Analytics_StRS_Train <- getdata(HR_Analytics,HR_Analytics_Strata)
+head(HR_Analytics_StRS_Train)
+
+# Test data
+library(sqldf)
+HR_Analytics_StRS_Test <- sqldf("select a.* from HR_Analytics a 
+                           left join HR_Analytics_StRS_Train b on a.row_id=b.row_id
+                           where b.row_id is NULL")
+
+HR_Analytics_StRS_Train[,c("row_id","ID_unit","Prob","Stratum")] <- NULL
+HR_Analytics_StRS_Test[,c("row_id","ID_unit","Prob","Stratum")] <- NULL
+```
+
+---
+
+##### **Create dummy variables for work accident, promotion, salary**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(dummies)
+HR_Analytics_StRS_Train_DV <- cbind(HR_Analytics_StRS_Train[c(7,1:5)], dummy.data.frame(HR_Analytics_StRS_Train[,c("Work_accident","promotion_last_5years","salary")]))
+
+HR_Analytics_StRS_Test_DV <- cbind(HR_Analytics_StRS_Test[c(7,1:5)], dummy.data.frame(HR_Analytics_StRS_Test[,c("Work_accident","promotion_last_5years","salary")]))
+
+HR_Analytics_StRS_Train_DV <- cbind(HR_Analytics_StRS_Train[c(7,1:6,8)], dummy.data.frame(HR_Analytics_StRS_Train["salary"]))
+HR_Analytics_StRS_Train_DV$salaryhigh <- NULL
+HR_Analytics_StRS_Train_DV$Work_accident <- as.numeric(HR_Analytics_StRS_Train_DV$Work_accident)
+HR_Analytics_StRS_Train_DV$promotion_last_5years <- as.numeric(HR_Analytics_StRS_Train_DV$promotion_last_5years)
+
+HR_Analytics_StRS_Test_DV <- cbind(HR_Analytics_StRS_Test[c(7,1:6,8)], dummy.data.frame(HR_Analytics_StRS_Test["salary"]))
+```
+
+---
+
+##### **Linear Discriminant Analysis**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(MASS)
+LDA <- lda(left ~., data = HR_Analytics_StRS_Train_DV)
+LDA$svd # 52% of the variations are explanied by LD1 however only 45% of variation explained by PC1
+
+LDA_Pred <- predict(LDA,newdata = HR_Analytics_StRS_Train_DV)
+LDA_Plot <- data.frame(lda=LDA_Pred$x,left=HR_Analytics_StRS_Train_DV$left)
+
+library(ggplot2)
+library(scales)
+# ggplot(LDA_Plot) + geom_point(aes(lda.LD1, # it doesnt has LD2, colour = left, shape = left), size = 2.5) +
+#   labs(x = paste("PC1 (", percent((LDA$svd/sum(LDA$svd))[1]), ")", sep=""),
+#        y = paste("PC2 (", percent((LDA$svd/sum(LDA$svd))[2]), ")", sep=""))
+
+```
+
+---
+
+#### **Partial Least Square(PLS)** 

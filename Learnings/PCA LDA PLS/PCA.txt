@@ -1,0 +1,9 @@
+http://sebastianraschka.com/Articles/2015_pca_in_3_steps.html
+
+http://stats.stackexchange.com/questions/32697/next-steps-after-performing-a-principal-component-analysis
+
+https://www.researchgate.net/post/Should_I_insert_dependent_variable_into_Principal_Component_Analysis
+
+http://stats.stackexchange.com/questions/213938/principal-components-for-dependent-variable-in-a-regression
+
+http://stats.stackexchange.com/questions/143905/loadings-vs-eigenvectors-in-pca-when-to-use-one-or-another
