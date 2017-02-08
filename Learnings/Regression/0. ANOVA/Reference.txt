@@ -1,0 +1,11 @@
+http://www.gardenersown.co.uk/education/lectures/r/anova.htm
+https://www.r-bloggers.com/one-way-analysis-of-variance-anova/
+
+http://www.theanalysisfactor.com/why-anova-and-linear-regression-are-the-same-analysis/
+http://stats.stackexchange.com/questions/190984/anova-vs-multiple-linear-regression-why-is-anova-so-commonly-used-in-experiment
+http://www.pmean.com/08/RegressionAndAnova.html
+
+http://www.theanalysisfactor.com/why-anova-and-linear-regression-are-the-same-analysis/
+http://www.pmean.com/08/RegressionAndAnova.html
+
+http://stattrek.com/regression/linear-transformation.aspx?Tutorial=AP
