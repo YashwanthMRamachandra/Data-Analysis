@@ -1,0 +1,3 @@
+https://onlinecourses.science.psu.edu/stat504/book/export/html/150
+
+http://www.statisticssolutions.com/assumptions-of-logistic-regression/
