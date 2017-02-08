@@ -1,0 +1,213 @@
+---
+title: "Decision Tree"
+output: html_notebook
+---
+
+### **Research question : Predict which client will subscribe to the term deposit**
+
+
+```{r,echo=FALSE,warning=FALSE}
+library(openxlsx)
+DMC_PBI_Input <- read.xlsx("H:/Yashwanth/Learnings/Machine Learning/Decision Tree/bank-additional-full.xlsx",
+                           sheet = 1)
+DMC_PBI <- DMC_PBI_Input
+DMC_PBI[sapply(DMC_PBI,is.character)] <- lapply(DMC_PBI[sapply(DMC_PBI,is.character)],as.factor)
+DMC_PBI$row_id <- row.names(DMC_PBI)
+```
+---
+
+##### **Stratified Random Sampling**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(sampling)
+DMC_PBI_FT <- data.frame(table(DMC_PBI$contact))
+DMC_PBI_FT$Per <- (DMC_PBI_FT$Freq/sum(DMC_PBI_FT$Freq))*100
+names(DMC_PBI_FT)[1] <- "contact"
+
+# Consider 70% of the data as sample
+DMC_PBI_FT$Strata_Size <- ceiling((DMC_PBI_FT$Freq*(ceiling((dim(DMC_PBI)[1]/100)*70)/sum(DMC_PBI_FT$Freq))))
+DMC_PBI_FT <- with(DMC_PBI_FT,DMC_PBI_FT[order(Strata_Size,decreasing = FALSE),])
+
+# Stratification
+set.seed(1256)
+DMC_PBI_Strata <- strata(DMC_PBI,c("contact"),size = DMC_PBI_FT$Strata_Size, method = "srswor")
+DMC_PBI_StRS <- getdata(DMC_PBI,DMC_PBI_Strata)
+head(DMC_PBI_StRS)
+
+# Test data
+library(sqldf)
+DMC_PBI_StRS_Test <- sqldf("select a.* from DMC_PBI a 
+                           left join DMC_PBI_StRS b on a.row_id=b.row_id
+                           where b.row_id is NULL")
+```
+
+### **Decision Tree Model**
+
+```{r, echo=FALSE, warning=FALSE}
+library(rpart)
+library(rattle)					  # Fancy tree plot
+library(rpart.plot)				# Enhanced tree plots
+library(RColorBrewer)			# Color selection for fancy tree plot
+library(party)					  # Alternative decision tree algorithm
+library(partykit)				  # Convert rpart object to BinaryTree
+library(caret)	
+
+DMC_PBI_StRS$row_id <- NULL
+DMC_PBI_StRS <- DMC_PBI_StRS[,1:(ncol(DMC_PBI_StRS)-3)]
+set(1234)
+DMC_PBI_DT <- rpart(y ~ ., data=DMC_PBI_StRS,method="class", 
+                    parms = list(split = "gini")) # By default "gini". Optional="information"(entropy)
+#summary(DMC_PBI_DT)
+rsq.rpart(DMC_PBI_DT)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+library(ROSE)
+# check how model is doing using test data
+DMC_PBI_DT_Pred <- predict(DMC_PBI_DT,DMC_PBI_StRS_Test)
+accuracy.meas(DMC_PBI_StRS_Test$y, DMC_PBI_DT_Pred[,2])
+roc.curve(DMC_PBI_StRS_Test$y, DMC_PBI_DT_Pred[,2])
+DMC_PBI_DT_Pred$predicted_response <- predict(DMC_PBI_DT,DMC_PBI_StRS_Test, type = "class")
+confusionMatrix(reference = DMC_PBI_StRS_Test$y, data=DMC_PBI_DT_Pred$predicted_response, positive = "yes")
+
+# Prune tree
+# cross validation to check where to stop pruning :  Get cps'
+printcp(DMC_PBI_DT)
+plotcp(DMC_PBI_DT)
+
+# Pruning # Increase cp-value : refer help(prune.rpart)
+DMC_PBI_DT_Prune <- prune(DMC_PBI_DT,cp=0.06)
+
+# Accuracy, Recall, Precision & F-measure(Harmonic avg between Precision & Recall): (0.113*1)/(0.113+1)
+DMC_PBI_DT_Prune_Pred <- predict(DMC_PBI_DT_Prune,DMC_PBI_StRS_Test)
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_Prune_Pred[,2])
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_DT_Prune_Pred[,2]) # http://gim.unmc.edu/dxtests/roc3.htm
+DMC_PBI_DT_Prune_Pred$predicted_response <- predict(DMC_PBI_DT_Prune,DMC_PBI_StRS_Test, type = "class")
+confusionMatrix(reference = DMC_PBI_StRS_Test$y, data=DMC_PBI_DT_Prune_Pred$predicted_response, positive = "yes")
+
+# A fancy plot from rattle
+fancyRpartPlot(DMC_PBI_DT)
+```
+
+##### **Insights**
+* nr_employeed >= 5088 & duration<522 has not-subscribed(N) for product(78%)
+* nr_employeed >= 5088 & 522<duration<836 has not-subscribed(N) for product(6%)
+* nr_employeed >= 5088 & duration>836 has subscribed(Y) for product(3%)
+
+* nr_employeed < 5088 & duration<172 has not-subscribed(N) for product(5%)
+
+* nr_employeed < 5088 & duration>172 has subscribed(Y) for product(2%)
+* nr_employeed < 5088 & duration>172 & pdays<513 has subscribed(Y) for product
+
+* nr_employeed < 5088 & duration>172 & pdays>=513 has subscribed(Y) for product
+* nr_employeed < 5088 & duration>172 & pdays>=513 & duration<320 has not-subscribed(N) for product(3%)
+* nr_employeed < 5088 & duration>172 & pdays>=513 & duration>320 has subscribed(N) for product(2%)
+
+* (required only in the case of high accuracy/overfit)COnclusion : Pruning decreases Accuracy by only 0.8%.
+
+---
+
+### **Decision Tree Model : Controls**
+
+```{r, echo=FALSE, warning=FALSE}
+set(4742)
+DMC_PBI_DT_Controls <- rpart(y ~ ., data=DMC_PBI_StRS,method="class", 
+                             control = rpart.control(minsplit = 500,minbucket = 200,maxdepth = 10,maxcompete = 10))
+#summary(DMC_PBI_DT_Controls)
+rsq.rpart(DMC_PBI_DT_Controls)
+```
+
+```{r, echo=FALSE, warning=FALSE}
+# check how model is doing using test data
+DMC_PBI_DT_Controls_Pred <- predict(DMC_PBI_DT_Controls,DMC_PBI_StRS_Test)
+DMC_PBI_DT_Controls_Pred$predicted_response <- predict(DMC_PBI_DT_Controls,DMC_PBI_StRS_Test, type = "class")
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_Controls_Pred[,2])
+confusionMatrix(reference = DMC_PBI_StRS_Test$y, 
+                data=DMC_PBI_DT_Controls_Pred$predicted_response, positive = "yes")
+
+# Prune tree
+# cross validation to check where to stop pruning :  Get cps'
+printcp(DMC_PBI_DT_Controls)
+plotcp(DMC_PBI_DT_Controls)
+
+# Pruning # Increase cp-value : refer help(prune.rpart)
+DMC_PBI_DT_Controls_Prune <- prune(DMC_PBI_DT_Controls,cp=0.012,nsplit=7)
+
+# check how model is doing using test data
+# Accuracy, Recall, Precision & F-measure(Harmonic avg between Precision & Recall): (0.113*1)/(0.113+1)
+DMC_PBI_DT_Controls_Prune_Pred <- predict(DMC_PBI_DT_Controls_Prune,DMC_PBI_StRS_Test)
+DMC_PBI_DT_Controls_Prune_Pred$predicted_response <- predict(DMC_PBI_DT_Controls_Prune,DMC_PBI_StRS_Test, 
+                                                             type = "class")
+confusionMatrix(reference = DMC_PBI_StRS_Test$y, 
+                data=DMC_PBI_DT_Controls_Prune_Pred$predicted_response, positive = "yes")
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_Controls_Prune_Pred[,2])
+
+# ROC-curve http://gim.unmc.edu/dxtests/roc3.htm
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_DT_Controls_Prune_Pred[,2], plotit = F)
+
+# A fancy plot from rattle
+fancyRpartPlot(DMC_PBI_DT_Controls)				
+```
+##### **Insigths**
+
+* Conclusion : Even after controls imputed, misclassification remain same & hence the actual tree is the best fit.
+
+---
+
+### **Decision Tree Model : Imbalanced classification(IC)**
+
+```{r, echo=FALSE, warning=FALSE}
+table(DMC_PBI$y)
+prop.table(table(DMC_PBI$y))
+table(DMC_PBI_StRS$y)
+prop.table(table(DMC_PBI_StRS$y))
+
+DMC_PBI_DT_IC_US <- ovun.sample(y ~., data = DMC_PBI_StRS, method = "under", 
+                                N = table(DMC_PBI_StRS$y)[2]*2, seed = 1)$data
+table(DMC_PBI_DT_IC_US$y)
+
+DMC_PBI_DT_IC_OS <- ovun.sample(y ~., data = DMC_PBI_StRS, method = "over", N = table(DMC_PBI_StRS$y)[1]*2)$data
+table(DMC_PBI_DT_IC_OS$y)
+
+DMC_PBI_DT_IC_Both <- ovun.sample(y ~., data = DMC_PBI_StRS, method = "both", 
+                                  N = dim(DMC_PBI_StRS)[1], p = 0.5, seed = 1)$data
+table(DMC_PBI_DT_IC_Both$y)
+
+DMC_PBI_DT_IC_ROSE <- ROSE(y ~., data = DMC_PBI_StRS, seed = 1)$data
+table(DMC_PBI_DT_IC_ROSE$y)
+
+
+# Build tree for all 4-methods
+set(1234)
+DMC_PBI_DT_IC_US_DT <- rpart(y ~ ., data=DMC_PBI_DT_IC_US,method="class")
+set(1234)
+DMC_PBI_DT_IC_OS_DT <- rpart(y ~ ., data=DMC_PBI_DT_IC_OS,method="class")
+set(1234)
+DMC_PBI_DT_IC_Both_DT <- rpart(y ~ ., data=DMC_PBI_DT_IC_Both,method="class")
+set(1234)
+DMC_PBI_DT_IC_ROSE_DT <- rpart(y ~ ., data=DMC_PBI_DT_IC_ROSE,method="class")
+
+
+# Prediction on unseen data
+DMC_PBI_DT_IC_US_DT_Pred <- predict(DMC_PBI_DT_IC_US_DT, DMC_PBI_StRS_Test)
+DMC_PBI_DT_IC_OS_DT_Pred <- predict(DMC_PBI_DT_IC_OS_DT, DMC_PBI_StRS_Test)
+DMC_PBI_DT_IC_Both_DT_Pred <- predict(DMC_PBI_DT_IC_Both_DT, DMC_PBI_StRS_Test)
+DMC_PBI_DT_IC_ROSE_DT_Pred <- predict(DMC_PBI_DT_IC_ROSE_DT, DMC_PBI_StRS_Test)
+
+
+# Accuracy
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_US_DT_Pred[,2])
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_OS_DT_Pred[,2])
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_Both_DT_Pred[,2])
+accuracy.meas(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_ROSE_DT_Pred[,2])
+
+# ROC-curve
+par(mfrow=c(2,2))
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_US_DT_Pred[,2])
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_OS_DT_Pred[,2])
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_Both_DT_Pred[,2])
+roc.curve(DMC_PBI_StRS_Test$y,DMC_PBI_DT_IC_ROSE_DT_Pred[,2])
+```
+
+##### **Insights**
+* AUC w.r.t ROSE is lesser than other method because minority class has sufficient proportion(89:11) of observations
