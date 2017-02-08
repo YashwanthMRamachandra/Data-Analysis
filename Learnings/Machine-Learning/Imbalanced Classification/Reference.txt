@@ -1,0 +1,5 @@
+*** https://www.analyticsvidhya.com/blog/2016/03/practical-guide-deal-imbalanced-classification-problems/
+
+http://machinelearningmastery.com/tactics-to-combat-imbalanced-classes-in-your-machine-learning-dataset/
+
+https://www.quora.com/In-classification-how-do-you-handle-an-unbalanced-training-set
