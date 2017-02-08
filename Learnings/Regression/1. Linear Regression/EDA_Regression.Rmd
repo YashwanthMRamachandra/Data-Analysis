@@ -1,0 +1,123 @@
+---
+title: "Exploratory Data Analysis"
+output: html_notebook
+---
+
+### **Exploratory Data Analysis with all possible experiments** 
+
+```{r,echo=FALSE,warning=FALSE}
+library(openxlsx)
+DMC_PBI_Input <- read.xlsx("H:/Yashwanth/Learnings/Machine Learning/Decision Tree/bank-additional-full.xlsx",
+                           sheet = 1)
+DMC_PBI <- DMC_PBI_Input
+DMC_PBI[sapply(DMC_PBI,is.character)] <- lapply(DMC_PBI[sapply(DMC_PBI,is.character)],as.factor)
+DMC_PBI$row_id <- row.names(DMC_PBI)
+```
+
+---
+
+### **Variable Identification** 
+
+```{r,echo=FALSE,warning=FALSE}
+data.frame(data_type=sapply(DMC_PBI,class))
+```
+
+---
+
+### **Uni-variate Analysis** 
+
+```{r,echo=FALSE,warning=FALSE}
+library(psych)
+describeBy(DMC_PBI[sapply(DMC_PBI, is.numeric)])
+```
+
+---
+
+##### **Proportion tables** 
+```{r, echo=FALSE, warnings=FALSE}
+# https://www.datacamp.com/community/tutorials/tutorial-on-loops-in-r#gs.16P3N2Y
+for(i in 1:ncol(DMC_PBI[sapply(DMC_PBI,is.factor)])){
+  print(prop.table(table(DMC_PBI[sapply(DMC_PBI,is.factor)][i]))*100)
+}
+```
+
+---
+
+#### **Distribution of Variables : Histogram**
+
+```{r, echo=FALSE, warning=FALSE}
+library(ggplot2)
+DMC_PBI_Num <- data.Normalization(data.frame(DMC_PBI[sapply(DMC_PBI,is.numeric)]),type = "n1")
+# lapply(DMC_PBI_Num,range)
+# lapply(DMC_PBI_Num,function(x){length(unique(x))})
+
+for(i in 1:ncol(DMC_PBI_Num)){
+attach(DMC_PBI_Num)
+  print(ggplot(DMC_PBI_Num,aes(x=i)) +
+  facet_wrap( ~ DMC_PBI$y) +
+  geom_histogram(aes(y=..density..),col = "blue2", bins = 50) +
+  stat_function(fun = dnorm,args = list(mean=mean(i),sd=sd(i)),colour = "red") +
+  labs(title = paste("Distribution of",names(DMC_PBI_Num)[i],sep = " "), x ="subscribe", y=names(DMC_PBI_Num)[i]) +
+  theme(plot.title = element_text(hjust = 0.5)))
+  detach(DMC_PBI_Num)
+}
+```
+
+---
+
+#### **Distribution of Variables : Boxplot**
+
+```{r, echo=FALSE, warning=FALSE}
+for(i in 1:ncol(DMC_PBI_Num)){
+attach(DMC_PBI_Num)
+print(ggplot(DMC_PBI_Num,aes(DMC_PBI$y,i)) +
+  geom_boxplot() +
+  labs(title = paste("Distribution of",names(DMC_PBI_Num)[i],sep = " "), x ="subscribe", y=names(DMC_PBI_Num)[i]) +   theme(plot.title = element_text(hjust = 0.5)))
+detach(DMC_PBI_Num)
+}
+```
+
+---
+
+#### **Relationship between Variables : Scatterplot**
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(DMC_PBI_Num)
+ggplot(DMC_PBI_Num, aes(last_evaluation,satisfaction_level)) +
+  facet_wrap(~DMC_PBI$contact) +
+  geom_point(aes(color=left)) +
+  geom_abline(color = "red") +
+  labs(title="Relationship between Satisfaction level & Last Evaluation", 
+       x = "last evaluation", y = "satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(DMC_PBI_Num)
+```
+
+---
+
+#### **Bi-variate analysis : Two-way table**
+
+```{r, echo=FALSE, warnings=FALSE}
+DMC_PBI_Cat <- DMC_PBI[sapply(DMC_PBI,is.factor)]
+for(i in 1:ncol(DMC_PBI_Cat)){
+    if(i==ncol(DMC_PBI_Cat)) {
+    break
+    }
+  print(table(DMC_PBI_Cat[,i],DMC_PBI_Cat[,i+1]))
+}
+```
+
+---
+
+#### **Bi-variate analysis : Chi-Square**
+
+```{r, echo=FALSE, warnings=FALSE}
+for(i in 1:ncol(DMC_PBI_Cat)){
+  if(i==ncol(DMC_PBI_Cat)) {
+    break
+    }
+  print(chisq.test(DMC_PBI_Cat[,i], DMC_PBI_Cat[,i+1]))
+}
+```
+
+---

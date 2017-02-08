@@ -1,0 +1,434 @@
+---
+title: "Linear Regression"
+output: html_notebook
+---
+
+### **Research question : HR wants to evaluate how satisfied employees working for their Organization in order to define better employee retention policies**
+
+#### **Hypothesis: Is there any significant difference between dependent & independent variables**
+##### 	Null Hypothesis: There is NO significant difference between Satisfaction level & number of projects, average monthly hours, time spend in company, work accident, promotion last year, last evaluation
+##### 	Alternate Hypothesis: There is a significant difference between Satisfaction level & number of projects, average monthly hours, time spent in company, work accident, promotion last year, last evaluation
+
+```{r, echo=FALSE, warnings=FALSE}
+library(openxlsx)
+HR_Analytics <- read.xlsx("H:/Yashwanth/Kaggle/HR_comma_sep.xlsx",sheet = 1)
+HR_Analytics$left <- factor(HR_Analytics$left, labels = c("Retain","Left"))
+HR_Analytics$Work_accident <- as.factor(HR_Analytics$Work_accident)
+HR_Analytics$promotion_last_5years <- as.factor(HR_Analytics$promotion_last_5years)
+```
+---
+
+#### **Proportion tables**
+```{r, echo=FALSE, warnings=FALSE}
+print(rbind(left=prop.table(table(HR_Analytics$left))*100,                              
+      Work_accident=prop.table(table(HR_Analytics$Work_accident))*100,
+      promotion_last_5years=prop.table(table(HR_Analytics$promotion_last_5years))*100))
+      
+print(rbind(salary=prop.table(table(HR_Analytics$salary,HR_Analytics$left))*100))
+
+print(rbind(Department=prop.table(table(HR_Analytics$Department,HR_Analytics$left))*100))
+```
+**Insights**
+
+* ~24% of employees has left organization
+* ~14% of employees had Work accident
+* ~2% of employees got promoted
+* ~ 14% of employees from Low salary & ~9% of employees from medium salary has left organization
+* ~7%, 4% and 5% of employees from Sales, Support & Technical department has left organization respectively
+
+---
+
+#### **Distribution of Variables : Histogram**
+
+```{r, echo=FALSE, warning=FALSE}
+library(ggplot2)
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(x=satisfaction_level)) +
+  facet_wrap(~ left)+
+  geom_histogram(aes(y=..density..),col = "blue2",bins = 40) +
+  stat_function(fun = dnorm,args = list(mean=mean(last_evaluation),sd=sd(last_evaluation)),colour = "red") +
+  labs(title = "Distribution of Satisfaction level", x = "left", y = "Satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+library(psych)
+print(describeBy(HR_Analytics$satisfaction_level,group = HR_Analytics$left)[1:2])
+```
+
+* Distribution of Satisfaction levels across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(x=last_evaluation)) +
+  facet_wrap(~ left)+
+  geom_histogram(aes(y=..density..),col = "blue2", bins = 40) +
+  stat_function(fun = dnorm,args = list(mean=mean(last_evaluation),sd=sd(last_evaluation)),colour = "red") +
+  labs(title = "Distribution of Last Evaluation", x = "left", y = "Last Evaluation") +
+  theme(plot.title = element_text(hjust = 0.50))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+print(describeBy(HR_Analytics$last_evaluation,group = HR_Analytics$left)[1:2])
+```
+
+* Distribution of Last Evaluation across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(x=number_project)) +
+  facet_wrap(~ left)+
+  geom_histogram(aes(y=..density..),col = "blue2", bins = 20) +
+  stat_function(fun = dnorm,args = list(mean=mean(number_project),sd=sd(number_project)),colour = "red") +
+  labs(title = "Distribution of Number of Projects", x = "left", y = "Number of Project") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+print(describeBy(HR_Analytics$number_project,group = HR_Analytics$left)[1:2])
+```
+
+* Distribution of Number of Projects across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(x=average_monthly_hours)) +
+  facet_wrap(~ left)+
+  geom_histogram(aes(y=..density..),col = "blue2", bins = 40) +
+  stat_function(fun = dnorm,args = list(mean=mean(average_monthly_hours),sd=sd(average_monthly_hours)),
+                colour = "red") +
+  labs(title = "Distribution of Average Monthly Hours", x = "left", y = "Average Monthly Hours") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+print(describeBy(HR_Analytics$average_monthly_hours,group = HR_Analytics$left)[1:2])
+```
+
+* Distribution of Average Monthly hours across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(x=time_spend_company)) +
+  facet_wrap(~ left)+
+  geom_histogram(aes(y=..density..),col = "blue2", bins = 40) +
+  stat_function(fun = dnorm,args = list(mean=mean(time_spend_company),sd=sd(time_spend_company)),colour = "red") +
+  labs(title = "Distribution of Time Spend in Company", x = "left", y = "Time Spend in Company") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+print(describeBy(HR_Analytics$time_spend_company,group = HR_Analytics$left)[1:2])
+```
+
+* Distribution of Time Spend in Company of the employees who retained appears right skewed & who left appears normal
+
+---
+
+#### **Distribution of Variables : Boxplot**
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(left,satisfaction_level)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Satisfaction level", x = "left", y = "Satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+* Distribution of Satisfaction levels across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(left,last_evaluation)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Last Evaluation", x = "left", y = "Last Evaluation") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+* Distribution of Last Evaluation across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(left,number_project)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Number of Projects", x = "left", y = "Number of Project") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+* 50th & 75th percentile of employees who retained shares same number of projects with one outlier(6)
+* Distribution of Number of Projects across employees who left from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(left,average_monthly_hours)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Average Monthly Hours", x = "left", y = "Average Monthly Hours") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+* Distribution of Average Monthly Hours across employees who retained & left in/from the organization appears normal
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics,aes(left,time_spend_company)) +
+  geom_boxplot() +
+  labs(title = "Distribution of Time Spend in Company", x = "left", y = "Time Spend in Company") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+* Distribution of Average Monthly Hours across employees who retained appeared right skewed with outliers
+* Distribution of Average Monthly Hours across employees who left appears normal
+
+---
+
+#### **Relationship between Variables : Scatterplot**
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics, aes(last_evaluation,satisfaction_level)) +
+  facet_wrap(~left) +
+  geom_point(aes(color=left)) +
+  geom_abline(color = "red") +
+  labs(title="Relationship between Satisfaction level & Last Evaluation", 
+       x = "last evaluation", y = "satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+```{r, echo=FALSE, warnings=FALSE}
+library(data.table)
+HR_Analytics <- data.table(HR_Analytics)
+print(HR_Analytics[,.(cor(satisfaction_level, last_evaluation)), by = left])
+HR_Analytics <- data.frame(HR_Analytics)
+print(cor(HR_Analytics$satisfaction_level,HR_Analytics$last_evaluation))
+```
+
+* There is Weak relationship between Satisfaction level & Last evaluation across employees who retained & left in/from the Organization
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics, aes(scale(HR_Analytics$number_project)[,1],scale(HR_Analytics$satisfaction_level)[,1])) +
+  facet_wrap(~left) +
+  geom_point(aes(color=left)) +
+  geom_abline(color = "red") +
+  labs(title="Relationship between Satisfaction level & Number of Projects", 
+       x = "Number of Projects", y = "satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+HR_Analytics <- data.table(HR_Analytics)
+print(HR_Analytics[,.(cor(satisfaction_level, number_project)), by = left])
+HR_Analytics <- data.frame(HR_Analytics)
+print(cor(HR_Analytics$satisfaction_level,HR_Analytics$number_project))
+```
+
+* There is Weak relationship between Satisfaction level & Number of Projects across employees who retained & left in/from the Organization
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics, aes(scale(average_monthly_hours)[,1],scale(satisfaction_level)[,1])) +
+  facet_wrap(~left) +
+  geom_point(aes(color=left)) +
+  geom_abline(color = "red") +
+  labs(title="Relationship between Satisfaction level & Average Monthly Hours", 
+       x = "average monthly hours", y = "satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+HR_Analytics <- data.table(HR_Analytics)
+print(HR_Analytics[,.(cor(satisfaction_level, average_monthly_hours)), by = left])
+HR_Analytics <- data.frame(HR_Analytics)
+print(cor(HR_Analytics$satisfaction_level,HR_Analytics$average_monthly_hours))
+```
+
+* There is Weak relationship between Satisfaction level & Average Monthly Hours across employees who retained & left in/from the Organization
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+attach(HR_Analytics)
+ggplot(HR_Analytics, aes(scale(time_spend_company)[,1],scale(satisfaction_level)[,1])) +
+  facet_wrap(~left) +
+  geom_point(aes(color=left)) +
+  geom_abline(color = "red") +
+  labs(title="Relationship between Satisfaction level & Time Spend in Company", 
+       x = "time spend in company", y = "satisfaction level") +
+  theme(plot.title = element_text(hjust = 0.5))
+detach(HR_Analytics)
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+HR_Analytics <- data.table(HR_Analytics)
+print(HR_Analytics[,.(cor(satisfaction_level, time_spend_company)), by = left])
+HR_Analytics <- data.frame(HR_Analytics)
+print(cor(HR_Analytics$satisfaction_level,HR_Analytics$time_spend_company))
+```
+
+* There is Weak relationship between Satisfaction level & Time Spend across employees who retained in the Organization
+* There is fairly strong relationship between Satisfaction level & Time Spend across employees who left from Organization
+
+---
+
+#### **Relationship between Variables(Correlation Analysis) : Tetrachoric & Polychoric Correlation** [Reference](http://john-uebersax.com/stat/tetra.htm#tsoft)
+
+```{r, echo=FALSE, warnings=FALSE}
+library(polycor)
+polychor(table(HR_Analytics$left,HR_Analytics$Work_accident), ML = T, std.err = T)
+```
+* There is fairly negative relationship between employees who left & work accident
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+polychor(table(HR_Analytics$left,HR_Analytics$promotion_last_5years), ML = T, std.err = T)
+```
+* There is fairly negative relationship between employees who left & given promotion in last 5-years
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+polychor(table(HR_Analytics$left,HR_Analytics$salary), ML = T, std.err = T)
+```
+* There is weak negative relationship between employees who left & salary break-up
+
+---
+
+#### **Correlation Matrix**
+
+```{r, echo=FALSE, warnings=FALSE}
+cor(HR_Analytics[sapply(HR_Analytics,is.numeric)])
+```
+* In general, there is no strong correlation exists between variables
+
+---
+
+#### **ANOVA**
+##### Null Hypothesis: There is NO significant relationship between means(SL) of groups of left & other attributes
+##### Alternate Hypothesis: There is significant relationship between means(SL) of groups of left & other attributes
+
+```{r, echo=FALSE, warnings=FALSE}
+anova(lm(satisfaction_level ~ Work_accident+promotion_last_5years+salary, data = HR_Analytics))
+```
+
+```{r, echo=FALSE, warnings=FALSE}
+TukeyHSD(aov(satisfaction_level ~ Work_accident+promotion_last_5years+salary, data = HR_Analytics))
+```
+
+##### **Insights**
+
+* There is a significant difference in the means of satisfaction level against work accident, promotion last 5-years & salary(low-high,medium-low)
+* However, there is only 84% significant difference in the means of satisfaction level against medium-high salary bucket
+
+---
+
+#### **Principal Component Analysis**
+
+```{r, echo=FALSE, warning=FALSE}
+# PCA
+PCA <- prcomp(HR_Analytics[sapply(HR_Analytics,is.numeric)][2:5],cor=TRUE, scale. = TRUE, retx = TRUE);PCA
+summary(PCA)
+
+#plot of variance of each PCA. It will be useful to decide how many principal components should be retained.
+screeplot(PCA, type="lines",col=3) # 3-components can be retained
+
+#biplot of first two principal components
+biplot(PCA,cex=0.8)
+abline(h = 0, v = 0, lty = 2, col = 8)
+title("Bi-Plot")
+
+# Identify which variable to drop
+library(raster)
+print(t(lapply(HR_Analytics[sapply(HR_Analytics,is.numeric)],sd)))
+print(t(lapply(HR_Analytics[sapply(HR_Analytics,is.numeric)],cv)))
+
+```
+
+* Drop time_spend_company variable & continue transformation with first-3-components
+
+* Note: As there are only few Variables, PCA is unable/not-suitable to explain more variances. Hence regression might not be prefered on PCA loadings
+
+---
+
+#### **Linear Regression**
+##### Null Hypothesis: There is NO significant relationship between satisfaction level & other attributes
+##### Alternate Hypothesis: There is significant relationship between satisfaction level & other attributes
+
+##### **Simple/Stratified Random Sampling**
+
+```{r, echo=FALSE, warnings=FALSE}
+library(sampling)
+HR_Analytics_Trans <- data.frame(PCA$x[,1:3])
+names(HR_Analytics_Trans) <- names(HR_Analytics)[2:4]
+HR_Analytics_Trans_Final <- cbind(satisfaction_level=HR_Analytics$satisfaction_level,HR_Analytics_Trans,
+                                  HR_Analytics[c("Work_accident","promotion_last_5years","salary")])
+
+HR_Analytics_Trans_Final_FT <- data.frame(table(HR_Analytics_Trans_Final$salary))
+HR_Analytics_Trans_Final_FT$Per <- (HR_Analytics_Trans_Final_FT$Freq/sum(HR_Analytics_Trans_Final_FT$Freq))*100
+names(HR_Analytics_Trans_Final_FT)[1] <- "salary"
+
+# Consider 70% of the data as sample
+HR_Analytics_Trans_Final_FT$Strata_Size <- ceiling((HR_Analytics_Trans_Final_FT$Freq*(ceiling((dim(HR_Analytics_Trans_Final)[1]/100)*70)/sum(HR_Analytics_Trans_Final_FT$Freq))))
+HR_Analytics_Trans_Final_FT <- with(HR_Analytics_Trans_Final_FT,HR_Analytics_Trans_Final_FT[order(Strata_Size,decreasing = TRUE),])
+
+# Stratification
+HR_Analytics_Trans_Final_Strata <- strata(HR_Analytics_Trans_Final,c("salary"),
+                                          size = HR_Analytics_Trans_Final_FT$Strata_Size, method = "srswor")
+HR_Analytics_Trans_StRS <- getdata(HR_Analytics_Trans_Final,HR_Analytics_Trans_Final_Strata)
+head(HR_Analytics_Trans_StRS)
+```
+
+##### **Linear Model** [Reference](http://stattrek.com/regression/linear-transformation.aspx?Tutorial=AP)
+
+```{r, echo=FALSE, warnings=FALSE}
+# Linear Model
+summary(lm(satisfaction_level ~ last_evaluation+number_project+average_monthly_hours+Work_accident+
+             promotion_last_5years+salary, data = HR_Analytics_Trans_StRS))
+par(mfrow = c(2,2))
+plot(lm(satisfaction_level ~ last_evaluation+number_project+average_monthly_hours+Work_accident+
+             promotion_last_5years+salary, data = HR_Analytics_Trans_StRS))
+```
+
+---
+
+```{r, echo=FALSE, warnings=FALSE}
+# Transformation methods: Linear Model
+summary(lm(log(satisfaction_level) ~ last_evaluation+number_project+average_monthly_hours+Work_accident+
+             promotion_last_5years+salary, data = HR_Analytics_Trans_StRS))
+par(mfrow = c(2,2))
+plot(lm(exp(satisfaction_level) ~ last_evaluation+number_project+average_monthly_hours+Work_accident+
+             promotion_last_5years+salary, data = HR_Analytics_Trans_StRS))
+```
+
+##### **Insights**
+
+* Log-transformation is successful. However, overall varaitions explained by the model is just ~10%(~5%). Hence model will have poor prediction power
+* Since p<0.05, we reject NH & conclude that there is a signficant relationship between satisfaction level & other attributes

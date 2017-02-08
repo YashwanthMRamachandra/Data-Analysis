@@ -1,0 +1,13 @@
+http://groups.chass.utoronto.ca/pol242/Labs/LM-9B/LM-9B_content.htm
+
+http://onlinestatbook.com/2/estimation/confidence.html
+
+http://stats.stackexchange.com/questions/94010/understanding-dummy-manual-or-automated-variable-creation-in-glm
+
+# Null & Alternate Hypothesis example
+http://stattrek.com/statistics/dictionary.aspx?definition=Alternative%20hypothesis
+
+
+http://www.statisticssolutions.com/homoscedasticity/
+http://www.statisticshowto.com/homoscedasticity/
+http://www.statisticssolutions.com/assumptions-of-linear-regression/
